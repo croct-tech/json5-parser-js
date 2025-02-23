@@ -3,6 +3,7 @@ import {JsonValueNode} from './valueNode';
 import {JsonStructureNode, StructureDelimiter} from './structureNode';
 import {JsonCompositeDefinition, JsonCompositeNode, PartialJsonCompositeDefinition} from './compositeNode';
 import {JsonValueFactory} from './factory';
+import {JsonError} from '../error';
 
 export interface JsonArrayDefinition extends JsonCompositeDefinition {
     readonly elements: readonly JsonValueNode[];
@@ -66,7 +67,7 @@ export class JsonArrayNode extends JsonStructureNode implements JsonArrayDefinit
         const element = this.elementNodes[index];
 
         if (!(element instanceof type)) {
-            throw new Error(`Expected ${type.name} at index ${index} but got ${element.constructor.name}`);
+            throw new JsonError(`Expected ${type.name} at index ${index}, but got ${element.constructor.name}.`);
         }
 
         return element;

@@ -8,6 +8,7 @@ import {JsonPrimitiveNode} from './primitiveNode';
 import {JsonValueFactory} from './factory';
 import {JsonTokenType} from '../token';
 import {JsonIdentifierNode} from './identifierNode';
+import {JsonError} from '../error';
 
 export interface JsonObjectDefinition extends JsonCompositeDefinition {
     readonly properties: readonly JsonPropertyNode[];
@@ -165,7 +166,7 @@ export class JsonObjectNode extends JsonStructureNode implements JsonCompositeDe
         const {value} = property;
 
         if (type !== undefined && !(value instanceof type)) {
-            throw new Error(`Expected a value of type ${type.name}, but got ${value.constructor.name}`);
+            throw new JsonError(`Expected a value of type ${type.name}, but got ${value.constructor.name}`);
         }
 
         return value;

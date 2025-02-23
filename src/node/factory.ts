@@ -9,6 +9,7 @@ import {
     JsonPrimitiveNode,
 } from './primitiveNode';
 import {JsonValueNode} from './valueNode';
+import {JsonError} from '../error';
 
 export namespace JsonValueFactory {
     type JsonValueFactories = {
@@ -28,7 +29,7 @@ export namespace JsonValueFactory {
         const factory = factories[type];
 
         if (factory === undefined) {
-            throw new Error(`No factory registered for type ${type}`);
+            throw new JsonError(`No factory registered for type ${type}.`);
         }
 
         return factory;

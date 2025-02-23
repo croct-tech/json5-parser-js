@@ -7,6 +7,7 @@ import {JsonTokenNode} from './tokenNode';
 import {JsonTokenType} from '../token';
 import {JsonValueFactory} from './factory';
 import {isIdentifier} from '../identifier';
+import {JsonError} from '../error';
 
 export interface JsonIdentifierDefinition extends JsonCompositeDefinition {
     readonly token: JsonTokenNode<JsonTokenType.IDENTIFIER>;
@@ -23,7 +24,7 @@ export class JsonIdentifierNode extends JsonValueNode implements JsonIdentifierD
 
     public static of(name: string): JsonIdentifierNode {
         if (!isIdentifier(name)) {
-            throw new Error(`Invalid identifier: ${name}`);
+            throw new JsonError(`Invalid identifier '${name}'.`);
         }
 
         return new JsonIdentifierNode({
