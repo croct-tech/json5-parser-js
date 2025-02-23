@@ -70,6 +70,16 @@ describe('NodeMatcher', () => {
         expect(NodeMatcher.SIGNIFICANT(lineCommentToken)).toBe(false);
         expect(NodeMatcher.SIGNIFICANT(blockCommentToken)).toBe(false);
     });
+
+    it('should match punctuation node', () => {
+        expect(NodeMatcher.PUNCTUATION(new JsonTokenNode({type: JsonTokenType.COLON, value: ':'}))).toBe(true);
+        expect(NodeMatcher.PUNCTUATION(new JsonTokenNode({type: JsonTokenType.COMMA, value: ','}))).toBe(true);
+        expect(NodeMatcher.PUNCTUATION(new JsonTokenNode({type: JsonTokenType.BRACE_LEFT, value: '{'}))).toBe(true);
+        expect(NodeMatcher.PUNCTUATION(new JsonTokenNode({type: JsonTokenType.BRACE_RIGHT, value: '}'}))).toBe(true);
+        expect(NodeMatcher.PUNCTUATION(new JsonTokenNode({type: JsonTokenType.BRACKET_LEFT, value: '['}))).toBe(true);
+        expect(NodeMatcher.PUNCTUATION(new JsonTokenNode({type: JsonTokenType.BRACKET_RIGHT, value: ']'}))).toBe(true);
+        expect(NodeMatcher.PUNCTUATION(new JsonTokenNode({type: JsonTokenType.BOOLEAN, value: 'true'}))).toBe(false);
+    });
 });
 
 describe('NodeManipulator', () => {

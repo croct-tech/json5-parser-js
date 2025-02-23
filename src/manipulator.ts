@@ -38,6 +38,18 @@ export namespace NodeMatcher {
         node instanceof JsonTokenNode
         && node.type === JsonTokenType.BLOCK_COMMENT
     );
+
+    export const PUNCTUATION: NodeMatcher = node => (
+        node instanceof JsonTokenNode
+        && [
+            JsonTokenType.COLON,
+            JsonTokenType.COMMA,
+            JsonTokenType.BRACE_LEFT,
+            JsonTokenType.BRACE_RIGHT,
+            JsonTokenType.BRACKET_LEFT,
+            JsonTokenType.BRACKET_RIGHT,
+        ].includes(node.type)
+    );
 }
 
 export class NodeManipulator {
@@ -254,8 +266,8 @@ export class NodeManipulator {
 
             const node = this.current;
 
-            if (NodeMatcher.SPACE(node)) {
-                // Stop if the previous node is not a space
+            if (NodeMatcher.INSIGNIFICANT(node)) {
+                // Stop if the previous node is a space
                 this.remove();
 
                 continue;
@@ -315,23 +327,21 @@ export class NodeManipulator {
         const previousToken = this.list[this.index - 1] ?? null;
 
         if (currentToken !== null) {
-            if (previousToken === null && NodeMatcher.SPACE(currentToken)) {
+            if (
+                (previousToken === null && NodeMatcher.SPACE(currentToken))
+                || (
+                    removalCount > 0
+                    && (
+                        ((NodeMatcher.BLOCK_COMMENT)(previousToken) && NodeMatcher.PUNCTUATION(currentToken))
+                        || ((NodeMatcher.BLOCK_COMMENT)(currentToken) && NodeMatcher.PUNCTUATION(previousToken))
+                    )
+                )
+            ) {
                 removalCount++;
             } else if (NodeMatcher.NEWLINE(previousToken) && NodeMatcher.NEWLINE(currentToken)) {
                 removalCount++;
                 this.previous();
             } else if (!NodeMatcher.NEWLINE(currentToken)) {
-                removalCount--;
-                this.next();
-            } else if (
-                removalCount > 0
-                // Preserve the leftmost whitespace between inline comments in the following cases:
-                && (
-                    ((NodeMatcher.BLOCK_COMMENT)(previousToken) && NodeManipulator.isLeftPadded(currentToken))
-                    // ✓ If the previous should be padded and the next is a comment
-                    || ((NodeMatcher.BLOCK_COMMENT)(currentToken) && NodeManipulator.isRightPadded(previousToken))
-                )
-            ) {
                 removalCount--;
 
                 this.next();
@@ -388,45 +398,5 @@ export class NodeManipulator {
         }
 
         return NodeMatcher.NONE;
-    }
-
-    private static isLeftPadded(node?: JsonNode): boolean {
-        if (node === undefined || NodeMatcher.NEWLINE(node)) {
-            return false;
-        }
-
-        if (!(node instanceof JsonTokenNode)) {
-            return true;
-        }
-
-        switch (node.type) {
-            case JsonTokenType.BRACE_RIGHT:
-            case JsonTokenType.BRACKET_RIGHT:
-            case JsonTokenType.COLON:
-            case JsonTokenType.COMMA:
-                return false;
-
-            default:
-                return true;
-        }
-    }
-
-    private static isRightPadded(node?: JsonNode): boolean {
-        if (node === undefined || NodeMatcher.NEWLINE(node)) {
-            return false;
-        }
-
-        if (!(node instanceof JsonTokenNode)) {
-            return true;
-        }
-
-        switch (node.type) {
-            case JsonTokenType.BRACE_LEFT:
-            case JsonTokenType.BRACKET_LEFT:
-                return false;
-
-            default:
-                return true;
-        }
     }
 }

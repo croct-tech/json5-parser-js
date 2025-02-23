@@ -2646,6 +2646,96 @@ describe('Functional test', () => {
             },
         },
         {
+            description: 'drop comments preceding an removed element',
+            // language=JSON5
+            input: multiline`
+              [1, /* comment */ 2]
+            `,
+            // language=JSON5
+            output: multiline`
+              [1]
+            `,
+            type: JsonArrayNode,
+            mutation: (node: JsonArrayNode): void => {
+                node.delete(1);
+            },
+        },
+        {
+            description: 'preserve comments preceding an removed element',
+            // language=JSON5
+            input: multiline`
+              [/* comment */ 1]
+            `,
+            // language=JSON5
+            output: multiline`
+              [/* comment */]
+            `,
+            type: JsonArrayNode,
+            mutation: (node: JsonArrayNode): void => {
+                node.delete(0);
+            },
+        },
+        {
+            description: 'preserve preceding a removed element among multiple elements',
+            // language=JSON5
+            input: multiline`
+              [1, /* comment */ 2, 3]
+            `,
+            // language=JSON5
+            output: multiline`
+              [1, /* comment */ 3]
+            `,
+            type: JsonArrayNode,
+            mutation: (node: JsonArrayNode): void => {
+                node.delete(1);
+            },
+        },
+        {
+            description: 'drop comments preceding an removed property',
+            // language=JSON5
+            input: multiline`
+              {foo: 2, /* comment */ bar: 3}
+            `,
+            // language=JSON5
+            output: multiline`
+              {foo: 2}
+            `,
+            type: JsonObjectNode,
+            mutation: (node: JsonObjectNode): void => {
+                node.delete('bar');
+            },
+        },
+        {
+            description: 'preserve comments preceding an removed property',
+            // language=JSON5
+            input: multiline`
+              {/* comment */ foo: 2}
+            `,
+            // language=JSON5
+            output: multiline`
+              {/* comment */}
+            `,
+            type: JsonObjectNode,
+            mutation: (node: JsonObjectNode): void => {
+                node.delete('foo');
+            },
+        },
+        {
+            description: 'preserve preceding a removed property among multiple properties',
+            // language=JSON5
+            input: multiline`
+              {foo: 1, /* comment */ bar: 2, baz: 3}
+            `,
+            // language=JSON5
+            output: multiline`
+              {foo: 1, /* comment */ baz: 3}
+            `,
+            type: JsonObjectNode,
+            mutation: (node: JsonObjectNode): void => {
+                node.delete('bar');
+            },
+        },
+        {
             description: 'use double quotes for property names',
             // language=JSON5
             input: multiline`
