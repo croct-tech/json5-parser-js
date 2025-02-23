@@ -3647,7 +3647,31 @@ describe('JsonLexer', () => {
     it('should throw error on unexpected token', () => {
         const lexer = new JsonLexer('@');
 
-        expect(() => lexer.next()).toThrow('Unexpected token \'@\' at 1:1.');
+        let caughtError: unknown;
+
+        try {
+            lexer.next();
+        } catch (error) {
+            caughtError = error;
+        }
+
+        expect(caughtError).toEqual(
+            new JsonParseError(
+                "Unexpected token '@' at 1:1.",
+                {
+                    start: {
+                        index: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        index: 1,
+                        line: 1,
+                        column: 2,
+                    },
+                },
+            ),
+        );
     });
 
     it('should skip insignificant tokens', () => {
@@ -3700,7 +3724,15 @@ describe('JsonLexer', () => {
 
         lexer.next();
 
-        expect(() => lexer.expect(JsonTokenType.BOOLEAN)).toThrow(
+        let caughtError: unknown;
+
+        try {
+            lexer.expect(JsonTokenType.BOOLEAN);
+        } catch (error) {
+            caughtError = error;
+        }
+
+        expect(caughtError).toEqual(
             new JsonParseError(
                 `Expected ${JsonTokenType.BOOLEAN}, but got ${JsonTokenType.EOF} at 1:1.`,
                 {
@@ -3724,7 +3756,15 @@ describe('JsonLexer', () => {
 
         lexer.next();
 
-        expect(() => lexer.expect(JsonTokenType.BOOLEAN, JsonTokenType.NULL)).toThrow(
+        let caughtError: unknown;
+
+        try {
+            lexer.expect(JsonTokenType.BOOLEAN, JsonTokenType.NULL);
+        } catch (error) {
+            caughtError = error;
+        }
+
+        expect(caughtError).toEqual(
             new JsonParseError(
                 `Expected either ${JsonTokenType.BOOLEAN} or ${JsonTokenType.NULL}, `
                 + `but got ${JsonTokenType.EOF} at 1:1.`,
@@ -3774,7 +3814,15 @@ describe('JsonLexer', () => {
 
         lexer.next();
 
-        expect(() => lexer.consume(JsonTokenType.BOOLEAN)).toThrow(
+        let caughtError: unknown;
+
+        try {
+            lexer.consume(JsonTokenType.BOOLEAN);
+        } catch (error) {
+            caughtError = error;
+        }
+
+        expect(caughtError).toEqual(
             new JsonParseError(
                 `Expected ${JsonTokenType.BOOLEAN}, but got ${JsonTokenType.EOF} at 1:1.`,
                 {

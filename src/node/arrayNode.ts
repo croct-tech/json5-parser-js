@@ -63,10 +63,14 @@ export class JsonArrayNode extends JsonStructureNode implements JsonArrayDefinit
         return [...this.elementNodes];
     }
 
-    public get<T extends JsonValueNode>(index: number, type: new (...args: any[]) => T): T {
+    public get(index: number): JsonValueNode;
+
+    public get<T extends JsonValueNode>(index: number, type: new (...args: any[]) => T): T;
+
+    public get<T extends JsonValueNode>(index: number, type?: new (...args: any[]) => T): JsonValueNode {
         const element = this.elementNodes[index];
 
-        if (!(element instanceof type)) {
+        if (type !== undefined && !(element instanceof type)) {
             throw new JsonError(`Expected ${type.name} at index ${index}, but got ${element.constructor.name}.`);
         }
 

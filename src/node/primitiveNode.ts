@@ -132,10 +132,10 @@ const tokenTypes: Record<string, JsonPrimitiveTokenType> = {
 JsonValueFactory.register(
     'primitive',
     value => new JsonPrimitiveNode({
+        value: value,
         token: new JsonTokenNode({
-            type: tokenTypes[typeof value],
+            type: tokenTypes[value === null ? 'null' : typeof value],
             value: JSON.stringify(value),
         }),
-        value: value,
     }),
 );

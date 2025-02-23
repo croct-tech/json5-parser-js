@@ -4,9 +4,8 @@ import {JsonNode} from './node';
 import {JsonStructureNode, StructureDelimiter} from './structureNode';
 import {JsonPropertyNode} from './propertyNode';
 import {JsonCompositeDefinition, JsonCompositeNode, PartialJsonCompositeDefinition} from './compositeNode';
-import {JsonPrimitiveNode} from './primitiveNode';
+import {JsonPrimitiveNode, JsonStringNode} from './primitiveNode';
 import {JsonValueFactory} from './factory';
-import {JsonTokenType} from '../token';
 import {JsonIdentifierNode} from './identifierNode';
 import {JsonError} from '../error';
 
@@ -120,10 +119,7 @@ export class JsonObjectNode extends JsonStructureNode implements JsonCompositeDe
         return [...this.propertyNodes];
     }
 
-    public set(
-        name: string|JsonPrimitiveNode<JsonTokenType.STRING>|JsonIdentifierNode,
-        value: JsonValue|JsonValueNode,
-    ): void {
+    public set(name: string|JsonStringNode|JsonIdentifierNode, value: JsonValue|JsonValueNode): void {
         const index = this.propertyNodes.findIndex(current => current.key.toJSON() === name);
 
         if (index >= 0) {
@@ -152,9 +148,9 @@ export class JsonObjectNode extends JsonStructureNode implements JsonCompositeDe
         }
     }
 
-    public get<T extends JsonValueNode>(name: string, type: new (...args: any[]) => T): T;
-
     public get(name: string): JsonValueNode;
+
+    public get<T extends JsonValueNode>(name: string, type: new (...args: any[]) => T): T;
 
     public get<T extends JsonValueNode>(name: string, type?: new (...args: any[]) => T): JsonNode {
         const property = this.propertyNodes.find(current => current.key.toJSON() === name);

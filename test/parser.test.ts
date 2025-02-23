@@ -16,7 +16,15 @@ describe('JsonParser', () => {
     });
 
     it('should report an error if an unexpected token is encountered', () => {
-        expect(() => JsonParser.parse('!')).toThrow(
+        let caughtError: unknown;
+
+        try {
+            JsonParser.parse('!');
+        } catch (error) {
+            caughtError = error;
+        }
+
+        expect(caughtError).toEqual(
             new JsonParseError(
                 'Unexpected token \'!\' at 1:1.',
                 {
@@ -36,7 +44,15 @@ describe('JsonParser', () => {
     });
 
     it('should report an error if the input is malformed', () => {
-        expect(() => JsonParser.parse('}')).toThrow(
+        let caughtError: unknown;
+
+        try {
+            JsonParser.parse('}');
+        } catch (error) {
+            caughtError = error;
+        }
+
+        expect(caughtError).toEqual(
             new JsonParseError(
                 'Unexpected token \'}\' at 1:1.',
                 {
@@ -56,9 +72,17 @@ describe('JsonParser', () => {
     });
 
     it('should report an error if extraneous input is encountered at the end of the input', () => {
-        expect(() => JsonParser.parse('{}{}')).toThrow(
+        let caughtError: unknown;
+
+        try {
+            JsonParser.parse('{}!');
+        } catch (error) {
+            caughtError = error;
+        }
+
+        expect(caughtError).toEqual(
             new JsonParseError(
-                'Unexpected token \'{\' at 1:3.',
+                'Unexpected token \'!\' at 1:3.',
                 {
                     start: {
                         index: 3,
@@ -427,7 +451,15 @@ describe('JsonParser', () => {
     });
 
     it('should report an error parsing an invalid string', () => {
-        expect(() => JsonParser.parse(' "\\u{2323}"')).toThrow(
+        let caughtError: unknown;
+
+        try {
+            JsonParser.parse(' "\\u{2323}"');
+        } catch (error) {
+            caughtError = error;
+        }
+
+        expect(caughtError).toEqual(
             new JsonParseError(
                 'Bad Unicode escape in JSON at 1:5.',
                 {
@@ -451,7 +483,15 @@ describe('JsonParser', () => {
             throw new Error('Unexpected error.');
         });
 
-        expect(() => JsonParser.parse('""')).toThrow(
+        let caughtError: unknown;
+
+        try {
+            JsonParser.parse('""');
+        } catch (error) {
+            caughtError = error;
+        }
+
+        expect(caughtError).toEqual(
             new JsonParseError(
                 'Unexpected error.',
                 {
@@ -1111,21 +1151,31 @@ describe('JsonParser', () => {
     });
 
     it('should fail to parse an object with reserved identifier key', () => {
-        expect(() => JsonParser.parse('{with:"value"}')).toThrow(new JsonParseError(
-            'Reserved identifier \'with\' at 1:2.',
-            {
-                start: {
-                    index: 1,
-                    line: 1,
-                    column: 2,
+        let caughtError: unknown;
+
+        try {
+            JsonParser.parse('{with:"value"}');
+        } catch (error) {
+            caughtError = error;
+        }
+
+        expect(caughtError).toEqual(
+            new JsonParseError(
+                'Reserved identifier \'with\' at 1:2.',
+                {
+                    start: {
+                        index: 1,
+                        line: 1,
+                        column: 2,
+                    },
+                    end: {
+                        index: 5,
+                        line: 1,
+                        column: 6,
+                    },
                 },
-                end: {
-                    index: 5,
-                    line: 1,
-                    column: 6,
-                },
-            },
-        ));
+            ),
+        );
     });
 
     it('should parse a value of the specified type', () => {
@@ -1157,20 +1207,30 @@ describe('JsonParser', () => {
     });
 
     it('should report an error if the result type mismatches', () => {
-        expect(() => JsonParser.parse('42', JsonArrayNode)).toThrow(new JsonParseError(
-            'Expected JsonArrayNode, but got JsonPrimitiveNode.',
-            {
-                start: {
-                    index: 0,
-                    line: 1,
-                    column: 1,
+        let caughtError: unknown;
+
+        try {
+            JsonParser.parse('42', JsonArrayNode);
+        } catch (error) {
+            caughtError = error;
+        }
+
+        expect(caughtError).toEqual(
+            new JsonParseError(
+                'Expected JsonArrayNode, but got JsonPrimitiveNode.',
+                {
+                    start: {
+                        index: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        index: 2,
+                        line: 1,
+                        column: 3,
+                    },
                 },
-                end: {
-                    index: 2,
-                    line: 1,
-                    column: 3,
-                },
-            },
-        ));
+            ),
+        );
     });
 });

@@ -8,16 +8,16 @@ import {NodeManipulator} from '../manipulator';
 import {JsonValueFactory} from './factory';
 import {JsonIdentifierNode} from './identifierNode';
 import {isIdentifier} from '../identifier';
-import {JsonPrimitiveNode} from './primitiveNode';
+import {JsonPrimitiveNode, JsonStringNode} from './primitiveNode';
 import {Formatting} from '../formatting';
 
 export interface JsonPropertyDefinition extends JsonCompositeDefinition {
-    readonly key: JsonPrimitiveNode<JsonTokenType.STRING> | JsonIdentifierNode;
+    readonly key: JsonStringNode | JsonIdentifierNode;
     value: JsonValueNode;
 }
 
 export class JsonPropertyNode extends JsonCompositeNode implements JsonPropertyDefinition {
-    public readonly key: JsonPrimitiveNode<JsonTokenType.STRING> | JsonIdentifierNode;
+    public readonly key: JsonStringNode | JsonIdentifierNode;
 
     public value: JsonValueNode;
 
@@ -87,7 +87,7 @@ export class JsonPropertyNode extends JsonCompositeNode implements JsonPropertyD
             .end();
     }
 
-    private formatKey(formatting?: Formatting): JsonPrimitiveNode<JsonTokenType.STRING> | JsonIdentifierNode {
+    private formatKey(formatting?: Formatting): JsonStringNode | JsonIdentifierNode {
         if (
             this.key instanceof JsonPrimitiveNode
             && formatting?.property?.unquoted === true

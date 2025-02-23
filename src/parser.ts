@@ -9,6 +9,10 @@ import {
     JsonArrayNode,
     JsonNode,
     JsonObjectNode,
+    JsonNumberNode,
+    JsonStringNode,
+    JsonNullNode,
+    JsonBooleanNode,
 } from './node';
 import {isReserved} from './identifier';
 import {JsonError, JsonParseError} from './error';
@@ -106,7 +110,7 @@ export class JsonParser {
         }
     }
 
-    private parseNumber(): JsonPrimitiveNode<JsonTokenType.NUMBER> {
+    private parseNumber(): JsonNumberNode {
         const token = this.lexer.consume(JsonTokenType.NUMBER);
         const tokenNode = new JsonTokenNode(token);
 
@@ -151,7 +155,7 @@ export class JsonParser {
         return sign * JSON.parse(value);
     }
 
-    private parseString(): JsonPrimitiveNode<JsonTokenType.STRING> {
+    private parseString(): JsonStringNode {
         const token = this.lexer.consume(JsonTokenType.STRING);
 
         let {value} = token;
@@ -204,7 +208,7 @@ export class JsonParser {
         return error.message;
     }
 
-    private parseNull(): JsonPrimitiveNode<JsonTokenType.NULL> {
+    private parseNull(): JsonNullNode {
         const token = this.lexer.consume(JsonTokenType.NULL);
         const tokenNode = new JsonTokenNode(token);
 
@@ -216,7 +220,7 @@ export class JsonParser {
         });
     }
 
-    private parseBoolean(): JsonPrimitiveNode<JsonTokenType.BOOLEAN> {
+    private parseBoolean(): JsonBooleanNode {
         const token = this.lexer.consume(JsonTokenType.BOOLEAN);
         const tokenNode = new JsonTokenNode(token);
 

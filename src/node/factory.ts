@@ -9,7 +9,6 @@ import {
     JsonPrimitiveNode,
 } from './primitiveNode';
 import {JsonValueNode} from './valueNode';
-import {JsonError} from '../error';
 
 export namespace JsonValueFactory {
     type JsonValueFactories = {
@@ -18,21 +17,10 @@ export namespace JsonValueFactory {
         primitive: (value: JsonPrimitive) => JsonPrimitiveNode,
     };
 
-    const factories: Partial<JsonValueFactories> = {};
+    const factories: JsonValueFactories = {} as JsonValueFactories;
 
     export function register<K extends keyof JsonValueFactories>(type: K, factory: JsonValueFactories[K]): void {
         factories[type] = factory;
-    }
-
-    // eslint-disable-next-line no-inner-declarations -- False positive
-    function getFactory<K extends keyof JsonValueFactories>(type: K): JsonValueFactories[K] {
-        const factory = factories[type];
-
-        if (factory === undefined) {
-            throw new JsonError(`No factory registered for type ${type}.`);
-        }
-
-        return factory;
     }
 
     export function create(value: JsonArray|JsonArrayNode): JsonArrayNode;
@@ -50,13 +38,13 @@ export namespace JsonValueFactory {
         }
 
         if (Array.isArray(value)) {
-            return getFactory('array')(value);
+            return factories.array(value);
         }
 
         if (typeof value === 'object' && value !== null) {
-            return getFactory('object')(value);
+            return factories.object(value);
         }
 
-        return getFactory('primitive')(value);
+        return factories.primitive(value);
     }
 }
