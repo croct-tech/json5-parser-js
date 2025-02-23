@@ -284,24 +284,8 @@ export class NodeManipulator {
     private findMatch(nodes: JsonNode[]): number {
         return this.findNext(
             current => nodes.some(node => current?.isEquivalent(node)),
-            NodeManipulator.getSkippableNodes(nodes),
+            NodeMatcher.INSIGNIFICANT,
         );
-    }
-
-    private shouldDropUntil(node: JsonNode): boolean {
-        if (!(node instanceof JsonTokenNode)) {
-            return this.matchesNext(node.isEquivalent.bind(node));
-        }
-
-        switch (node.type) {
-            case JsonTokenType.BRACE_LEFT:
-            case JsonTokenType.BRACKET_LEFT:
-            case JsonTokenType.COLON:
-                return true;
-
-            default:
-                return false;
-        }
     }
 
     private fixSpacing(startIndex: number): void {
@@ -360,12 +344,7 @@ export class NodeManipulator {
             return;
         }
 
-        if (this.shouldDropUntil(node)) {
-            if (this.dropUntil(current => current.isEquivalent(node))) {
-                this.remove();
-                this.fixing = false;
-            }
-        } else if (!this.done()) {
+        if (!this.done()) {
             const index = this.findNext(current => NodeManipulator.isReplacement(current, node));
 
             if (index >= 0) {
@@ -388,15 +367,5 @@ export class NodeManipulator {
         }
 
         return previousNode.constructor === currentNode.constructor;
-    }
-
-    private static getSkippableNodes(nodes: JsonNode[]): NodeMatcher {
-        for (const node of nodes) {
-            if (!(node instanceof JsonTokenNode) || NodeMatcher.SIGNIFICANT(node.type)) {
-                return NodeMatcher.INSIGNIFICANT;
-            }
-        }
-
-        return NodeMatcher.NONE;
     }
 }
