@@ -461,7 +461,7 @@ describe('JsonParser', () => {
 
         expect(caughtError).toEqual(
             new JsonParseError(
-                'Bad Unicode escape in JSON at 1:5.',
+                'Unexpected token { in JSON at position 3',
                 {
                     start: {
                         index: 1,
@@ -1228,6 +1228,34 @@ describe('JsonParser', () => {
                         index: 2,
                         line: 1,
                         column: 3,
+                    },
+                },
+            ),
+        );
+    });
+
+    it('should fail to parse a JSON ending with invalid characters', () => {
+        let caughtError: unknown;
+
+        try {
+            JsonParser.parse('{"foo": "bar"} 123', JsonArrayNode);
+        } catch (error) {
+            caughtError = error;
+        }
+
+        expect(caughtError).toEqual(
+            new JsonParseError(
+                'Unexpected token \'123\' at 1:16.',
+                {
+                    start: {
+                        index: 15,
+                        line: 1,
+                        column: 16,
+                    },
+                    end: {
+                        index: 18,
+                        line: 1,
+                        column: 19,
                     },
                 },
             ),

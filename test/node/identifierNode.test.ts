@@ -1,4 +1,11 @@
-import {JsonIdentifierNode, JsonPrimitiveNode, JsonTokenNode, JsonTokenType, reservedIdentifiers} from '../../src';
+import {
+    JsonIdentifierNode,
+    JsonPrimitiveNode,
+    JsonTokenNode,
+    JsonTokenType,
+    reservedIdentifiers,
+    SourceLocation
+} from '../../src';
 import {JsonError} from '../../src/error';
 
 describe('IdentifierNode', () => {
@@ -63,13 +70,26 @@ describe('IdentifierNode', () => {
         expect(identifierNode).toStrictEqual(JsonIdentifierNode.of('foo'));
     });
 
-    // @todo see if this test can be improved
     it('should rebuild the node', () => {
         const identifierNode = JsonIdentifierNode.of('foo');
 
         identifierNode.rebuild();
 
-        expect(identifierNode).toStrictEqual(JsonIdentifierNode.of('foo'));
+        expect(identifierNode).toStrictEqual(new JsonIdentifierNode({
+            location: SourceLocation.unknown(),
+            children: [
+                new JsonTokenNode({
+                    location: SourceLocation.unknown(),
+                    type: JsonTokenType.IDENTIFIER,
+                    value: 'foo',
+                }),
+            ],
+            token: new JsonTokenNode({
+                location: SourceLocation.unknown(),
+                type: JsonTokenType.IDENTIFIER,
+                value: 'foo',
+            }),
+        }));
     });
 
     // @todo see if this test can be improved

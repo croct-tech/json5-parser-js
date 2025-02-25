@@ -135,6 +135,7 @@ describe('PrimitiveNode', () => {
         );
     });
 
+    // @todo refactor all clone tests
     it('should clone the primitive node', () => {
         const primitiveNode = JsonPrimitiveNode.of('foo');
 

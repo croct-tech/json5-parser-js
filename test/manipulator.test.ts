@@ -1,5 +1,5 @@
-import {JsonArrayNode, JsonTokenNode, JsonTokenType} from '../src';
-import {NodeMatcher} from '../src/manipulator';
+import {JsonArrayNode, JsonPrimitiveNode, JsonTokenNode, JsonTokenType} from '../src';
+import {NodeManipulator, NodeMatcher} from '../src/manipulator';
 
 describe('NodeMatcher', () => {
     const booleanToken = new JsonTokenNode({type: JsonTokenType.BOOLEAN, value: 'true'});
@@ -83,4 +83,130 @@ describe('NodeMatcher', () => {
 });
 
 describe('NodeManipulator', () => {
+    it('should check whether the current node is the last of the children list', () => {
+        const manipulator = new NodeManipulator([
+            JsonPrimitiveNode.of('foo'),
+            JsonPrimitiveNode.of('bar'),
+        ]);
+
+        expect(manipulator.done()).toBeFalse();
+
+        manipulator.next();
+
+        expect(manipulator.done()).toBeFalse();
+
+        manipulator.next();
+
+        expect(manipulator.done()).toBeTrue();
+    });
+
+    it('should iterate to the next children node', () => {
+        const firstNode = JsonPrimitiveNode.of('foo');
+        const secondNode = JsonPrimitiveNode.of('bar');
+
+        const manipulator = new NodeManipulator([
+            firstNode,
+            secondNode,
+        ]);
+
+        expect(manipulator.current).toBe(firstNode);
+
+        manipulator.next();
+
+        expect(manipulator.current).toBe(secondNode);
+    });
+
+    it('should fail to iterate to the next children node when all children were traversed', () => {
+        const manipulator = new NodeManipulator([JsonPrimitiveNode.of('foo')]);
+
+        manipulator.next();
+
+        expect(() => manipulator.next()).toThrowWithMessage(
+            Error,
+            'The iterator is at the end of the list.',
+        );
+    });
+
+    it('should get the node position', () => {
+        const manipulator = new NodeManipulator([
+            JsonPrimitiveNode.of('foo'),
+            JsonPrimitiveNode.of('bar'),
+        ]);
+
+        expect(manipulator.position).toBe(0);
+
+        manipulator.next();
+
+        expect(manipulator.position).toBe(1);
+    });
+
+    it('should fail to seek a node at a position less than 0', () => {
+        const manipulator = new NodeManipulator([JsonPrimitiveNode.of('foo')]);
+
+        expect(() => manipulator.seek(-1)).toThrowWithMessage(
+            Error,
+            'The position is out of bounds.',
+        );
+    });
+
+    it('should fail to seek a node at a position greater than the children list length', () => {
+        const manipulator = new NodeManipulator([JsonPrimitiveNode.of('foo')]);
+
+        expect(() => manipulator.seek(1)).toThrowWithMessage(
+            Error,
+            'The position is out of bounds.',
+        );
+    });
+
+    it('should seek a node at a given position', () => {
+        const firstNode = JsonPrimitiveNode.of('foo');
+        const secondNode = JsonPrimitiveNode.of('bar');
+
+        const manipulator = new NodeManipulator([
+            firstNode,
+            secondNode,
+        ]);
+
+        manipulator.seek(1);
+
+        expect(manipulator.current).toBe(secondNode);
+
+        manipulator.seek(0);
+
+        expect(manipulator.current).toBe(firstNode);
+    });
+
+    it('should fail to get the previous node when the current node is the first child', () => {
+        const manipulator = new NodeManipulator([]);
+
+        expect(() => manipulator.previous()).toThrowWithMessage(
+            Error,
+            'The iterator is at the beginning of the list.',
+        );
+    });
+
+    it('should get the previous node', () => {
+        const firstNode = JsonPrimitiveNode.of('foo');
+        const secondNode = JsonPrimitiveNode.of('bar');
+
+        const manipulator = new NodeManipulator([
+            firstNode,
+            secondNode,
+        ]);
+
+        manipulator.seek(1);
+
+        manipulator.previous();
+
+        expect(manipulator.current).toBe(firstNode);
+    });
+
+    it('should fail to get the current node when the iterator is at the end of the list', () => {
+        const manipulator = new NodeManipulator([]);
+
+        expect(() => manipulator.current).toThrowWithMessage(
+            Error,
+            'The iterator is at the end of the list.',
+        );
+    });
 });

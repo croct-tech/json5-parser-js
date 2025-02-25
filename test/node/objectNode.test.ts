@@ -261,20 +261,13 @@ describe('ObjectNode', () => {
                 ],
             }),
         },
-        // @todo is this right? foo-bar AND foo-qux?
         'an existing property': {
-            name: JsonPrimitiveNode.of('foo'),
+            name: 'foo',
             value: JsonPrimitiveNode.of('qux'),
             result: new JsonObjectNode({
                 location: SourceLocation.unknown(),
                 children: [],
                 properties: [
-                    new JsonPropertyNode({
-                        location: SourceLocation.unknown(),
-                        children: [],
-                        key: JsonPrimitiveNode.of('foo'),
-                        value: JsonPrimitiveNode.of('bar'),
-                    }),
                     new JsonPropertyNode({
                         location: SourceLocation.unknown(),
                         children: [],
@@ -335,15 +328,26 @@ describe('ObjectNode', () => {
     });
 
     it('should clone the object node', () => {
-        const objectNode = JsonObjectNode.of({
-            foo: 'bar',
+        const property = new JsonPropertyNode({
+            location: SourceLocation.unknown(),
+            children: [],
+            key: JsonPrimitiveNode.of('foo'),
+            value: JsonPrimitiveNode.of('bar'),
+        });
+
+        const objectNode = new JsonObjectNode({
+            location: SourceLocation.unknown(),
+            children: [property],
+            properties: [property],
         });
 
         const clone = objectNode.clone();
 
         expect(objectNode).toStrictEqual(clone);
-
         expect(objectNode).not.toBe(clone);
+
+        expect(objectNode.children[0]).toStrictEqual(clone.children[0]);
+        expect(objectNode.children[0]).not.toBe(clone.children[0]);
     });
 
     it('should not be equivalent to a non-object node', () => {
