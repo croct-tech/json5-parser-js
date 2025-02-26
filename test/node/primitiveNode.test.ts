@@ -75,8 +75,6 @@ describe('PrimitiveNode', () => {
     });
 
     it('should reset its children', () => {
-        const children = [JsonPrimitiveNode.of('bar')];
-
         const primitiveNode = new JsonPrimitiveNode({
             value: 'foo',
             token: new JsonTokenNode({
@@ -84,11 +82,9 @@ describe('PrimitiveNode', () => {
                 value: '"foo"',
                 location: SourceLocation.unknown(),
             }),
-            children: children,
+            children: [JsonPrimitiveNode.of('foo')],
             location: SourceLocation.unknown(),
         });
-
-        expect(primitiveNode.children).toStrictEqual(children);
 
         primitiveNode.reset();
 
@@ -135,13 +131,10 @@ describe('PrimitiveNode', () => {
         );
     });
 
-    // @todo refactor all clone tests
     it('should clone the primitive node', () => {
         const primitiveNode = JsonPrimitiveNode.of('foo');
 
         const clone = primitiveNode.clone();
-
-        expect(clone).not.toBe(primitiveNode);
 
         expect(clone).toStrictEqual(
             new JsonPrimitiveNode({
@@ -151,6 +144,8 @@ describe('PrimitiveNode', () => {
                 location: primitiveNode.location,
             }),
         );
+
+        expect(clone).not.toBe(primitiveNode);
     });
 
     it('should not be equivalent to a non primitive node', () => {

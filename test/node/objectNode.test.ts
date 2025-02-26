@@ -143,7 +143,6 @@ describe('ObjectNode', () => {
         }));
     });
 
-    // @todo is this a bug?
     it('should update existing node properties', () => {
         const objectNode = JsonObjectNode.of({
             foo: 'bar',
@@ -162,7 +161,6 @@ describe('ObjectNode', () => {
         }));
     });
 
-    // @todo why does this have a different outcome than when using literal objects?
     it('should update merging node properties', () => {
         const objectNode = JsonObjectNode.of({
             foo: 'bar',

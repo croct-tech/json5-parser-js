@@ -79,9 +79,6 @@ describe('StructureNode', () => {
             properties: [property],
         });
 
-        expect(property.children).toStrictEqual([JsonPrimitiveNode.of('foo')]);
-        expect(structureNode.children).toStrictEqual([JsonPrimitiveNode.of('foo')]);
-
         structureNode.reset();
 
         expect(property.children).toBeEmpty();

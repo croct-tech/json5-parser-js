@@ -11,6 +11,19 @@ import {
 } from '../../src';
 
 describe('PropertyNode', () => {
+    it('should set a value', () => {
+        const propertyNode = new JsonPropertyNode({
+            location: SourceLocation.unknown(),
+            children: [],
+            key: JsonPrimitiveNode.of('foo'),
+            value: JsonPrimitiveNode.of('bar'),
+        });
+
+        propertyNode.set('baz');
+
+        expect(propertyNode.value).toStrictEqual(JsonPrimitiveNode.of('baz'));
+    });
+
     it('should reset its children', () => {
         const key = new JsonPrimitiveNode({
             location: SourceLocation.unknown(),
@@ -34,18 +47,16 @@ describe('PropertyNode', () => {
             value: 'bar',
         });
 
-        const children = [
-            new JsonPropertyNode({
-                location: SourceLocation.unknown(),
-                children: [],
-                key: key,
-                value: value,
-            }),
-        ];
-
         const propertyNode = new JsonPropertyNode({
             location: SourceLocation.unknown(),
-            children: children,
+            children: [
+                new JsonPropertyNode({
+                    location: SourceLocation.unknown(),
+                    children: [],
+                    key: key,
+                    value: value,
+                }),
+            ],
             key: key,
             value: value,
         });
@@ -55,19 +66,6 @@ describe('PropertyNode', () => {
         expect(propertyNode.children).toBeEmpty();
         expect(propertyNode.key.children).toBeEmpty();
         expect(propertyNode.value.children).toBeEmpty();
-    });
-
-    it('should set a value', () => {
-        const propertyNode = new JsonPropertyNode({
-            location: SourceLocation.unknown(),
-            children: [],
-            key: JsonPrimitiveNode.of('foo'),
-            value: JsonPrimitiveNode.of('bar'),
-        });
-
-        propertyNode.set('baz');
-
-        expect(propertyNode.value).toStrictEqual(JsonPrimitiveNode.of('baz'));
     });
 
     type Scenario = {

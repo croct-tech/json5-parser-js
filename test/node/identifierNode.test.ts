@@ -61,13 +61,27 @@ describe('IdentifierNode', () => {
         expect(identifierNode.toJSON()).toStrictEqual('foo');
     });
 
-    // @todo see if this test can be improved
     it('should reset its children', () => {
-        const identifierNode = JsonIdentifierNode.of('foo');
+        const identifierNode = new JsonIdentifierNode({
+            token: new JsonTokenNode({
+                type: JsonTokenType.IDENTIFIER,
+                value: 'foo',
+            }),
+            children: [
+                new JsonPrimitiveNode({
+                    token: new JsonTokenNode({
+                        type: JsonTokenType.STRING,
+                        value: 'foo',
+                    }),
+                    children: [JsonPrimitiveNode.of('foo')],
+                    value: 'foo',
+                }),
+            ],
+        });
 
         identifierNode.reset();
 
-        expect(identifierNode).toStrictEqual(JsonIdentifierNode.of('foo'));
+        expect(identifierNode.children).toBeEmpty();
     });
 
     it('should rebuild the node', () => {
@@ -92,13 +106,13 @@ describe('IdentifierNode', () => {
         }));
     });
 
-    // @todo see if this test can be improved
     it('should clone the node', () => {
         const identifierNode = JsonIdentifierNode.of('foo');
 
         const clone = identifierNode.clone();
 
         expect(identifierNode).toStrictEqual(clone);
+        expect(identifierNode).not.toBe(clone);
     });
 
     it('should not be equivalent to a non-identifier node', () => {
