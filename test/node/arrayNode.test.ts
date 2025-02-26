@@ -60,64 +60,6 @@ describe('ArrayNode', () => {
         expect(arrayNode.elements).toStrictEqual(elements);
     });
 
-    it('should update the node with a non array value', () => {
-        const arrayNode = JsonArrayNode.of('foo', 'bar');
-
-        const updatedNode = arrayNode.update('baz');
-
-        expect(updatedNode).toStrictEqual(JsonPrimitiveNode.of('baz'));
-
-        expect(arrayNode).toStrictEqual(JsonArrayNode.of('foo', 'bar'));
-    });
-
-    it('should update the node with an array value without merging', () => {
-        const arrayNode = JsonArrayNode.of(1, 2, 3);
-
-        const updatedNode = arrayNode.update([4, 5, 6, 7]);
-
-        const expected = JsonArrayNode.of(4, 5, 6, 7);
-
-        expect(updatedNode).toStrictEqual(expected);
-
-        expect(arrayNode).toStrictEqual(expected);
-    });
-
-    it('should update the node merging an array value', () => {
-        const arrayNode = JsonArrayNode.of(1, 2, 3, 4, 5);
-
-        const updatedNode = arrayNode.update([1, 2], true);
-
-        const expected = JsonArrayNode.of(1, 2);
-
-        expect(updatedNode).toStrictEqual(expected);
-
-        expect(arrayNode).toStrictEqual(expected);
-    });
-
-    it('should update the node with a node value without merging', () => {
-        const arrayNode = JsonArrayNode.of(1, 2, 3);
-
-        const updatedNode = arrayNode.update(JsonArrayNode.of(4, 5, 6, 7));
-
-        const expected = JsonArrayNode.of(4, 5, 6, 7);
-
-        expect(updatedNode).toStrictEqual(expected);
-
-        expect(arrayNode).toStrictEqual(expected);
-    });
-
-    it('should update the node merging a node value', () => {
-        const arrayNode = JsonArrayNode.of(1, 2, 3);
-
-        const updatedNode = arrayNode.update(JsonArrayNode.of(4, 5, 6, 7), true);
-
-        const expected = JsonArrayNode.of(4, 5, 6, 7);
-
-        expect(updatedNode).toStrictEqual(expected);
-
-        expect(arrayNode).toStrictEqual(expected);
-    });
-
     it('should get its elements', () => {
         const arrayNode = JsonArrayNode.of(1, 2, 3);
 
@@ -275,6 +217,64 @@ describe('ArrayNode', () => {
         expect(arrayNode).toStrictEqual(clone);
 
         expect(arrayNode).not.toBe(clone);
+    });
+
+    it('should update the node with a non array value', () => {
+        const arrayNode = JsonArrayNode.of('foo', 'bar');
+
+        const updatedNode = arrayNode.update('baz');
+
+        expect(updatedNode).toStrictEqual(JsonPrimitiveNode.of('baz'));
+
+        expect(arrayNode).toStrictEqual(JsonArrayNode.of('foo', 'bar'));
+    });
+
+    it('should update the node with an array value without merging', () => {
+        const arrayNode = JsonArrayNode.of(1, 2, 3);
+
+        const updatedNode = arrayNode.update([4, 5, 6, 7]);
+
+        const expected = JsonArrayNode.of(4, 5, 6, 7);
+
+        expect(updatedNode).toStrictEqual(expected);
+
+        expect(arrayNode).toStrictEqual(expected);
+    });
+
+    it('should update the node merging an array value', () => {
+        const arrayNode = JsonArrayNode.of(1, 2, 3, 4, 5);
+
+        const updatedNode = arrayNode.update([1, 2], true);
+
+        const expected = JsonArrayNode.of(1, 2);
+
+        expect(updatedNode).toStrictEqual(expected);
+
+        expect(arrayNode).toStrictEqual(expected);
+    });
+
+    it('should update the node with a node value without merging', () => {
+        const arrayNode = JsonArrayNode.of(1, 2, 3);
+
+        const updatedNode = arrayNode.update(JsonArrayNode.of(4, 5, 6, 7));
+
+        const expected = JsonArrayNode.of(4, 5, 6, 7);
+
+        expect(updatedNode).toStrictEqual(expected);
+
+        expect(arrayNode).toStrictEqual(expected);
+    });
+
+    it('should update the node merging a node value', () => {
+        const arrayNode = JsonArrayNode.of(1, 2, 3);
+
+        const updatedNode = arrayNode.update(JsonArrayNode.of(4, 5, 6, 7), true);
+
+        const expected = JsonArrayNode.of(4, 5, 6, 7);
+
+        expect(updatedNode).toStrictEqual(expected);
+
+        expect(arrayNode).toStrictEqual(expected);
     });
 
     it('should not be equivalent to a non-array node', () => {
