@@ -3,7 +3,6 @@ import {
     JsonArrayNode,
     JsonCompositeNode,
     PartialJsonCompositeDefinition,
-    SourceLocation,
 } from '../../src';
 
 describe('CompositeNode', () => {
@@ -31,7 +30,6 @@ describe('CompositeNode', () => {
 
     it('should serialize to string', () => {
         const compositeNode = TestCompositeNode.fromDefinition({
-            location: SourceLocation.unknown(),
             children: [JsonArrayNode.of(1, 2, 3)],
         });
 
@@ -40,7 +38,6 @@ describe('CompositeNode', () => {
 
     it('should reformat the node', () => {
         const compositeNode = TestCompositeNode.fromDefinition({
-            location: SourceLocation.unknown(),
             children: [JsonArrayNode.of(1, 2, 3)],
         });
 

@@ -12,7 +12,6 @@ import {
     JsonTokenType,
     JsonValueNode,
     PartialJsonCompositeDefinition,
-    SourceLocation,
     StructureDelimiter,
 } from '../../src';
 
@@ -65,14 +64,12 @@ describe('StructureNode', () => {
 
     it('should reset its children', () => {
         const property = new JsonPropertyNode({
-            location: SourceLocation.unknown(),
             children: [JsonPrimitiveNode.of('foo')],
             key: JsonPrimitiveNode.of('foo'),
             value: JsonPrimitiveNode.of('bar'),
         });
 
         const structureNode = new TestStructureNode({
-            location: SourceLocation.unknown(),
             children: [
                 JsonPrimitiveNode.of('foo'),
             ],
@@ -87,22 +84,18 @@ describe('StructureNode', () => {
 
     it('should rebuild with indentation size', () => {
         const property = new JsonPropertyNode({
-            location: SourceLocation.unknown(),
             children: [],
             key: JsonIdentifierNode.of('foo'),
             value: JsonPrimitiveNode.of('bar'),
         });
 
         const structureNode = new TestStructureNode({
-            location: SourceLocation.unknown(),
             children: [
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_LEFT,
                     value: '{',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_RIGHT,
                     value: '}',
                 }),
@@ -118,57 +111,45 @@ describe('StructureNode', () => {
         });
 
         expect(structureNode).toStrictEqual(new TestStructureNode({
-            location: SourceLocation.unknown(),
             children: [
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_LEFT,
                     value: '{',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.NEWLINE,
                     value: '\n',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.WHITESPACE,
                     value: '    ',
                 }),
                 new JsonPropertyNode({
-                    location: SourceLocation.unknown(),
                     children: [
                         new JsonIdentifierNode({
-                            location: SourceLocation.unknown(),
                             children: [
                                 new JsonTokenNode({
-                                    location: SourceLocation.unknown(),
                                     type: JsonTokenType.IDENTIFIER,
                                     value: 'foo',
                                 }),
                             ],
                             token: new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.IDENTIFIER,
                                 value: 'foo',
                             }),
                         }),
                         new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.COLON,
                             value: ':',
                         }),
                         new JsonPrimitiveNode({
-                            location: SourceLocation.unknown(),
                             children: [
                                 new JsonTokenNode({
-                                    location: SourceLocation.unknown(),
                                     type: JsonTokenType.STRING,
                                     value: '"bar"',
                                 }),
                             ],
                             token: new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.STRING,
                                 value: '"bar"',
                             }),
@@ -176,31 +157,25 @@ describe('StructureNode', () => {
                         }),
                     ],
                     key: new JsonIdentifierNode({
-                        location: SourceLocation.unknown(),
                         children: [
                             new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.IDENTIFIER,
                                 value: 'foo',
                             }),
                         ],
                         token: new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.IDENTIFIER,
                             value: 'foo',
                         }),
                     }),
                     value: new JsonPrimitiveNode({
-                        location: SourceLocation.unknown(),
                         children: [
                             new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.STRING,
                                 value: '"bar"',
                             }),
                         ],
                         token: new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.STRING,
                             value: '"bar"',
                         }),
@@ -208,7 +183,6 @@ describe('StructureNode', () => {
                     }),
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_RIGHT,
                     value: '}',
                 }),
@@ -219,22 +193,18 @@ describe('StructureNode', () => {
 
     it('should rebuild with comma spacing', () => {
         const property = new JsonPropertyNode({
-            location: SourceLocation.unknown(),
             children: [],
             key: JsonIdentifierNode.of('foo'),
             value: JsonPrimitiveNode.of('bar'),
         });
 
         const structureNode = new TestStructureNode({
-            location: SourceLocation.unknown(),
             children: [
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_LEFT,
                     value: '{',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_RIGHT,
                     value: '}',
                 }),
@@ -249,52 +219,41 @@ describe('StructureNode', () => {
         });
 
         expect(structureNode).toStrictEqual(new TestStructureNode({
-            location: SourceLocation.unknown(),
             children: [
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_LEFT,
                     value: '{',
                 }),
                 new JsonPropertyNode({
-                    location: SourceLocation.unknown(),
                     children: [
                         new JsonIdentifierNode({
-                            location: SourceLocation.unknown(),
                             children: [
                                 new JsonTokenNode({
-                                    location: SourceLocation.unknown(),
                                     type: JsonTokenType.IDENTIFIER,
                                     value: 'foo',
                                 }),
                             ],
                             token: new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.IDENTIFIER,
                                 value: 'foo',
                             }),
                         }),
                         new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.COLON,
                             value: ':',
                         }),
                         new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.WHITESPACE,
                             value: ' ',
                         }),
                         new JsonPrimitiveNode({
-                            location: SourceLocation.unknown(),
                             children: [
                                 new JsonTokenNode({
-                                    location: SourceLocation.unknown(),
                                     type: JsonTokenType.STRING,
                                     value: '"bar"',
                                 }),
                             ],
                             token: new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.STRING,
                                 value: '"bar"',
                             }),
@@ -302,31 +261,25 @@ describe('StructureNode', () => {
                         }),
                     ],
                     key: new JsonIdentifierNode({
-                        location: SourceLocation.unknown(),
                         children: [
                             new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.IDENTIFIER,
                                 value: 'foo',
                             }),
                         ],
                         token: new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.IDENTIFIER,
                             value: 'foo',
                         }),
                     }),
                     value: new JsonPrimitiveNode({
-                        location: SourceLocation.unknown(),
                         children: [
                             new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.STRING,
                                 value: '"bar"',
                             }),
                         ],
                         token: new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.STRING,
                             value: '"bar"',
                         }),
@@ -334,7 +287,6 @@ describe('StructureNode', () => {
                     }),
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_RIGHT,
                     value: '}',
                 }),
@@ -345,22 +297,18 @@ describe('StructureNode', () => {
 
     it('should rebuild with entry indentation', () => {
         const property = new JsonPropertyNode({
-            location: SourceLocation.unknown(),
             children: [],
             key: JsonIdentifierNode.of('foo'),
             value: JsonPrimitiveNode.of('bar'),
         });
 
         const structureNode = new TestStructureNode({
-            location: SourceLocation.unknown(),
             children: [
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_LEFT,
                     value: '{',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_RIGHT,
                     value: '}',
                 }),
@@ -375,47 +323,37 @@ describe('StructureNode', () => {
         });
 
         expect(structureNode).toStrictEqual(new TestStructureNode({
-            location: SourceLocation.unknown(),
             children: [
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_LEFT,
                     value: '{',
                 }),
                 new JsonPropertyNode({
-                    location: SourceLocation.unknown(),
                     children: [
                         new JsonIdentifierNode({
-                            location: SourceLocation.unknown(),
                             children: [
                                 new JsonTokenNode({
-                                    location: SourceLocation.unknown(),
                                     type: JsonTokenType.IDENTIFIER,
                                     value: 'foo',
                                 }),
                             ],
                             token: new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.IDENTIFIER,
                                 value: 'foo',
                             }),
                         }),
                         new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.COLON,
                             value: ':',
                         }),
                         new JsonPrimitiveNode({
-                            location: SourceLocation.unknown(),
                             children: [
                                 new JsonTokenNode({
-                                    location: SourceLocation.unknown(),
                                     type: JsonTokenType.STRING,
                                     value: '"bar"',
                                 }),
                             ],
                             token: new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.STRING,
                                 value: '"bar"',
                             }),
@@ -423,31 +361,25 @@ describe('StructureNode', () => {
                         }),
                     ],
                     key: new JsonIdentifierNode({
-                        location: SourceLocation.unknown(),
                         children: [
                             new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.IDENTIFIER,
                                 value: 'foo',
                             }),
                         ],
                         token: new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.IDENTIFIER,
                             value: 'foo',
                         }),
                     }),
                     value: new JsonPrimitiveNode({
-                        location: SourceLocation.unknown(),
                         children: [
                             new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.STRING,
                                 value: '"bar"',
                             }),
                         ],
                         token: new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.STRING,
                             value: '"bar"',
                         }),
@@ -455,7 +387,6 @@ describe('StructureNode', () => {
                     }),
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_RIGHT,
                     value: '}',
                 }),
@@ -466,16 +397,13 @@ describe('StructureNode', () => {
 
     it('should rebuild with leading indentation', () => {
         const firstElement = new JsonPrimitiveNode({
-            location: SourceLocation.unknown(),
             children: [
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.NUMBER,
                     value: '1',
                 }),
             ],
             token: new JsonTokenNode({
-                location: SourceLocation.unknown(),
                 type: JsonTokenType.NUMBER,
                 value: '1',
             }),
@@ -483,16 +411,13 @@ describe('StructureNode', () => {
         });
 
         const secondElement = new JsonPrimitiveNode({
-            location: SourceLocation.unknown(),
             children: [
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.NUMBER,
                     value: '2',
                 }),
             ],
             token: new JsonTokenNode({
-                location: SourceLocation.unknown(),
                 type: JsonTokenType.NUMBER,
                 value: '2',
             }),
@@ -500,16 +425,13 @@ describe('StructureNode', () => {
         });
 
         const thirdElement = new JsonPrimitiveNode({
-            location: SourceLocation.unknown(),
             children: [
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.NUMBER,
                     value: '3',
                 }),
             ],
             token: new JsonTokenNode({
-                location: SourceLocation.unknown(),
                 type: JsonTokenType.NUMBER,
                 value: '3',
             }),
@@ -517,47 +439,38 @@ describe('StructureNode', () => {
         });
 
         const arrayNode = new JsonArrayNode({
-            location: SourceLocation.unknown(),
             children: [
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACKET_LEFT,
                     value: '[',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.NEWLINE,
                     value: '\n',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.WHITESPACE,
                     value: ' ',
                 }),
                 firstElement,
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.COMMA,
                     value: ',',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.NEWLINE,
                     value: '\n',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.WHITESPACE,
                     value: ' ',
                 }),
                 thirdElement,
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.NEWLINE,
                     value: '\n',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACKET_RIGHT,
                     value: ']',
                 }),
@@ -566,23 +479,19 @@ describe('StructureNode', () => {
         });
 
         const property = new JsonPropertyNode({
-            location: SourceLocation.unknown(),
             children: [],
             key: JsonIdentifierNode.of('foo'),
             value: arrayNode,
         });
 
         const structureNode = new TestStructureNode({
-            location: SourceLocation.unknown(),
             children: [
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_LEFT,
                     value: '{',
                 }),
                 property,
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_RIGHT,
                     value: '}',
                 }),
@@ -598,109 +507,87 @@ describe('StructureNode', () => {
         });
 
         expect(structureNode).toStrictEqual(new TestStructureNode({
-            location: SourceLocation.unknown(),
             children: [
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_LEFT,
                     value: '{',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.NEWLINE,
                     value: '\n',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.WHITESPACE,
                     value: '    ',
                 }),
                 new JsonPropertyNode({
-                    location: SourceLocation.unknown(),
                     children: [
                         new JsonIdentifierNode({
-                            location: SourceLocation.unknown(),
                             children: [
                                 new JsonTokenNode({
-                                    location: SourceLocation.unknown(),
                                     type: JsonTokenType.IDENTIFIER,
                                     value: 'foo',
                                 }),
                             ],
                             token: new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.IDENTIFIER,
                                 value: 'foo',
                             }),
                         }),
                         new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.COLON,
                             value: ':',
                         }),
                         new JsonArrayNode({
-                            location: SourceLocation.unknown(),
                             children: [
                                 new JsonTokenNode({
-                                    location: SourceLocation.unknown(),
                                     type: JsonTokenType.BRACKET_LEFT,
                                     value: '[',
                                 }),
                                 new JsonTokenNode({
-                                    location: SourceLocation.unknown(),
                                     type: JsonTokenType.NEWLINE,
                                     value: '\n',
                                 }),
                                 new JsonTokenNode({
-                                    location: SourceLocation.unknown(),
                                     type: JsonTokenType.WHITESPACE,
                                     value: ' ',
                                 }),
                                 firstElement,
                                 new JsonTokenNode({
-                                    location: SourceLocation.unknown(),
                                     type: JsonTokenType.COMMA,
                                     value: ',',
                                 }),
                                 new JsonTokenNode({
-                                    location: SourceLocation.unknown(),
                                     type: JsonTokenType.NEWLINE,
                                     value: '\n',
                                 }),
                                 new JsonTokenNode({
-                                    location: SourceLocation.unknown(),
                                     type: JsonTokenType.WHITESPACE,
                                     value: ' ',
                                 }),
                                 secondElement,
                                 new JsonTokenNode({
-                                    location: SourceLocation.unknown(),
                                     type: JsonTokenType.COMMA,
                                     value: ',',
                                 }),
                                 new JsonTokenNode({
-                                    location: SourceLocation.unknown(),
                                     type: JsonTokenType.NEWLINE,
                                     value: '\n',
                                 }),
                                 new JsonTokenNode({
-                                    location: SourceLocation.unknown(),
                                     type: JsonTokenType.WHITESPACE,
                                     value: '  ',
                                 }),
                                 thirdElement,
                                 new JsonTokenNode({
-                                    location: SourceLocation.unknown(),
                                     type: JsonTokenType.NEWLINE,
                                     value: '\n',
                                 }),
                                 new JsonTokenNode({
-                                    location: SourceLocation.unknown(),
                                     type: JsonTokenType.WHITESPACE,
                                     value: ' ',
                                 }),
                                 new JsonTokenNode({
-                                    location: SourceLocation.unknown(),
                                     type: JsonTokenType.BRACKET_RIGHT,
                                     value: ']',
                                 }),
@@ -709,83 +596,67 @@ describe('StructureNode', () => {
                         }),
                     ],
                     key: new JsonIdentifierNode({
-                        location: SourceLocation.unknown(),
                         children: [
                             new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.IDENTIFIER,
                                 value: 'foo',
                             }),
                         ],
                         token: new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.IDENTIFIER,
                             value: 'foo',
                         }),
                     }),
                     value: new JsonArrayNode({
-                        location: SourceLocation.unknown(),
                         children: [
                             new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.BRACKET_LEFT,
                                 value: '[',
                             }),
                             new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.NEWLINE,
                                 value: '\n',
                             }),
                             new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.WHITESPACE,
                                 value: ' ',
                             }),
                             firstElement,
                             new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.COMMA,
                                 value: ',',
                             }),
                             new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.NEWLINE,
                                 value: '\n',
                             }),
                             new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.WHITESPACE,
                                 value: ' ',
                             }),
                             secondElement,
                             new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.COMMA,
                                 value: ',',
                             }),
                             new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.NEWLINE,
                                 value: '\n',
                             }),
                             new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.WHITESPACE,
                                 value: '  ',
                             }),
                             thirdElement,
                             new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.NEWLINE,
                                 value: '\n',
                             }),
                             new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.WHITESPACE,
                                 value: ' ',
                             }),
                             new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.BRACKET_RIGHT,
                                 value: ']',
                             }),
@@ -794,7 +665,6 @@ describe('StructureNode', () => {
                     }),
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_RIGHT,
                     value: '}',
                 }),
@@ -805,22 +675,18 @@ describe('StructureNode', () => {
 
     it('should rebuild with trailing indentation', () => {
         const property = new JsonPropertyNode({
-            location: SourceLocation.unknown(),
             children: [],
             key: JsonIdentifierNode.of('foo'),
             value: JsonPrimitiveNode.of('bar'),
         });
 
         const structureNode = new TestStructureNode({
-            location: SourceLocation.unknown(),
             children: [
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_LEFT,
                     value: '{',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_RIGHT,
                     value: '}',
                 }),
@@ -836,47 +702,37 @@ describe('StructureNode', () => {
         });
 
         expect(structureNode).toStrictEqual(new TestStructureNode({
-            location: SourceLocation.unknown(),
             children: [
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_LEFT,
                     value: '{',
                 }),
                 new JsonPropertyNode({
-                    location: SourceLocation.unknown(),
                     children: [
                         new JsonIdentifierNode({
-                            location: SourceLocation.unknown(),
                             children: [
                                 new JsonTokenNode({
-                                    location: SourceLocation.unknown(),
                                     type: JsonTokenType.IDENTIFIER,
                                     value: 'foo',
                                 }),
                             ],
                             token: new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.IDENTIFIER,
                                 value: 'foo',
                             }),
                         }),
                         new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.COLON,
                             value: ':',
                         }),
                         new JsonPrimitiveNode({
-                            location: SourceLocation.unknown(),
                             children: [
                                 new JsonTokenNode({
-                                    location: SourceLocation.unknown(),
                                     type: JsonTokenType.STRING,
                                     value: '"bar"',
                                 }),
                             ],
                             token: new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.STRING,
                                 value: '"bar"',
                             }),
@@ -884,31 +740,25 @@ describe('StructureNode', () => {
                         }),
                     ],
                     key: new JsonIdentifierNode({
-                        location: SourceLocation.unknown(),
                         children: [
                             new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.IDENTIFIER,
                                 value: 'foo',
                             }),
                         ],
                         token: new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.IDENTIFIER,
                             value: 'foo',
                         }),
                     }),
                     value: new JsonPrimitiveNode({
-                        location: SourceLocation.unknown(),
                         children: [
                             new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.STRING,
                                 value: '"bar"',
                             }),
                         ],
                         token: new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.STRING,
                             value: '"bar"',
                         }),
@@ -916,17 +766,14 @@ describe('StructureNode', () => {
                     }),
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.NEWLINE,
                     value: '\n',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.WHITESPACE,
                     value: '',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_RIGHT,
                     value: '}',
                 }),
@@ -937,22 +784,18 @@ describe('StructureNode', () => {
 
     it('should rebuild with trailing comma', () => {
         const property = new JsonPropertyNode({
-            location: SourceLocation.unknown(),
             children: [],
             key: JsonIdentifierNode.of('foo'),
             value: JsonPrimitiveNode.of('bar'),
         });
 
         const structureNode = new TestStructureNode({
-            location: SourceLocation.unknown(),
             children: [
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_LEFT,
                     value: '{',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_RIGHT,
                     value: '}',
                 }),
@@ -967,47 +810,37 @@ describe('StructureNode', () => {
         });
 
         expect(structureNode).toStrictEqual(new TestStructureNode({
-            location: SourceLocation.unknown(),
             children: [
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_LEFT,
                     value: '{',
                 }),
                 new JsonPropertyNode({
-                    location: SourceLocation.unknown(),
                     children: [
                         new JsonIdentifierNode({
-                            location: SourceLocation.unknown(),
                             children: [
                                 new JsonTokenNode({
-                                    location: SourceLocation.unknown(),
                                     type: JsonTokenType.IDENTIFIER,
                                     value: 'foo',
                                 }),
                             ],
                             token: new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.IDENTIFIER,
                                 value: 'foo',
                             }),
                         }),
                         new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.COLON,
                             value: ':',
                         }),
                         new JsonPrimitiveNode({
-                            location: SourceLocation.unknown(),
                             children: [
                                 new JsonTokenNode({
-                                    location: SourceLocation.unknown(),
                                     type: JsonTokenType.STRING,
                                     value: '"bar"',
                                 }),
                             ],
                             token: new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.STRING,
                                 value: '"bar"',
                             }),
@@ -1015,31 +848,25 @@ describe('StructureNode', () => {
                         }),
                     ],
                     key: new JsonIdentifierNode({
-                        location: SourceLocation.unknown(),
                         children: [
                             new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.IDENTIFIER,
                                 value: 'foo',
                             }),
                         ],
                         token: new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.IDENTIFIER,
                             value: 'foo',
                         }),
                     }),
                     value: new JsonPrimitiveNode({
-                        location: SourceLocation.unknown(),
                         children: [
                             new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.STRING,
                                 value: '"bar"',
                             }),
                         ],
                         token: new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.STRING,
                             value: '"bar"',
                         }),
@@ -1047,12 +874,10 @@ describe('StructureNode', () => {
                     }),
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.COMMA,
                     value: ',',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_RIGHT,
                     value: '}',
                 }),
@@ -1063,32 +888,26 @@ describe('StructureNode', () => {
 
     it('should rebuild with block comment', () => {
         const property = new JsonPropertyNode({
-            location: SourceLocation.unknown(),
             children: [],
             key: JsonIdentifierNode.of('foo'),
             value: JsonPrimitiveNode.of('bar'),
         });
 
         const structureNode = new TestStructureNode({
-            location: SourceLocation.unknown(),
             children: [
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_LEFT,
                     value: '{',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.WHITESPACE,
                     value: ' ',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BLOCK_COMMENT,
                     value: '/* comment */',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_RIGHT,
                     value: '}',
                 }),
@@ -1099,62 +918,49 @@ describe('StructureNode', () => {
         structureNode.rebuild({});
 
         expect(structureNode).toStrictEqual(new TestStructureNode({
-            location: SourceLocation.unknown(),
             children: [
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_LEFT,
                     value: '{',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.WHITESPACE,
                     value: ' ',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BLOCK_COMMENT,
                     value: '/* comment */',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.WHITESPACE,
                     value: ' ',
                 }),
                 new JsonPropertyNode({
-                    location: SourceLocation.unknown(),
                     children: [
                         new JsonIdentifierNode({
-                            location: SourceLocation.unknown(),
                             children: [
                                 new JsonTokenNode({
-                                    location: SourceLocation.unknown(),
                                     type: JsonTokenType.IDENTIFIER,
                                     value: 'foo',
                                 }),
                             ],
                             token: new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.IDENTIFIER,
                                 value: 'foo',
                             }),
                         }),
                         new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.COLON,
                             value: ':',
                         }),
                         new JsonPrimitiveNode({
-                            location: SourceLocation.unknown(),
                             children: [
                                 new JsonTokenNode({
-                                    location: SourceLocation.unknown(),
                                     type: JsonTokenType.STRING,
                                     value: '"bar"',
                                 }),
                             ],
                             token: new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.STRING,
                                 value: '"bar"',
                             }),
@@ -1162,31 +968,25 @@ describe('StructureNode', () => {
                         }),
                     ],
                     key: new JsonIdentifierNode({
-                        location: SourceLocation.unknown(),
                         children: [
                             new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.IDENTIFIER,
                                 value: 'foo',
                             }),
                         ],
                         token: new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.IDENTIFIER,
                             value: 'foo',
                         }),
                     }),
                     value: new JsonPrimitiveNode({
-                        location: SourceLocation.unknown(),
                         children: [
                             new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.STRING,
                                 value: '"bar"',
                             }),
                         ],
                         token: new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.STRING,
                             value: '"bar"',
                         }),
@@ -1194,7 +994,6 @@ describe('StructureNode', () => {
                     }),
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_RIGHT,
                     value: '}',
                 }),
@@ -1205,38 +1004,30 @@ describe('StructureNode', () => {
 
     it('should rebuild with string key', () => {
         const property = new JsonPropertyNode({
-            location: SourceLocation.unknown(),
             children: [
                 new JsonPrimitiveNode({
-                    location: SourceLocation.unknown(),
                     children: [
                         new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.STRING,
                             value: '"foo"',
                         }),
                     ],
                     token: new JsonTokenNode({
-                        location: SourceLocation.unknown(),
                         type: JsonTokenType.STRING,
                         value: '"foo"',
                     }),
                     value: 'foo',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.COLON,
                     value: new JsonPrimitiveNode({
-                        location: SourceLocation.unknown(),
                         children: [
                             new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.STRING,
                                 value: 'foo',
                             }),
                         ],
                         token: new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.STRING,
                             value: 'foo',
                         }),
@@ -1245,32 +1036,26 @@ describe('StructureNode', () => {
                 }),
             ],
             key: new JsonPrimitiveNode({
-                location: SourceLocation.unknown(),
                 children: [
                     new JsonTokenNode({
-                        location: SourceLocation.unknown(),
                         type: JsonTokenType.STRING,
                         value: '"foo"',
                     }),
                 ],
                 token: new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.STRING,
                     value: '"foo"',
                 }),
                 value: '"foo"',
             }),
             value: new JsonPrimitiveNode({
-                location: SourceLocation.unknown(),
                 children: [
                     new JsonTokenNode({
-                        location: SourceLocation.unknown(),
                         type: JsonTokenType.STRING,
                         value: '"bar"',
                     }),
                 ],
                 token: new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.STRING,
                     value: '"bar"',
                 }),
@@ -1279,36 +1064,29 @@ describe('StructureNode', () => {
         });
 
         const structureNode = new TestStructureNode({
-            location: SourceLocation.unknown(),
             children: [
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_LEFT,
                     value: '{',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.NEWLINE,
                     value: '\n',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.WHITESPACE,
                     value: ' ',
                 }),
                 property,
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.COMMA,
                     value: ',',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.NEWLINE,
                     value: '\n',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_RIGHT,
                     value: '}',
                 }),
@@ -1323,48 +1101,38 @@ describe('StructureNode', () => {
         });
 
         expect(structureNode).toStrictEqual(new TestStructureNode({
-            location: SourceLocation.unknown(),
             children: [
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_LEFT,
                     value: '{',
                 }),
                 new JsonPropertyNode({
-                    location: SourceLocation.unknown(),
                     children: [
                         new JsonPrimitiveNode({
-                            location: SourceLocation.unknown(),
                             children: [
                                 new JsonTokenNode({
-                                    location: SourceLocation.unknown(),
                                     type: JsonTokenType.STRING,
                                     value: '"foo"',
                                 }),
                             ],
                             token: new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.STRING,
                                 value: '"foo"',
                             }),
                             value: 'foo',
                         }),
                         new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.COLON,
                             value: ':',
                         }),
                         new JsonPrimitiveNode({
-                            location: SourceLocation.unknown(),
                             children: [
                                 new JsonTokenNode({
-                                    location: SourceLocation.unknown(),
                                     type: JsonTokenType.STRING,
                                     value: '"bar"',
                                 }),
                             ],
                             token: new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.STRING,
                                 value: '"bar"',
                             }),
@@ -1372,32 +1140,26 @@ describe('StructureNode', () => {
                         }),
                     ],
                     key: new JsonPrimitiveNode({
-                        location: SourceLocation.unknown(),
                         children: [
                             new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.STRING,
                                 value: '"foo"',
                             }),
                         ],
                         token: new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.STRING,
                             value: '"foo"',
                         }),
                         value: 'foo',
                     }),
                     value: new JsonPrimitiveNode({
-                        location: SourceLocation.unknown(),
                         children: [
                             new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.STRING,
                                 value: '"bar"',
                             }),
                         ],
                         token: new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.STRING,
                             value: '"bar"',
                         }),
@@ -1405,7 +1167,6 @@ describe('StructureNode', () => {
                     }),
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_RIGHT,
                     value: '}',
                 }),
@@ -1416,18 +1177,15 @@ describe('StructureNode', () => {
 
     it('should rebuild with nested structure node', () => {
         const property = new JsonPropertyNode({
-            location: SourceLocation.unknown(),
             children: [],
             key: JsonIdentifierNode.of('foo'),
             value: JsonPrimitiveNode.of('bar'),
         });
 
         const structureNode = new TestStructureNode({
-            location: SourceLocation.unknown(),
             children: [
                 property,
                 new TestStructureNode({
-                    location: SourceLocation.unknown(),
                     children: [property],
                     properties: [],
                 }),
@@ -1442,47 +1200,37 @@ describe('StructureNode', () => {
         });
 
         expect(structureNode).toStrictEqual(new TestStructureNode({
-            location: SourceLocation.unknown(),
             children: [
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_LEFT,
                     value: '{',
                 }),
                 new JsonPropertyNode({
-                    location: SourceLocation.unknown(),
                     children: [
                         new JsonIdentifierNode({
-                            location: SourceLocation.unknown(),
                             children: [
                                 new JsonTokenNode({
-                                    location: SourceLocation.unknown(),
                                     type: JsonTokenType.IDENTIFIER,
                                     value: 'foo',
                                 }),
                             ],
                             token: new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.IDENTIFIER,
                                 value: 'foo',
                             }),
                         }),
                         new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.COLON,
                             value: ':',
                         }),
                         new JsonPrimitiveNode({
-                            location: SourceLocation.unknown(),
                             children: [
                                 new JsonTokenNode({
-                                    location: SourceLocation.unknown(),
                                     type: JsonTokenType.STRING,
                                     value: '"bar"',
                                 }),
                             ],
                             token: new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.STRING,
                                 value: '"bar"',
                             }),
@@ -1490,31 +1238,25 @@ describe('StructureNode', () => {
                         }),
                     ],
                     key: new JsonIdentifierNode({
-                        location: SourceLocation.unknown(),
                         children: [
                             new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.IDENTIFIER,
                                 value: 'foo',
                             }),
                         ],
                         token: new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.IDENTIFIER,
                             value: 'foo',
                         }),
                     }),
                     value: new JsonPrimitiveNode({
-                        location: SourceLocation.unknown(),
                         children: [
                             new JsonTokenNode({
-                                location: SourceLocation.unknown(),
                                 type: JsonTokenType.STRING,
                                 value: '"bar"',
                             }),
                         ],
                         token: new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.STRING,
                             value: '"bar"',
                         }),
@@ -1522,7 +1264,6 @@ describe('StructureNode', () => {
                     }),
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.BRACE_RIGHT,
                     value: '}',
                 }),

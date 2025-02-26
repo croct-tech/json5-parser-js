@@ -86,5 +86,5 @@ describe('Node', () => {
         });
 
         expect(left.equals(right)).toBeTrue();
-    })
+    });
 });

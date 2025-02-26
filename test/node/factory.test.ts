@@ -6,7 +6,6 @@ import {
     JsonTokenNode,
     JsonTokenType,
     JsonValueFactory,
-    SourceLocation,
 } from '../../src';
 
 describe('JsonValueFactory', () => {
@@ -23,9 +22,7 @@ describe('JsonValueFactory', () => {
                 token: new JsonTokenNode({
                     type: JsonTokenType.NULL,
                     value: 'null',
-                    location: SourceLocation.unknown(),
                 }),
-                location: SourceLocation.unknown(),
             }),
         );
     });
@@ -37,9 +34,7 @@ describe('JsonValueFactory', () => {
                 token: new JsonTokenNode({
                     type: JsonTokenType.BOOLEAN,
                     value: 'true',
-                    location: SourceLocation.unknown(),
                 }),
-                location: SourceLocation.unknown(),
             }),
         );
     });
@@ -51,9 +46,7 @@ describe('JsonValueFactory', () => {
                 token: new JsonTokenNode({
                     type: JsonTokenType.NUMBER,
                     value: '1',
-                    location: SourceLocation.unknown(),
                 }),
-                location: SourceLocation.unknown(),
             }),
         );
     });
@@ -65,9 +58,7 @@ describe('JsonValueFactory', () => {
                 token: new JsonTokenNode({
                     type: JsonTokenType.STRING,
                     value: '"\\"string\\""',
-                    location: SourceLocation.unknown(),
                 }),
-                location: SourceLocation.unknown(),
             }),
         );
     });

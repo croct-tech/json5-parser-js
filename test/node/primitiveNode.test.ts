@@ -1,4 +1,4 @@
-import {JsonArrayNode, JsonPrimitiveNode, JsonTokenNode, JsonTokenType, SourceLocation} from '../../src';
+import {JsonArrayNode, JsonPrimitiveNode, JsonTokenNode, JsonTokenType} from '../../src';
 
 describe('PrimitiveNode', () => {
     it('should create a string primitive node', () => {
@@ -80,10 +80,8 @@ describe('PrimitiveNode', () => {
             token: new JsonTokenNode({
                 type: JsonTokenType.STRING,
                 value: '"foo"',
-                location: SourceLocation.unknown(),
             }),
             children: [JsonPrimitiveNode.of('foo')],
-            location: SourceLocation.unknown(),
         });
 
         primitiveNode.reset();
@@ -97,10 +95,8 @@ describe('PrimitiveNode', () => {
             token: new JsonTokenNode({
                 type: JsonTokenType.STRING,
                 value: '"foo"',
-                location: SourceLocation.unknown(),
             }),
             children: [],
-            location: SourceLocation.unknown(),
         });
 
         expect(primitiveNode.toString()).toStrictEqual('"foo"');
@@ -117,16 +113,13 @@ describe('PrimitiveNode', () => {
                 token: new JsonTokenNode({
                     type: JsonTokenType.STRING,
                     value: '"foo"',
-                    location: SourceLocation.unknown(),
                 }),
                 children: [
                     new JsonTokenNode({
                         type: JsonTokenType.STRING,
                         value: '\'foo\'',
-                        location: SourceLocation.unknown(),
                     }),
                 ],
-                location: SourceLocation.unknown(),
             }),
         );
     });

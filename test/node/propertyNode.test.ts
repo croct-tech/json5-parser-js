@@ -7,13 +7,11 @@ import {
     JsonStringNode,
     JsonTokenNode,
     JsonTokenType,
-    SourceLocation,
 } from '../../src';
 
 describe('PropertyNode', () => {
     it('should set a value', () => {
         const propertyNode = new JsonPropertyNode({
-            location: SourceLocation.unknown(),
             children: [],
             key: JsonPrimitiveNode.of('foo'),
             value: JsonPrimitiveNode.of('bar'),
@@ -26,10 +24,8 @@ describe('PropertyNode', () => {
 
     it('should reset its children', () => {
         const key = new JsonPrimitiveNode({
-            location: SourceLocation.unknown(),
             children: [JsonPrimitiveNode.of('foo')],
             token: new JsonTokenNode({
-                location: SourceLocation.unknown(),
                 type: JsonTokenType.STRING,
                 value: '"foo"',
             }),
@@ -37,10 +33,8 @@ describe('PropertyNode', () => {
         });
 
         const value = new JsonPrimitiveNode({
-            location: SourceLocation.unknown(),
             children: [JsonPrimitiveNode.of('bar')],
             token: new JsonTokenNode({
-                location: SourceLocation.unknown(),
                 type: JsonTokenType.STRING,
                 value: '"bar"',
             }),
@@ -48,10 +42,8 @@ describe('PropertyNode', () => {
         });
 
         const propertyNode = new JsonPropertyNode({
-            location: SourceLocation.unknown(),
             children: [
                 new JsonPropertyNode({
-                    location: SourceLocation.unknown(),
                     children: [],
                     key: key,
                     value: value,
@@ -84,37 +76,30 @@ describe('PropertyNode', () => {
             },
             children: [
                 new JsonPrimitiveNode({
-                    location: SourceLocation.unknown(),
                     children: [
                         new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.STRING,
                             value: "'foo'",
                         }),
                     ],
                     token: new JsonTokenNode({
-                        location: SourceLocation.unknown(),
                         type: JsonTokenType.STRING,
                         value: '"foo"',
                     }),
                     value: 'foo',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.COLON,
                     value: ':',
                 }),
                 new JsonPrimitiveNode({
-                    location: SourceLocation.unknown(),
                     children: [
                         new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.STRING,
                             value: "'bar'",
                         }),
                     ],
                     token: new JsonTokenNode({
-                        location: SourceLocation.unknown(),
                         type: JsonTokenType.STRING,
                         value: '"bar"',
                     }),
@@ -122,33 +107,27 @@ describe('PropertyNode', () => {
                 }),
             ],
             key: new JsonPrimitiveNode({
-                location: SourceLocation.unknown(),
                 children: [
                     new JsonTokenNode({
-                        location: SourceLocation.unknown(),
                         type: JsonTokenType.STRING,
                         value: "'foo'",
                     }),
                 ],
                 value: 'foo',
                 token: new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.STRING,
                     value: '"foo"',
                 }),
             }),
             value: new JsonPrimitiveNode({
-                location: SourceLocation.unknown(),
                 children: [
                     new JsonTokenNode({
-                        location: SourceLocation.unknown(),
                         type: JsonTokenType.STRING,
                         value: "'bar'",
                     }),
                 ],
                 value: 'bar',
                 token: new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.STRING,
                     value: '"bar"',
                 }),
@@ -162,37 +141,30 @@ describe('PropertyNode', () => {
             },
             children: [
                 new JsonPrimitiveNode({
-                    location: SourceLocation.unknown(),
                     children: [
                         new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.STRING,
                             value: '"foo"',
                         }),
                     ],
                     token: new JsonTokenNode({
-                        location: SourceLocation.unknown(),
                         type: JsonTokenType.STRING,
                         value: '"foo"',
                     }),
                     value: 'foo',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.COLON,
                     value: ':',
                 }),
                 new JsonPrimitiveNode({
-                    location: SourceLocation.unknown(),
                     children: [
                         new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.STRING,
                             value: '"bar"',
                         }),
                     ],
                     token: new JsonTokenNode({
-                        location: SourceLocation.unknown(),
                         type: JsonTokenType.STRING,
                         value: '"bar"',
                     }),
@@ -200,33 +172,27 @@ describe('PropertyNode', () => {
                 }),
             ],
             key: new JsonPrimitiveNode({
-                location: SourceLocation.unknown(),
                 children: [
                     new JsonTokenNode({
-                        location: SourceLocation.unknown(),
                         type: JsonTokenType.STRING,
                         value: '"foo"',
                     }),
                 ],
                 value: 'foo',
                 token: new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.STRING,
                     value: '"foo"',
                 }),
             }),
             value: new JsonPrimitiveNode({
-                location: SourceLocation.unknown(),
                 children: [
                     new JsonTokenNode({
-                        location: SourceLocation.unknown(),
                         type: JsonTokenType.STRING,
                         value: '"bar"',
                     }),
                 ],
                 value: 'bar',
                 token: new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.STRING,
                     value: '"bar"',
                 }),
@@ -240,42 +206,34 @@ describe('PropertyNode', () => {
             },
             children: [
                 new JsonPrimitiveNode({
-                    location: SourceLocation.unknown(),
                     children: [
                         new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.STRING,
                             value: '"foo"',
                         }),
                     ],
                     token: new JsonTokenNode({
-                        location: SourceLocation.unknown(),
                         type: JsonTokenType.STRING,
                         value: '"foo"',
                     }),
                     value: 'foo',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.COLON,
                     value: ':',
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.WHITESPACE,
                     value: ' ',
                 }),
                 new JsonPrimitiveNode({
-                    location: SourceLocation.unknown(),
                     children: [
                         new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.STRING,
                             value: '"bar"',
                         }),
                     ],
                     token: new JsonTokenNode({
-                        location: SourceLocation.unknown(),
                         type: JsonTokenType.STRING,
                         value: '"bar"',
                     }),
@@ -283,33 +241,27 @@ describe('PropertyNode', () => {
                 }),
             ],
             key: new JsonPrimitiveNode({
-                location: SourceLocation.unknown(),
                 children: [
                     new JsonTokenNode({
-                        location: SourceLocation.unknown(),
                         type: JsonTokenType.STRING,
                         value: '"foo"',
                     }),
                 ],
                 value: 'foo',
                 token: new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.STRING,
                     value: '"foo"',
                 }),
             }),
             value: new JsonPrimitiveNode({
-                location: SourceLocation.unknown(),
                 children: [
                     new JsonTokenNode({
-                        location: SourceLocation.unknown(),
                         type: JsonTokenType.STRING,
                         value: '"bar"',
                     }),
                 ],
                 value: 'bar',
                 token: new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.STRING,
                     value: '"bar"',
                 }),
@@ -323,36 +275,29 @@ describe('PropertyNode', () => {
             },
             children: [
                 new JsonIdentifierNode({
-                    location: SourceLocation.unknown(),
                     children: [
                         new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.IDENTIFIER,
                             value: 'foo',
                         }),
                     ],
                     token: new JsonTokenNode({
-                        location: SourceLocation.unknown(),
                         type: JsonTokenType.IDENTIFIER,
                         value: 'foo',
                     }),
                 }),
                 new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.COLON,
                     value: ':',
                 }),
                 new JsonPrimitiveNode({
-                    location: SourceLocation.unknown(),
                     children: [
                         new JsonTokenNode({
-                            location: SourceLocation.unknown(),
                             type: JsonTokenType.STRING,
                             value: '"bar"',
                         }),
                     ],
                     token: new JsonTokenNode({
-                        location: SourceLocation.unknown(),
                         type: JsonTokenType.STRING,
                         value: '"bar"',
                     }),
@@ -360,27 +305,22 @@ describe('PropertyNode', () => {
                 }),
             ],
             key: new JsonPrimitiveNode({
-                location: SourceLocation.unknown(),
                 children: [],
                 value: 'foo',
                 token: new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.STRING,
                     value: '"foo"',
                 }),
             }),
             value: new JsonPrimitiveNode({
-                location: SourceLocation.unknown(),
                 children: [
                     new JsonTokenNode({
-                        location: SourceLocation.unknown(),
                         type: JsonTokenType.STRING,
                         value: '"bar"',
                     }),
                 ],
                 value: 'bar',
                 token: new JsonTokenNode({
-                    location: SourceLocation.unknown(),
                     type: JsonTokenType.STRING,
                     value: '"bar"',
                 }),
@@ -388,7 +328,6 @@ describe('PropertyNode', () => {
         },
     }))('should rebuild with %s formatting style', (_, scenario) => {
         const propertyNode = new JsonPropertyNode({
-            location: SourceLocation.unknown(),
             children: [],
             key: JsonPrimitiveNode.of('foo'),
             value: JsonPrimitiveNode.of('bar'),
@@ -396,24 +335,19 @@ describe('PropertyNode', () => {
 
         expect(propertyNode).toStrictEqual(
             new JsonPropertyNode({
-                location: SourceLocation.unknown(),
                 children: [],
                 key: new JsonPrimitiveNode({
-                    location: SourceLocation.unknown(),
                     children: [],
                     value: 'foo',
                     token: new JsonTokenNode({
-                        location: SourceLocation.unknown(),
                         type: JsonTokenType.STRING,
                         value: '"foo"',
                     }),
                 }),
                 value: new JsonPrimitiveNode({
-                    location: SourceLocation.unknown(),
                     children: [],
                     value: 'bar',
                     token: new JsonTokenNode({
-                        location: SourceLocation.unknown(),
                         type: JsonTokenType.STRING,
                         value: '"bar"',
                     }),
@@ -425,7 +359,6 @@ describe('PropertyNode', () => {
 
         expect(propertyNode).toStrictEqual(
             new JsonPropertyNode({
-                location: SourceLocation.unknown(),
                 children: scenario.children,
                 key: scenario.key,
                 value: scenario.value,
@@ -435,7 +368,6 @@ describe('PropertyNode', () => {
 
     it('should clone the property node', () => {
         const propertyNode = new JsonPropertyNode({
-            location: SourceLocation.unknown(),
             children: [JsonPrimitiveNode.of('foo')],
             key: JsonPrimitiveNode.of('foo'),
             value: JsonPrimitiveNode.of('bar'),
@@ -450,7 +382,6 @@ describe('PropertyNode', () => {
 
     it('should not be equivalent when other node is not a JSON property node', () => {
         const left = new JsonPropertyNode({
-            location: SourceLocation.unknown(),
             children: [],
             key: JsonPrimitiveNode.of('foo'),
             value: JsonPrimitiveNode.of('bar'),
@@ -463,14 +394,12 @@ describe('PropertyNode', () => {
 
     it('should not be equivalent when keys does not match', () => {
         const left = new JsonPropertyNode({
-            location: SourceLocation.unknown(),
             children: [],
             key: JsonPrimitiveNode.of('foo'),
             value: JsonPrimitiveNode.of('bar'),
         });
 
         const right = new JsonPropertyNode({
-            location: SourceLocation.unknown(),
             children: [],
             key: JsonPrimitiveNode.of('baz'),
             value: JsonPrimitiveNode.of('bar'),
@@ -481,14 +410,12 @@ describe('PropertyNode', () => {
 
     it('should not be equivalent when value does not match', () => {
         const left = new JsonPropertyNode({
-            location: SourceLocation.unknown(),
             children: [],
             key: JsonPrimitiveNode.of('foo'),
             value: JsonPrimitiveNode.of('bar'),
         });
 
         const right = new JsonPropertyNode({
-            location: SourceLocation.unknown(),
             children: [],
             key: JsonPrimitiveNode.of('foo'),
             value: JsonPrimitiveNode.of('baz'),
@@ -499,14 +426,12 @@ describe('PropertyNode', () => {
 
     it('should be equivalent to a node with equivalent key and value', () => {
         const left = new JsonPropertyNode({
-            location: SourceLocation.unknown(),
             children: [],
             key: JsonPrimitiveNode.of('foo'),
             value: JsonPrimitiveNode.of('bar'),
         });
 
         const right = new JsonPropertyNode({
-            location: SourceLocation.unknown(),
             children: [],
             key: JsonPrimitiveNode.of('foo'),
             value: JsonPrimitiveNode.of('bar'),

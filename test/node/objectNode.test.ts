@@ -7,7 +7,6 @@ import {
     JsonPropertyNode,
     JsonStringNode,
     JsonValueNode,
-    SourceLocation,
 } from '../../src';
 import {JsonError} from '../../src/error';
 
@@ -208,7 +207,6 @@ describe('ObjectNode', () => {
             new JsonPropertyNode({
                 key: JsonPrimitiveNode.of('foo'),
                 value: JsonPrimitiveNode.of('bar'),
-                location: SourceLocation.unknown(),
                 children: [],
             }),
         ]);
@@ -241,17 +239,14 @@ describe('ObjectNode', () => {
             name: JsonIdentifierNode.of('qux'),
             value: JsonPrimitiveNode.of('quux'),
             result: new JsonObjectNode({
-                location: SourceLocation.unknown(),
                 children: [],
                 properties: [
                     new JsonPropertyNode({
-                        location: SourceLocation.unknown(),
                         children: [],
                         key: JsonPrimitiveNode.of('foo'),
                         value: JsonPrimitiveNode.of('bar'),
                     }),
                     new JsonPropertyNode({
-                        location: SourceLocation.unknown(),
                         children: [],
                         key: JsonIdentifierNode.of('qux'),
                         value: JsonPrimitiveNode.of('quux'),
@@ -263,11 +258,9 @@ describe('ObjectNode', () => {
             name: 'foo',
             value: JsonPrimitiveNode.of('qux'),
             result: new JsonObjectNode({
-                location: SourceLocation.unknown(),
                 children: [],
                 properties: [
                     new JsonPropertyNode({
-                        location: SourceLocation.unknown(),
                         children: [],
                         key: JsonPrimitiveNode.of('foo'),
                         value: JsonPrimitiveNode.of('qux'),
@@ -327,14 +320,12 @@ describe('ObjectNode', () => {
 
     it('should clone the object node', () => {
         const property = new JsonPropertyNode({
-            location: SourceLocation.unknown(),
             children: [],
             key: JsonPrimitiveNode.of('foo'),
             value: JsonPrimitiveNode.of('bar'),
         });
 
         const objectNode = new JsonObjectNode({
-            location: SourceLocation.unknown(),
             children: [property],
             properties: [property],
         });
@@ -377,11 +368,9 @@ describe('ObjectNode', () => {
         });
 
         const right = new JsonObjectNode({
-            location: SourceLocation.unknown(),
             children: [],
             properties: [
                 new JsonPropertyNode({
-                    location: SourceLocation.unknown(),
                     children: [],
                     key: JsonIdentifierNode.of('foo'),
                     value: JsonPrimitiveNode.of('bar'),

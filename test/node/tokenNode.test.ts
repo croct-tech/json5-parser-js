@@ -1,9 +1,8 @@
-import {JsonPrimitiveNode, JsonTokenNode, JsonTokenType, SourceLocation} from '../../src';
+import {JsonPrimitiveNode, JsonTokenNode, JsonTokenType} from '../../src';
 
 describe('TokenNode', () => {
     it('should check whether a token is of a given type', () => {
         const token = new JsonTokenNode({
-            location: SourceLocation.unknown(),
             type: JsonTokenType.STRING,
             value: 'foo',
         });
@@ -15,7 +14,6 @@ describe('TokenNode', () => {
 
     it('should clone the token', () => {
         const token = new JsonTokenNode({
-            location: SourceLocation.unknown(),
             type: JsonTokenType.STRING,
             value: 'foo',
         });
@@ -28,7 +26,6 @@ describe('TokenNode', () => {
 
     it('should not be equivalent when the other node is not a JSON token', () => {
         const left = new JsonTokenNode({
-            location: SourceLocation.unknown(),
             type: JsonTokenType.STRING,
             value: 'foo',
         });
@@ -40,13 +37,11 @@ describe('TokenNode', () => {
 
     it('should not be equivalent when the other token type does not match', () => {
         const left = new JsonTokenNode({
-            location: SourceLocation.unknown(),
             type: JsonTokenType.STRING,
             value: 'foo',
         });
 
         const right = new JsonTokenNode({
-            location: SourceLocation.unknown(),
             type: JsonTokenType.NUMBER,
             value: 'foo',
         });
@@ -56,13 +51,11 @@ describe('TokenNode', () => {
 
     it('should not be equivalent when the other token value does not match', () => {
         const left = new JsonTokenNode({
-            location: SourceLocation.unknown(),
             type: JsonTokenType.STRING,
             value: 'foo',
         });
 
         const right = new JsonTokenNode({
-            location: SourceLocation.unknown(),
             type: JsonTokenType.STRING,
             value: 'bar',
         });
@@ -72,13 +65,11 @@ describe('TokenNode', () => {
 
     it('should be equivalent to other token node', () => {
         const left = new JsonTokenNode({
-            location: SourceLocation.unknown(),
             type: JsonTokenType.STRING,
             value: 'foo',
         });
 
         const right = new JsonTokenNode({
-            location: SourceLocation.unknown(),
             type: JsonTokenType.STRING,
             value: 'foo',
         });
@@ -88,7 +79,6 @@ describe('TokenNode', () => {
 
     it('should serialize to string', () => {
         const token = new JsonTokenNode({
-            location: SourceLocation.unknown(),
             type: JsonTokenType.NUMBER,
             value: '123',
         });
