@@ -1,10 +1,4 @@
-import {
-    JsonIdentifierNode,
-    JsonPrimitiveNode,
-    JsonTokenNode,
-    JsonTokenType,
-    reservedIdentifiers,
-} from '../../src';
+import {JsonIdentifierNode, JsonPrimitiveNode, JsonTokenNode, JsonTokenType, reservedIdentifiers} from '../../src';
 import {JsonError} from '../../src/error';
 
 describe('IdentifierNode', () => {
@@ -125,7 +119,7 @@ describe('IdentifierNode', () => {
         expect(left.isEquivalent(right)).toBeFalse();
     });
 
-    it('should be equivalent to a node with same idenfitier', () => {
+    it('should be equivalent to a node with same identifier', () => {
         const left = JsonIdentifierNode.of('foo');
         const right = JsonIdentifierNode.of('foo');
 

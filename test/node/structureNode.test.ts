@@ -1018,21 +1018,18 @@ describe('StructureNode', () => {
                     }),
                     value: 'foo',
                 }),
-                new JsonTokenNode({
-                    type: JsonTokenType.COLON,
-                    value: new JsonPrimitiveNode({
-                        children: [
-                            new JsonTokenNode({
-                                type: JsonTokenType.STRING,
-                                value: 'foo',
-                            }),
-                        ],
-                        token: new JsonTokenNode({
+                new JsonPrimitiveNode({
+                    children: [
+                        new JsonTokenNode({
                             type: JsonTokenType.STRING,
                             value: 'foo',
                         }),
+                    ],
+                    token: new JsonTokenNode({
+                        type: JsonTokenType.STRING,
                         value: 'foo',
                     }),
+                    value: 'foo',
                 }),
             ],
             key: new JsonPrimitiveNode({
@@ -1079,10 +1076,6 @@ describe('StructureNode', () => {
                 }),
                 property,
                 new JsonTokenNode({
-                    type: JsonTokenType.COMMA,
-                    value: ',',
-                }),
-                new JsonTokenNode({
                     type: JsonTokenType.NEWLINE,
                     value: '\n',
                 }),
@@ -1106,6 +1099,14 @@ describe('StructureNode', () => {
                     type: JsonTokenType.BRACE_LEFT,
                     value: '{',
                 }),
+                new JsonTokenNode({
+                    type: JsonTokenType.NEWLINE,
+                    value: '\n',
+                }),
+                new JsonTokenNode({
+                    type: JsonTokenType.WHITESPACE,
+                    value: ' ',
+                }),
                 new JsonPropertyNode({
                     children: [
                         new JsonPrimitiveNode({
@@ -1119,7 +1120,7 @@ describe('StructureNode', () => {
                                 type: JsonTokenType.STRING,
                                 value: '"foo"',
                             }),
-                            value: 'foo',
+                            value: '"foo"',
                         }),
                         new JsonTokenNode({
                             type: JsonTokenType.COLON,
@@ -1136,7 +1137,7 @@ describe('StructureNode', () => {
                                 type: JsonTokenType.STRING,
                                 value: '"bar"',
                             }),
-                            value: 'bar',
+                            value: '"bar"',
                         }),
                     ],
                     key: new JsonPrimitiveNode({
@@ -1150,7 +1151,7 @@ describe('StructureNode', () => {
                             type: JsonTokenType.STRING,
                             value: '"foo"',
                         }),
-                        value: 'foo',
+                        value: '"foo"',
                     }),
                     value: new JsonPrimitiveNode({
                         children: [
@@ -1163,8 +1164,16 @@ describe('StructureNode', () => {
                             type: JsonTokenType.STRING,
                             value: '"bar"',
                         }),
-                        value: 'bar',
+                        value: '"bar"',
                     }),
+                }),
+                new JsonTokenNode({
+                    type: JsonTokenType.NEWLINE,
+                    value: '\n',
+                }),
+                new JsonTokenNode({
+                    type: JsonTokenType.WHITESPACE,
+                    value: '',
                 }),
                 new JsonTokenNode({
                     type: JsonTokenType.BRACE_RIGHT,

@@ -1,9 +1,4 @@
-import {
-    Formatting,
-    JsonArrayNode,
-    JsonCompositeNode,
-    PartialJsonCompositeDefinition,
-} from '../../src';
+import {Formatting, JsonArrayNode, JsonCompositeNode, PartialJsonCompositeDefinition} from '../../src';
 
 describe('CompositeNode', () => {
     class TestCompositeNode extends JsonCompositeNode {
