@@ -82,8 +82,9 @@ describe('NodeMatcher', () => {
     });
 });
 
+// @todo add more tests to cover the rest of the code
 describe('NodeManipulator', () => {
-    it('should indicate whether the iterator has reached the end of the children list', () => {
+    it('should indicate whether the iterator has reached the end', () => {
         const manipulator = new NodeManipulator([
             JsonPrimitiveNode.of('foo'),
             JsonPrimitiveNode.of('bar'),
@@ -104,10 +105,7 @@ describe('NodeManipulator', () => {
         const firstNode = JsonPrimitiveNode.of('foo');
         const secondNode = JsonPrimitiveNode.of('bar');
 
-        const manipulator = new NodeManipulator([
-            firstNode,
-            secondNode,
-        ]);
+        const manipulator = new NodeManipulator([firstNode, secondNode]);
 
         expect(manipulator.current).toBe(firstNode);
 
@@ -116,7 +114,7 @@ describe('NodeManipulator', () => {
         expect(manipulator.current).toBe(secondNode);
     });
 
-    it('should fail when attempting to advance past the end of the children list', () => {
+    it('should fail to advance when the iterator is at the end of the list', () => {
         const manipulator = new NodeManipulator([JsonPrimitiveNode.of('foo')]);
 
         manipulator.next();
@@ -140,7 +138,7 @@ describe('NodeManipulator', () => {
         expect(manipulator.position).toBe(1);
     });
 
-    it('should fail when attempting to seek a position less than 0', () => {
+    it('should fail to seek a position before the beginning of the children list', () => {
         const manipulator = new NodeManipulator([JsonPrimitiveNode.of('foo')]);
 
         expect(() => manipulator.seek(-1)).toThrowWithMessage(
@@ -149,7 +147,7 @@ describe('NodeManipulator', () => {
         );
     });
 
-    it('should fail when attempting to seek a position beyond the children list length', () => {
+    it('should fail to seek a position beyond the children list length', () => {
         const manipulator = new NodeManipulator([JsonPrimitiveNode.of('foo')]);
 
         expect(() => manipulator.seek(1)).toThrowWithMessage(
@@ -176,7 +174,7 @@ describe('NodeManipulator', () => {
         expect(manipulator.current).toBe(firstNode);
     });
 
-    it('should fail when attempting to move to the previous node from the beginning of the list', () => {
+    it('should fail to move to the previous node at the beginning of the list', () => {
         const manipulator = new NodeManipulator([]);
 
         expect(() => manipulator.previous()).toThrowWithMessage(
@@ -201,7 +199,7 @@ describe('NodeManipulator', () => {
         expect(manipulator.current).toBe(firstNode);
     });
 
-    it('should fail when attempting to access the current node at the end of the list', () => {
+    it('should fail to access the current node at the end of the list', () => {
         const manipulator = new NodeManipulator([]);
 
         expect(() => manipulator.current).toThrowWithMessage(
@@ -210,7 +208,7 @@ describe('NodeManipulator', () => {
         );
     });
 
-    it('should return false when checking previous token at the beginning of the list', () => {
+    it('should not match any previous node at the beginning of the list', () => {
         const manipulator = new NodeManipulator([
             new JsonTokenNode({
                 type: JsonTokenType.BRACE_LEFT,
@@ -270,7 +268,7 @@ describe('NodeManipulator', () => {
         expect(manipulator.matchesPreviousToken(JsonTokenType.BRACE_LEFT)).toBeTrue();
     });
 
-    it('should return true when the current node matches the specified node', () => {
+    it('should return true when the current node matches the specified node ignoring insignificant nodes', () => {
         const primitiveNode = JsonPrimitiveNode.of('foo');
 
         const manipulator = new NodeManipulator([
@@ -378,7 +376,7 @@ describe('NodeManipulator', () => {
         expect(manipulator.findNext(matcher, NodeMatcher.SPACE)).toBe(2);
     });
 
-    it('should not found when no node satisfies the matcher', () => {
+    it('should return -1 when no node in the sequence satisfies the matcher', () => {
         const manipulator = new NodeManipulator([
             new JsonTokenNode({
                 type: JsonTokenType.WHITESPACE,
@@ -395,7 +393,7 @@ describe('NodeManipulator', () => {
         expect(manipulator.findNext(matcher, NodeMatcher.WHITESPACE)).toBe(-1);
     });
 
-    it('should match and replace a token node', () => {
+    it('should replace the current node and advance to the next node', () => {
         const tokenNode = new JsonTokenNode({
             type: JsonTokenType.WHITESPACE,
             value: ' ',
@@ -432,7 +430,7 @@ describe('NodeManipulator', () => {
         expect(manipulator.current).toBe(tokenNode);
     });
 
-    it('should not insert a insignificant token node if it does not exist and is optional', () => {
+    it('should not insert an insignificant token node if it does not exist and is optional', () => {
         const tokenNode = new JsonTokenNode({
             type: JsonTokenType.WHITESPACE,
             value: ' ',
@@ -500,7 +498,7 @@ describe('NodeManipulator', () => {
         expect(manipulator.current).toStrictEqual(targetNode);
     });
 
-    it('should match and replace a node', () => {
+    it('should replace a node and advance to the next node', () => {
         const node = JsonPrimitiveNode.of('foo');
         const manipulator = new NodeManipulator([node]);
 
@@ -638,6 +636,7 @@ describe('NodeManipulator', () => {
     });
 
     it('should drop nodes until a matching node is found', () => {
+        // @todo what happened to the list? include an assertion to make it clear
         const targetNode = JsonPrimitiveNode.of('bar');
         const manipulator = new NodeManipulator([
             JsonPrimitiveNode.of('foo'),
@@ -656,6 +655,7 @@ describe('NodeManipulator', () => {
     });
 
     it('should drop insignificant nodes until a significant node is found', () => {
+        // @todo what happened to the list? include an assertion to make it clear
         const targetNode = JsonPrimitiveNode.of('bar');
         const manipulator = new NodeManipulator([
             new JsonTokenNode({
@@ -679,6 +679,7 @@ describe('NodeManipulator', () => {
     });
 
     it('should drop all nodes if no matching node is found', () => {
+        // @todo what happened to the list? include an assertion to make it clear
         const manipulator = new NodeManipulator([
             JsonPrimitiveNode.of('foo'),
             new JsonTokenNode({
@@ -695,7 +696,7 @@ describe('NodeManipulator', () => {
         expect(manipulator.done()).toBeTrue();
     });
 
-    it('should handle droping nodes in an empty list', () => {
+    it('should drop nothing if no nodes left', () => {
         const manipulator = new NodeManipulator([]);
 
         const matcher = (node: JsonNode): boolean => node.isEquivalent(JsonPrimitiveNode.of('foo'));
@@ -730,13 +731,17 @@ describe('NodeManipulator', () => {
 
         manipulator.next();
 
-        expect(manipulator.current).toEqual(new JsonTokenNode({
-            type: JsonTokenType.WHITESPACE,
-            value: ' ',
-        }));
+        expect(manipulator.current).toEqual(
+            // @todo: which of the tokens should be here? use toBe to make it more clear
+            new JsonTokenNode({
+                type: JsonTokenType.WHITESPACE,
+                value: ' ',
+            }),
+        );
     });
 
-    it('should handle consecutive insignificant nodes', () => {
+    // @todo: we should assert what we expect to happen to the list
+    it('should handle consecutive insignificant nodes when dropping nodes', () => {
         const targetNode = JsonPrimitiveNode.of('bar');
         const manipulator = new NodeManipulator([
             new JsonTokenNode({
@@ -761,6 +766,7 @@ describe('NodeManipulator', () => {
         expect(manipulator.position).toBe(3);
     });
 
+    // @todo: not sure what it's doing
     it('should handle dropping nodes until the end of the list', () => {
         const manipulator = new NodeManipulator([
             JsonPrimitiveNode.of('foo'),
@@ -777,27 +783,22 @@ describe('NodeManipulator', () => {
         expect(manipulator.done()).toBeTrue();
     });
 
-    it('should remove all nodes', () => {
-        const manipulator = new NodeManipulator([
-            JsonPrimitiveNode.of('foo'),
-        ]);
+    it('should drop all remaining nodes', () => {
+        const list = [JsonPrimitiveNode.of('foo')];
+
+        const manipulator = new NodeManipulator(list);
 
         manipulator.end();
 
         expect(manipulator.done()).toBeTrue();
-
-        expect(() => manipulator.previous()).toThrowWithMessage(
-            Error,
-            'The iterator is at the beginning of the list.',
-        );
+        expect(list).toBeEmpty();
     });
 
     it('should remove all insignificant nodes', () => {
-        const manipulator = new NodeManipulator([
-            JsonPrimitiveNode.of('foo'),
-        ]);
+        const list = [JsonPrimitiveNode.of('foo')];
 
-        // Set the internal fixing property to true
+        const manipulator = new NodeManipulator(list);
+
         manipulator.nodes([
             new JsonTokenNode({
                 type: JsonTokenType.WHITESPACE,
@@ -813,9 +814,6 @@ describe('NodeManipulator', () => {
 
         expect(manipulator.done()).toBeTrue();
 
-        expect(() => manipulator.previous()).toThrowWithMessage(
-            Error,
-            'The iterator is at the beginning of the list.',
-        );
+        expect(list).toBeEmpty();
     });
 });
