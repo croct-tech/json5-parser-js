@@ -14,197 +14,109 @@ import {JsonError} from '../../src/error';
 
 describe('ObjectNode', () => {
     it('should create an object node', () => {
-        const objectNode = JsonObjectNode.of({
-            foo: 'bar',
-        });
+        const node = JsonObjectNode.of({foo: 'bar'});
 
-        expect(objectNode.children).toStrictEqual([]);
-    });
-
-    it('should update a non object node', () => {
-        const objectNode = JsonObjectNode.of({
-            foo: 'bar',
-        });
-
-        const updatedNode = objectNode.update('baz');
-
-        expect(updatedNode).toStrictEqual(JsonPrimitiveNode.of('baz'));
-
-        expect(objectNode).toStrictEqual(JsonObjectNode.of({
-            foo: 'bar',
-        }));
-    });
-
-    it('should update the node with a object value', () => {
-        const objectNode = JsonObjectNode.of({
-            foo: 'bar',
-        });
-
-        const updatedNode = objectNode.update({
-            baz: 'qux',
-        });
-
-        expect(updatedNode).toStrictEqual(JsonObjectNode.of({
-            baz: 'qux',
-        }));
-
-        expect(objectNode).toStrictEqual(JsonObjectNode.of({
-            baz: 'qux',
-        }));
-    });
-
-    it('should update an undefined object property', () => {
-        const objectNode = JsonObjectNode.of({
-            foo: 'bar',
-        });
-
-        const updatedNode = objectNode.update({
-            foo: undefined,
-        });
-
-        expect(updatedNode).toStrictEqual(JsonObjectNode.of({}));
-
-        expect(objectNode).toStrictEqual(JsonObjectNode.of({}));
-    });
-
-    it('should update an object property', () => {
-        const objectNode = JsonObjectNode.of({
-            foo: 'bar',
-        });
-
-        const updatedNode = objectNode.update({
-            foo: 'baz',
-        });
-
-        expect(updatedNode).toStrictEqual(JsonObjectNode.of({
-            foo: 'baz',
-        }));
-
-        expect(objectNode).toStrictEqual(JsonObjectNode.of({
-            foo: 'baz',
-        }));
-    });
-
-    it('should update merging object properties', () => {
-        const objectNode = JsonObjectNode.of({
-            foo: 'bar',
-            qux: 'quux',
-            corge: 'grault',
-        });
-
-        const updatedNode = objectNode.update(
-            {
-                foo: 'baz',
-                qux: undefined,
-                corge: 'garply',
-            },
-            true,
+        expect(node).toStrictEqual(
+            new JsonObjectNode({
+                properties: [
+                    new JsonPropertyNode({
+                        children: [],
+                        key: JsonPrimitiveNode.of('foo'),
+                        value: JsonPrimitiveNode.of('bar'),
+                    }),
+                ],
+            }),
         );
-
-        expect(updatedNode).toStrictEqual(JsonObjectNode.of({
-            foo: 'baz',
-            corge: 'garply',
-        }));
-
-        expect(updatedNode).toStrictEqual(JsonObjectNode.of({
-            foo: 'baz',
-            corge: 'garply',
-        }));
     });
 
-    it('should update non JSON object nodes', () => {
-        const objectNode = JsonObjectNode.of({
+    it('should update a non-object value', () => {
+        const node = JsonObjectNode.of({
             foo: 'bar',
         });
 
-        const updatedNode = objectNode.update(JsonPrimitiveNode.of('foo'));
-
-        expect(updatedNode).toStrictEqual(JsonPrimitiveNode.of('foo'));
-
-        expect(objectNode).toStrictEqual(JsonObjectNode.of({
-            foo: 'bar',
-        }));
+        expect(node.update('baz')).toStrictEqual(JsonPrimitiveNode.of('baz'));
     });
 
-    it('should update new node properties', () => {
-        const objectNode = JsonObjectNode.of({
+    it('should update a non-object node', () => {
+        const node = JsonObjectNode.of({
             foo: 'bar',
         });
 
-        const updatedNode = objectNode.update(JsonObjectNode.of({
-            qux: 'quux',
-        }));
+        const primitive = JsonPrimitiveNode.of('baz');
 
-        expect(updatedNode).toStrictEqual(JsonObjectNode.of({
-            qux: 'quux',
-        }));
-
-        expect(objectNode).toStrictEqual(JsonObjectNode.of({
-            qux: 'quux',
-        }));
+        expect(node.update(primitive)).toStrictEqual(JsonPrimitiveNode.of(primitive));
     });
 
-    it('should update existing node properties', () => {
-        const objectNode = JsonObjectNode.of({
+    it('should update the node with an object value', () => {
+        const node = JsonObjectNode.of({
+            foo: 'bar',
+            baz: 'qux',
+        });
+
+        const result = node.update({baz: 'qux'}).cast(JsonObjectNode);
+
+        expect(result).toStrictEqual(JsonObjectNode.of({baz: 'qux'}));
+
+        expect(node.properties[0]).toBe(result.properties[0]);
+    });
+
+    it('should update the node with an object node', () => {
+        const node = JsonObjectNode.of({
+            foo: 'bar',
+            baz: 'qux',
+        });
+
+        const anotherNode = JsonObjectNode.of({
+            baz: 'qux',
+            quux: 'corge',
+        });
+
+        const result = node.update(anotherNode).cast(JsonObjectNode);
+
+        expect(result).toStrictEqual(anotherNode);
+
+        expect(node.properties[0]).toBe(result.properties[0]);
+    });
+
+    it('should remove undefined properties', () => {
+        const node = JsonObjectNode.of({
             foo: 'bar',
         });
 
-        const updatedNode = objectNode.update(JsonObjectNode.of({
-            foo: 'qux',
-        }));
-
-        expect(updatedNode).toStrictEqual(JsonObjectNode.of({
-            foo: 'bar',
-        }));
-
-        expect(objectNode).toStrictEqual(JsonObjectNode.of({
-            foo: 'bar',
-        }));
-    });
-
-    it('should update merging node properties', () => {
-        const objectNode = JsonObjectNode.of({
-            foo: 'bar',
-            qux: 'quux',
-            corge: 'grault',
+        const updatedNode = node.update({
+            foo: undefined,
+            bar: 'baz',
         });
 
-        const updatedNode = objectNode.update(JsonObjectNode.of({
-            foo: 'baz',
-            corge: 'garply',
-        }));
-
-        expect(updatedNode).toStrictEqual(JsonObjectNode.of({
-            foo: 'bar',
-            corge: 'grault',
-        }));
-
-        expect(updatedNode).toStrictEqual(JsonObjectNode.of({
-            foo: 'bar',
-            corge: 'grault',
-        }));
+        expect(updatedNode).toStrictEqual(JsonObjectNode.of({bar: 'baz'}));
     });
 
-    it('should check whether an object node has a key', () => {
-        const objectNode = JsonObjectNode.of({
+    it('should check whether an object has a property', () => {
+        const node = JsonObjectNode.of({
             foo: 'bar',
         });
 
-        expect(objectNode.has('foo')).toBeTrue();
-
-        expect(objectNode.has('bar')).toBeFalse();
+        expect(node.has('foo')).toBeTrue();
+        expect(node.has('bar')).toBeFalse();
     });
 
-    it('should get its properties', () => {
-        const objectNode = JsonObjectNode.of({
-            foo: 'bar',
+    it('should get the properties', () => {
+        const bar = JsonPrimitiveNode.of('bar');
+        const baz = JsonPrimitiveNode.of('baz');
+
+        const node = JsonObjectNode.of({
+            foo: bar,
+            bar: baz,
         });
 
-        expect(objectNode.properties).toStrictEqual([
+        expect(node.properties).toStrictEqual([
             new JsonPropertyNode({
                 key: JsonPrimitiveNode.of('foo'),
-                value: JsonPrimitiveNode.of('bar'),
-                children: [],
+                value: bar,
+            }),
+            new JsonPropertyNode({
+                key: JsonPrimitiveNode.of('bar'),
+                value: baz,
             }),
         ]);
     });
@@ -236,15 +148,12 @@ describe('ObjectNode', () => {
             name: JsonIdentifierNode.of('qux'),
             value: JsonPrimitiveNode.of('quux'),
             result: new JsonObjectNode({
-                children: [],
                 properties: [
                     new JsonPropertyNode({
-                        children: [],
                         key: JsonPrimitiveNode.of('foo'),
                         value: JsonPrimitiveNode.of('bar'),
                     }),
                     new JsonPropertyNode({
-                        children: [],
                         key: JsonIdentifierNode.of('qux'),
                         value: JsonPrimitiveNode.of('quux'),
                     }),
@@ -255,10 +164,8 @@ describe('ObjectNode', () => {
             name: 'foo',
             value: JsonPrimitiveNode.of('qux'),
             result: new JsonObjectNode({
-                children: [],
                 properties: [
                     new JsonPropertyNode({
-                        children: [],
                         key: JsonPrimitiveNode.of('foo'),
                         value: JsonPrimitiveNode.of('qux'),
                     }),
@@ -266,74 +173,76 @@ describe('ObjectNode', () => {
             }),
         },
     }))('should set %s', (_, scenario) => {
-        const objectNode = JsonObjectNode.of({
+        const node = JsonObjectNode.of({
             foo: 'bar',
         });
 
-        objectNode.set(scenario.name, scenario.value);
+        node.set(scenario.name, scenario.value);
 
-        expect(objectNode).toStrictEqual(scenario.result);
+        expect(node).toStrictEqual(scenario.result);
     });
 
     it('should delete a property', () => {
-        const objectNode = JsonObjectNode.of({
+        const node = JsonObjectNode.of({
             foo: 'bar',
         });
 
-        objectNode.delete('foo');
+        node.delete('foo');
 
-        expect(objectNode).toStrictEqual(JsonObjectNode.of({}));
+        expect(node).toStrictEqual(JsonObjectNode.of({}));
     });
 
-    it('should fail to get an unexisting property', () => {
-        const objectNode = JsonObjectNode.of({
+    it('should fail to get a non-existing property', () => {
+        const node = JsonObjectNode.of({
             foo: 'bar',
         });
 
-        expect(() => objectNode.get('bar')).toThrowWithMessage(
+        expect(() => node.get('bar')).toThrowWithMessage(
             Error,
             'Property "bar" does not exist.',
         );
     });
 
-    it('should fail when the property does not match the expected type', () => {
-        const objectNode = JsonObjectNode.of({
+    it('should fail to get a property with an invalid type', () => {
+        const node = JsonObjectNode.of({
             foo: 'bar',
         });
 
-        expect(() => objectNode.get('foo', JsonArrayNode)).toThrowWithMessage(
+        expect(() => node.get('foo', JsonArrayNode)).toThrowWithMessage(
             JsonError,
             'Expected a value of type JsonArrayNode, but got JsonPrimitiveNode',
         );
     });
 
     it('should get a property', () => {
-        const objectNode = JsonObjectNode.of({
+        const node = JsonObjectNode.of({
             foo: 'bar',
         });
 
-        expect(objectNode.get('foo', JsonPrimitiveNode)).toStrictEqual(JsonPrimitiveNode.of('bar'));
+        expect(node.get('foo', JsonPrimitiveNode)).toStrictEqual(JsonPrimitiveNode.of('bar'));
     });
 
     it('should clone the object node', () => {
         const property = new JsonPropertyNode({
-            children: [],
             key: JsonPrimitiveNode.of('foo'),
             value: JsonPrimitiveNode.of('bar'),
         });
 
-        const objectNode = new JsonObjectNode({
-            children: [property],
+        const node = new JsonObjectNode({
             properties: [property],
+            children: [property],
         });
 
-        const clone = objectNode.clone();
+        const clone = node.clone();
 
-        expect(objectNode).toStrictEqual(clone);
-        expect(objectNode).not.toBe(clone);
+        expect(node).toStrictEqual(clone);
+        expect(node).not.toBe(clone);
 
-        expect(objectNode.children[0]).toStrictEqual(clone.children[0]);
-        expect(objectNode.children[0]).not.toBe(clone.children[0]);
+        expect(node.properties[0]).toStrictEqual(clone.properties[0]);
+        expect(node.properties[0]).not.toBe(clone.properties[0]);
+
+        expect(node.children[0]).toStrictEqual(clone.children[0]);
+        expect(node.children[0]).not.toBe(clone.children[0]);
     });
 
     it('should not be equivalent to a non-object node', () => {
@@ -346,7 +255,7 @@ describe('ObjectNode', () => {
         expect(left.isEquivalent(right)).toBeFalse();
     });
 
-    it('should not be equivalent when other node have extra properties', () => {
+    it('should not be equivalent to another node with different properties', () => {
         const left = JsonObjectNode.of({
             foo: 'bar',
         });
@@ -359,7 +268,7 @@ describe('ObjectNode', () => {
         expect(left.isEquivalent(right)).toBeFalse();
     });
 
-    it('should not be equivalent when properties are not equivalent', () => {
+    it('should not be equivalent to another node with different values', () => {
         const left = JsonObjectNode.of({
             foo: 'bar',
         });
@@ -378,7 +287,7 @@ describe('ObjectNode', () => {
         expect(left.isEquivalent(right)).toBeFalse();
     });
 
-    it('should be equivalent when every property is equivalent', () => {
+    it('should be equivalent to another node with the same properties', () => {
         const left = JsonObjectNode.of({
             foo: 'bar',
         });
@@ -391,17 +300,39 @@ describe('ObjectNode', () => {
     });
 
     it('should rebuild itself', () => {
-        const node = new JsonObjectNode({
-            properties: [
-                new JsonPropertyNode({
-                    children: [],
-                    key: JsonPrimitiveNode.of('foo'),
-                    value: JsonPrimitiveNode.of('bar'),
-                }),
-            ],
+        const node = JsonObjectNode.of({
+            foo: 'bar',
         });
 
         node.rebuild();
+
+        const key = new JsonPrimitiveNode({
+            children: [
+                new JsonTokenNode({
+                    type: JsonTokenType.STRING,
+                    value: '"foo"',
+                }),
+            ],
+            token: new JsonTokenNode({
+                type: JsonTokenType.STRING,
+                value: '"foo"',
+            }),
+            value: 'foo',
+        });
+
+        const value = new JsonPrimitiveNode({
+            children: [
+                new JsonTokenNode({
+                    type: JsonTokenType.STRING,
+                    value: '"bar"',
+                }),
+            ],
+            token: new JsonTokenNode({
+                type: JsonTokenType.STRING,
+                value: '"bar"',
+            }),
+            value: 'bar',
+        });
 
         expect(node.children).toStrictEqual([
             new JsonTokenNode({
@@ -410,63 +341,15 @@ describe('ObjectNode', () => {
             }),
             new JsonPropertyNode({
                 children: [
-                    new JsonPrimitiveNode({
-                        children: [
-                            new JsonTokenNode({
-                                type: JsonTokenType.STRING,
-                                value: '"foo"',
-                            }),
-                        ],
-                        token: new JsonTokenNode({
-                            type: JsonTokenType.STRING,
-                            value: '"foo"',
-                        }),
-                        value: 'foo',
-                    }),
+                    key,
                     new JsonTokenNode({
                         type: JsonTokenType.COLON,
                         value: ':',
                     }),
-                    new JsonPrimitiveNode({
-                        children: [
-                            new JsonTokenNode({
-                                type: JsonTokenType.STRING,
-                                value: '"bar"',
-                            }),
-                        ],
-                        token: new JsonTokenNode({
-                            type: JsonTokenType.STRING,
-                            value: '"bar"',
-                        }),
-                        value: 'bar',
-                    }),
+                    value,
                 ],
-                key: new JsonPrimitiveNode({
-                    children: [
-                        new JsonTokenNode({
-                            type: JsonTokenType.STRING,
-                            value: '"foo"',
-                        }),
-                    ],
-                    token: new JsonTokenNode({
-                        type: JsonTokenType.STRING,
-                        value: '"foo"',
-                    }),
-                    value: 'foo',
-                }),
-                value: new JsonPrimitiveNode({
-                    children: [
-                        new JsonTokenNode({
-                            type: JsonTokenType.STRING,
-                            value: '"bar"',
-                        }),
-                    ],
-                    token: new JsonTokenNode({
-                        type: JsonTokenType.STRING,
-                        value: '"bar"',
-                    }),
-                    value: 'bar',
-                }),
+                key: key,
+                value: value,
             }),
             new JsonTokenNode({
                 type: JsonTokenType.BRACE_RIGHT,
@@ -489,12 +372,12 @@ describe('ObjectNode', () => {
         'nested array': [1, 2, 3],
         'empty object': {},
         'empty array': [],
-    }))('should serialize %s to its JSON format', (_, value) => {
-        const objectNode = JsonObjectNode.of({
+    }))('should serialize %s to JSON', (_, value) => {
+        const node = JsonObjectNode.of({
             key: value,
         });
 
-        expect(objectNode.toJSON()).toStrictEqual({
+        expect(node.toJSON()).toStrictEqual({
             key: value,
         });
     });

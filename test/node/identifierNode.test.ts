@@ -22,7 +22,7 @@ describe('IdentifierNode', () => {
     });
 
     it('should create a valid identifier', () => {
-        const identifierNode = JsonIdentifierNode.of('foo');
+        const node = JsonIdentifierNode.of('foo');
 
         const expected = new JsonIdentifierNode({
             token: new JsonTokenNode({
@@ -31,23 +31,23 @@ describe('IdentifierNode', () => {
             }),
         });
 
-        expect(identifierNode).toStrictEqual(expected);
+        expect(node).toStrictEqual(expected);
     });
 
     it('should update the identifier', () => {
-        const identifierNode = JsonIdentifierNode.of('foo');
+        const node = JsonIdentifierNode.of('foo');
 
-        expect(identifierNode.update('bar')).toStrictEqual(JsonPrimitiveNode.of('bar'));
+        expect(node.update('bar')).toStrictEqual(JsonPrimitiveNode.of('bar'));
     });
 
     it('should update equivalent node identifiers', () => {
-        const identifierNode = JsonIdentifierNode.of('foo');
+        const node = JsonIdentifierNode.of('foo');
 
-        expect(identifierNode.update(identifierNode)).toBe(identifierNode);
+        expect(node.update(node)).toBe(node);
     });
 
     it('should reset its children', () => {
-        const identifierNode = new JsonIdentifierNode({
+        const node = new JsonIdentifierNode({
             token: new JsonTokenNode({
                 type: JsonTokenType.IDENTIFIER,
                 value: 'foo',
@@ -64,17 +64,17 @@ describe('IdentifierNode', () => {
             ],
         });
 
-        identifierNode.reset();
+        node.reset();
 
-        expect(identifierNode.children).toBeEmpty();
+        expect(node.children).toBeEmpty();
     });
 
     it('should rebuild the node', () => {
-        const identifierNode = JsonIdentifierNode.of('foo');
+        const node = JsonIdentifierNode.of('foo');
 
-        identifierNode.rebuild();
+        node.rebuild();
 
-        expect(identifierNode.children).toStrictEqual([
+        expect(node.children).toStrictEqual([
             new JsonTokenNode({
                 type: JsonTokenType.IDENTIFIER,
                 value: 'foo',
@@ -88,20 +88,20 @@ describe('IdentifierNode', () => {
             value: 'foo',
         });
 
-        const identifierNode = new JsonIdentifierNode({
+        const node = new JsonIdentifierNode({
             token: token,
             children: [token],
         });
 
-        const clone = identifierNode.clone();
+        const clone = node.clone();
 
-        expect(identifierNode).toStrictEqual(clone);
-        expect(identifierNode).not.toBe(clone);
-        expect(identifierNode.token).toStrictEqual(clone.token);
-        expect(identifierNode.token).not.toBe(clone.token);
+        expect(node).toStrictEqual(clone);
+        expect(node).not.toBe(clone);
+        expect(node.token).toStrictEqual(clone.token);
+        expect(node.token).not.toBe(clone.token);
 
-        expect(identifierNode.children[0]).toStrictEqual(clone.children[0]);
-        expect(identifierNode.children[0]).not.toBe(clone.children[0]);
+        expect(node.children[0]).toStrictEqual(clone.children[0]);
+        expect(node.children[0]).not.toBe(clone.children[0]);
     });
 
     it('should not be equivalent to a non-identifier node', () => {
@@ -126,8 +126,8 @@ describe('IdentifierNode', () => {
     });
 
     it('should serialize to JSON', () => {
-        const identifierNode = JsonIdentifierNode.of('foo');
+        const node = JsonIdentifierNode.of('foo');
 
-        expect(identifierNode.toJSON()).toStrictEqual('foo');
+        expect(node.toJSON()).toStrictEqual('foo');
     });
 });

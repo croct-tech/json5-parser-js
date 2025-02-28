@@ -46,11 +46,11 @@ describe('CompositeNode', () => {
     });
 
     it('should reformat the node', () => {
-        const compositeNode = TestCompositeNode.fromDefinition({
+        const node = TestCompositeNode.fromDefinition({
             children: [JsonArrayNode.of(1, 2, 3)],
         });
 
-        expect(compositeNode.toString()).toStrictEqual('[1,2,3]');
+        expect(node.toString()).toStrictEqual('[1,2,3]');
 
         const formatting: Formatting = {
             array: {
@@ -58,12 +58,12 @@ describe('CompositeNode', () => {
             },
         };
 
-        spyOn(compositeNode, 'reset');
-        spyOn(compositeNode, 'rebuild');
+        spyOn(node, 'reset');
+        spyOn(node, 'rebuild');
 
-        compositeNode.reformat(formatting);
+        node.reformat(formatting);
 
-        expect(compositeNode.reset).toHaveBeenCalled();
-        expect(compositeNode.rebuild).toHaveBeenCalledWith(formatting);
+        expect(node.reset).toHaveBeenCalled();
+        expect(node.rebuild).toHaveBeenCalledWith(formatting);
     });
 });
