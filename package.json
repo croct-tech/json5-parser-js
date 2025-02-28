@@ -1,28 +1,28 @@
 {
-  "name": "@croct/ts-project",
+  "name": "@croct/json5-parser",
   "version": "0.0.0-dev",
-  "description": "A brief description about the project.",
+  "description": "A lossless JSON5 tokenizer and parser for Node.js that maintains indentation, spacing, and comments.",
   "author": {
     "name": "Croct",
-    "email": "lib+project-ts@croct.com",
-    "url": "https://github.com/croct-tech/project-ts"
+    "email": "lib+json5-parser-js@croct.com",
+    "url": "https://github.com/croct-tech/json5-parser-js"
   },
-  "license": "UNLICENSED",
+  "license": "MIT",
   "keywords": [
-    "croct",
-    "personalization",
-    "typescript"
+    "json5",
+    "parser",
+    "tokenizer"
   ],
   "types": "index.d.ts",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/croct-tech/project-ts.git"
+    "url": "git+https://github.com/croct-tech/json5-parser-js.git"
   },
   "bugs": {
-    "url": "https://github.com/croct-tech/project-ts/issues"
+    "url": "https://github.com/croct-tech/json5-parser-js/issues"
   },
-  "homepage": "https://github.com/croct-tech/project-ts",
+  "homepage": "https://github.com/croct-tech/json5-parser-js",
   "scripts": {
     "lint": "eslint 'src/**/*.ts' 'test/**/*.ts'",
     "test": "jest -c jest.config.js --coverage",
