@@ -3,9 +3,9 @@
         <img src="https://cdn.croct.io/brand/logo/repo-icon-green.svg" alt="Croct" height="80"/>
     </a>
     <br />
-    <strong>TypeScript Project Title</strong>
+    <strong>JSON5 Parser</strong>
     <br />
-    A brief description about the project.
+    A lossless JSON5 tokenizer and parser for Node.js that maintains indentation, spacing, and comments.
 </p>
 <p align="center">
     <img alt="Build" src="https://img.shields.io/badge/build-passing-green" />
@@ -20,84 +20,200 @@
     <a href="https://github.com/croct-tech/repository-template-typescript/issues/new?labels=enhancement&template=feature-request.md">✨ Request Feature</a>
 </p>
 
-# Instructions
-Follow the steps below to create a new repository:
+## Overview
 
-1. Customize the repository
-   1. Click on the _Use this template_ button at the top of this page
-   2. Clone the repository locally 
-   3. Update the `README.md` and `package.json` with the new package information
-2. Setup Code Climate
-   1. Add the project to [Croct's code climate organization](https://codeclimate.com/accounts/5e714648faaa9c00fb000081/dashboard)
-   2. Go to **Repo Settings > Test coverage** and copy the "_TEST REPORTER ID_"
-   3. Go to **Repo Settings > Badges** and copy the maintainability and coverage badges to the `README.md` 
-   4. On the Github repository page, go to **Settings > Secrets** and add a secret with name `CC_TEST_REPORTER_ID` and the ID from the previous step as value.
-   
+This library provides an API for working with JSON and [JSON5](https://json5.org/) documents while preserving their original structure and formatting. 
+Unlike traditional JSON parsers that use an Abstract Syntax Tree (AST) and discard formatting, this library leverages a Concrete Syntax Tree (CST) to retain every detail—comments, indentation, and whitespace.
+
+Ideal for editing configuration files (e.g., `package.json`, `tsconfig.json`) or any user-generated JSON5 content, this library ensures that formatting remains intact throughout modifications.
+
+### Key features
+
+- **Preserve formatting** – Read, modify, and write JSON5 files without losing comments, indentation, or spacing.
+- **Style learning** – Automatically applies the document's existing formatting style to new entries.
+- **Reformatting** – Customize output formatting with flexible options.
+- **Type Safety** – Fully typed API for working with JSON5 documents.
+
 ## Installation
-We recommend using [NPM](https://www.npmjs.com) to install the package:
+
+Install via [NPM](https://www.npmjs.com):
 
 ```sh
-npm install @croct/project-ts
+npm install @croct/json5-parser
 ```
 
-## Basic usage
+## Usage
 
-```typescript
-import {Example} from '@croct/project-ts';
+The library provides a simple API for parsing, manipulating, and serializing JSON5 documents.
 
-const example = new Example();
-example.displayBasicUsage();
+### Lexing
+
+Usually, you don't need to interact with the lexer directly. However, you can use it to tokenize a JSON5 document:
+
+```ts
+import {JsonLexer} from '@croct/json5-parser';
+
+const tokens = JsonLexer.tokenize(
+    `{
+        // Comment
+        "name": "John Doe",
+        "age": 42,
+    }`
+);
 ```
+
+### Parsing
+
+To parse a JSON5 document:
+
+```ts
+import {JsonParser} from '@croct/json5-parser';
+
+const node = JsonParser.parse(
+    `{
+        // Comment
+        "name": "John Doe",
+        "age": 42,
+    }`
+);
+```
+
+Optionally, specify the expected root node type to narrow down the result:
+
+```ts
+import {JsonParser, JsonObjectNode} from '@croct/json5-parser';
+
+const node = JsonParser.parse<JsonObjectNode>(
+    `{
+        // Comment
+        "name": "John Doe",
+        "age": 42,
+    }`,
+    JsonObjectNode
+);
+```
+
+### Manipulation
+
+Modify values while preserving formatting:
+
+```ts
+// Get the value of a property
+const name = node.get('name').toJSON();
+
+// Update a property
+node.set('age', 43);
+
+console.log(node.toString());
+```
+
+New entries adopt the document's existing style:
+
+```ts
+node.set('country', 'USA');
+
+console.log(node.toString());
+```
+
+Output:
+
+```json5
+{
+    // Comment
+    "name": "John Doe",
+    "age": 43,
+    "country": "USA",
+}
+```
+
+Formatting is applied at a block level, handling different styles within the same document:
+
+```json5
+{
+  "name": "My Project",
+  "version": "1.0.0",
+  "keywords": ["json5", "parser"],
+}
+```
+
+Adding an array entry keeps the existing format:
+
+```ts
+node.set('stack', ['react', 'typescript']);
+```
+
+Output:
+
+```json5
+{
+  "name": "My Project",
+  "version": "1.0.0",
+  "keywords": ["json5", "parser"],
+  "stack": ["react", "typescript"],
+}
+```
+
+To reset formatting and apply a new style:
+
+```ts
+node.reset();
+
+console.log(node.toString({ indentationLevel: 2 }));
+```
+
+Output:
+
+```json5
+{
+  "name": "My Project",
+  "version": "1.0.0",
+  "keywords": [
+    "json5",
+    "parser"
+  ],
+  "stack": [
+    "react",
+    "typescript"
+  ]
+}
+```
+
+To update the document while preserving formatting, use the `update` method:
+
+```ts
+
+node.update({
+    ...node.toJSON(),
+    "version": "2.0.0",
+});
+```
+
+The `update` method reconciles the new content with the existing document, preserving comments, indentation, and spacing.
 
 ## Contributing
-Contributions to the package are always welcome! 
 
-- Report any bugs or issues on the [issue tracker](https://github.com/croct-tech/project-ts/issues).
-- For major changes, please [open an issue](https://github.com/croct-tech/project-ts/issues) first to discuss what you would like to change.
-- Please make sure to update tests as appropriate.
+Contributions are welcome!
+
+- Report issues on the [issue tracker](https://github.com/croct-tech/project-ts/issues).
+- For major changes, [open an issue](https://github.com/croct-tech/project-ts/issues) first to discuss.
+- Ensure test coverage is updated accordingly.
 
 ## Testing
 
-Before running the test suites, the development dependencies must be installed:
+Install dependencies:
 
 ```sh
 npm install
 ```
 
-Then, to run all tests:
+Run tests:
 
 ```sh
 npm run test
 ```
 
-Run the following command to check the code against the style guide:
+Lint code to check for style issues:
 
 ```sh
 npm run lint
 ```
-
-## Building
-
-Before building the project, the dependencies must be installed:
-
-```sh
-npm install
-```
-
-Then, to build the CommonJS module:
-
-```sh
-npm run rollup
-```
-
-The following command bundles a minified IIFE module for browsers:
-
-```
-npm run rollup-min
-```
-
-## License
-
-Copyright © 2015-2022 Croct Limited, All Rights Reserved.
-
-All information contained herein is, and remains the property of Croct Limited. The intellectual, design and technical concepts contained herein are proprietary to Croct Limited s and may be covered by U.S. and Foreign Patents, patents in process, and are protected by trade secret or copyright law. Dissemination of this information or reproduction of this material is strictly forbidden unless prior written permission is obtained from Croct Limited.
