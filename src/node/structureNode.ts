@@ -78,6 +78,8 @@ export abstract class JsonStructureNode extends JsonValueNode {
         this.children.length = 0;
     }
 
+    public abstract clone(): JsonStructureNode;
+
     public rebuild(formatting: Formatting = {}): void {
         const parentFormatting = this.detectFormatting(formatting);
 
