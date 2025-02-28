@@ -459,23 +459,24 @@ describe('JsonParser', () => {
             caughtError = error;
         }
 
-        expect(caughtError).toEqual(
-            new JsonParseError(
-                'Unexpected token { in JSON at position 3',
-                {
-                    start: {
-                        index: 1,
-                        line: 1,
-                        column: 2,
-                    },
-                    end: {
-                        index: 8,
-                        line: 1,
-                        column: 9,
-                    },
-                },
-            ),
-        );
+        expect(caughtError).toBeInstanceOf(JsonParseError);
+
+        const jsonParseError = caughtError as JsonParseError;
+
+        expect(jsonParseError.message).toMatch('Invalid string at 1:2: ');
+
+        expect(jsonParseError.location).toStrictEqual({
+            start: {
+                index: 1,
+                line: 1,
+                column: 2,
+            },
+            end: {
+                index: 11,
+                line: 1,
+                column: 12,
+            },
+        });
     });
 
     it('should report an error if unexpected error occurs parsing a string', () => {
@@ -493,7 +494,7 @@ describe('JsonParser', () => {
 
         expect(caughtError).toEqual(
             new JsonParseError(
-                'Unexpected error.',
+                'Invalid string at 1:1: Unexpected error.',
                 {
                     start: {
                         index: 1,

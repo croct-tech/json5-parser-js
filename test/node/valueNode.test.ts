@@ -1,5 +1,5 @@
 import {JsonValue} from '@croct/json';
-import {JsonCompositeNode, JsonPrimitiveNode, JsonValueNode, SourceLocation} from '../../src';
+import {JsonPrimitiveNode, JsonValueNode, SourceLocation} from '../../src';
 import {JsonError} from '../../src/error';
 
 describe('ValueNode', () => {
@@ -18,7 +18,7 @@ describe('ValueNode', () => {
             throw new Error('Method not implemented.');
         }
 
-        public clone(): JsonCompositeNode {
+        public clone(): JsonValueNode {
             throw new Error('Method not implemented.');
         }
 
@@ -35,13 +35,13 @@ describe('ValueNode', () => {
         }
     }
 
-    it('should cast a value node', () => {
+    it('should cast to a compatible type', () => {
         const value = new TestJsonValue();
 
         expect(value.cast(TestJsonValue)).toBe(value);
     });
 
-    it('should throw an error when casting a value node to an incompatible type', () => {
+    it('should fail to cast to an incompatible type', () => {
         const value = new TestJsonValue();
 
         expect(() => value.cast(JsonPrimitiveNode))

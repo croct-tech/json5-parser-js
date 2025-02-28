@@ -181,7 +181,10 @@ export class JsonParser {
             parsedValue = JSON.parse(value);
         } catch (error) {
             if (error instanceof Error) {
-                throw new JsonParseError(JsonParser.getJsonError(error, token), token.location);
+                throw new JsonParseError(
+                    `Invalid string at ${token.location.start.line}:${token.location.start.column}: ${error.message}`,
+                    token.location,
+                );
             }
 
             throw error;
@@ -193,19 +196,6 @@ export class JsonParser {
             children: [tokenNode],
             location: token.location,
         });
-    }
-
-    private static getJsonError(error: Error, token: JsonToken): string {
-        const match = error.message.match(/^(.+) at position (\d+) \(line (\d+) column (\d+)\)/);
-
-        if (match !== null) {
-            const line = token.location.start.line + Number(match[3]) - 1;
-            const column = token.location.start.column + Number(match[4]) - 1;
-
-            return `${match[1]} at ${line}:${column}.`;
-        }
-
-        return error.message;
     }
 
     private parseNull(): JsonNullNode {

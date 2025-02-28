@@ -1,7 +1,7 @@
 import {JsonPrimitiveNode, JsonTokenNode, JsonTokenType} from '../../src';
 
 describe('TokenNode', () => {
-    it('should check whether a token is of a given type', () => {
+    it('should check whether a token matches a type', () => {
         const token = new JsonTokenNode({
             type: JsonTokenType.STRING,
             value: 'foo',
@@ -12,7 +12,7 @@ describe('TokenNode', () => {
         expect(token.isType(JsonTokenType.STRING)).toBeTrue();
     });
 
-    it('should clone the token', () => {
+    it('should create a clone', () => {
         const token = new JsonTokenNode({
             type: JsonTokenType.STRING,
             value: 'foo',
@@ -24,7 +24,7 @@ describe('TokenNode', () => {
         expect(token).not.toBe(clone);
     });
 
-    it('should not be equivalent when the other node is not a JSON token', () => {
+    it('should not be equivalent to another node of a different type', () => {
         const left = new JsonTokenNode({
             type: JsonTokenType.STRING,
             value: 'foo',
@@ -35,7 +35,7 @@ describe('TokenNode', () => {
         expect(left.isEquivalent(right)).toBeFalse();
     });
 
-    it('should not be equivalent when the other token type does not match', () => {
+    it('should not be equivalent to another token of a different type', () => {
         const left = new JsonTokenNode({
             type: JsonTokenType.STRING,
             value: 'foo',
@@ -49,7 +49,7 @@ describe('TokenNode', () => {
         expect(left.isEquivalent(right)).toBeFalse();
     });
 
-    it('should not be equivalent when the other token value does not match', () => {
+    it('should not be equivalent to another token with a different value', () => {
         const left = new JsonTokenNode({
             type: JsonTokenType.STRING,
             value: 'foo',
@@ -63,7 +63,7 @@ describe('TokenNode', () => {
         expect(left.isEquivalent(right)).toBeFalse();
     });
 
-    it('should be equivalent to other token node', () => {
+    it('should be equivalent to other tokens with the same value', () => {
         const left = new JsonTokenNode({
             type: JsonTokenType.STRING,
             value: 'foo',
