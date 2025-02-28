@@ -1,4 +1,4 @@
-import {JsonArrayNode, JsonNode, JsonPrimitiveNode, JsonTokenNode, JsonTokenType} from '../src';
+import {JsonArrayNode, JsonNode, JsonPrimitiveNode, JsonPropertyNode, JsonTokenNode, JsonTokenType} from '../src';
 import {NodeManipulator, NodeMatcher} from '../src/manipulator';
 
 describe('NodeMatcher', () => {
@@ -82,8 +82,27 @@ describe('NodeMatcher', () => {
     });
 });
 
-// @todo add more tests to cover the rest of the code
 describe('NodeManipulator', () => {
+    it('should get its values', () => {
+        const manipulator = new NodeManipulator([
+            JsonPrimitiveNode.of('foo'),
+            JsonPrimitiveNode.of('bar'),
+        ]);
+
+        expect(manipulator.values).toStrictEqual([
+            JsonPrimitiveNode.of('foo'),
+            JsonPrimitiveNode.of('bar'),
+        ]);
+
+        manipulator.insert(JsonPrimitiveNode.of('baz'));
+
+        expect(manipulator.values).toStrictEqual([
+            JsonPrimitiveNode.of('baz'),
+            JsonPrimitiveNode.of('foo'),
+            JsonPrimitiveNode.of('bar'),
+        ]);
+    });
+
     it('should indicate whether the iterator has reached the end', () => {
         const manipulator = new NodeManipulator([
             JsonPrimitiveNode.of('foo'),
@@ -500,7 +519,9 @@ describe('NodeManipulator', () => {
 
     it('should replace a node and advance to the next node', () => {
         const node = JsonPrimitiveNode.of('foo');
-        const manipulator = new NodeManipulator([node]);
+        const manipulator = new NodeManipulator([
+            JsonPrimitiveNode.of('foo'),
+        ]);
 
         manipulator.node(node);
 
@@ -526,18 +547,63 @@ describe('NodeManipulator', () => {
 
         manipulator.node(node, true);
 
-        expect(manipulator.done()).toBeTrue();
+        expect(manipulator.values).toBeEmpty();
     });
 
-    it('should match and replace a list of nodes', () => {
+    it('should accommodate a node without replacing any existing node', () => {
+        const node = new JsonPropertyNode({
+            children: [],
+            key: JsonPrimitiveNode.of('foo'),
+            value: JsonPrimitiveNode.of(NaN),
+        });
+
+        const manipulator = new NodeManipulator([
+            JsonPrimitiveNode.of('foo'),
+            JsonPrimitiveNode.of('bar'),
+        ]);
+
+        manipulator.node(node, false);
+
+        expect(manipulator.values).toStrictEqual([
+            node,
+            JsonPrimitiveNode.of('foo'),
+            JsonPrimitiveNode.of('bar'),
+        ]);
+    });
+
+    it('should match and replace a list matching a single node', () => {
         const node = JsonPrimitiveNode.of('foo');
-        const manipulator = new NodeManipulator([node]);
+        const manipulator = new NodeManipulator([
+            JsonPrimitiveNode.of('foo'),
+        ]);
 
         manipulator.nodes([node]);
 
         manipulator.seek(0);
 
         expect(manipulator.current).toBe(node);
+    });
+
+    it('should not match and replace a list matching multiple nodes', () => {
+        const firstNode = JsonPrimitiveNode.of('foo');
+        const secondNode = JsonPrimitiveNode.of('bar');
+
+        const manipulator = new NodeManipulator([
+            JsonPrimitiveNode.of('foo'),
+            JsonPrimitiveNode.of('bar'),
+        ]);
+
+        manipulator.nodes([firstNode, secondNode]);
+
+        expect(manipulator.values.length).toBe(2);
+
+        manipulator.seek(0);
+
+        expect(manipulator.current).not.toBe(firstNode);
+
+        manipulator.seek(1);
+
+        expect(manipulator.current).not.toBe(secondNode);
     });
 
     it('should insert nodes if it does not exist and is not optional', () => {
@@ -549,8 +615,6 @@ describe('NodeManipulator', () => {
         manipulator.seek(0);
 
         expect(manipulator.current).toBe(node);
-
-        manipulator.next();
     });
 
     it('should not insert nodes if it does not exist and is optional', () => {
@@ -559,7 +623,7 @@ describe('NodeManipulator', () => {
 
         manipulator.nodes([node], true);
 
-        expect(manipulator.done()).toBeTrue();
+        expect(manipulator.values).toBeEmpty();
     });
 
     it('should insert a node in the current position', () => {
@@ -578,21 +642,12 @@ describe('NodeManipulator', () => {
 
         manipulator.insert(thirdNode);
 
-        manipulator.seek(0);
-
-        expect(manipulator.current).toBe(firstNode);
-
-        manipulator.next();
-
-        expect(manipulator.current).toBe(secondNode);
-
-        manipulator.next();
-
-        expect(manipulator.current).toBe(thirdNode);
-
-        manipulator.next();
-
-        expect(manipulator.current).toBe(fourthNode);
+        expect(manipulator.values).toStrictEqual([
+            firstNode,
+            secondNode,
+            thirdNode,
+            fourthNode,
+        ]);
     });
 
     it('should remove the current node', () => {
@@ -618,25 +673,15 @@ describe('NodeManipulator', () => {
 
         manipulator.remove();
 
-        manipulator.seek(0);
-
-        expect(manipulator.current).toBe(firstNode);
-
-        manipulator.next();
-
-        expect(manipulator.current).toBe(secondNode);
-
-        manipulator.next();
-
-        expect(manipulator.current).toBe(thirdNode);
-
-        manipulator.next();
-
-        expect(manipulator.current).toBe(fourthNode);
+        expect(manipulator.values).toStrictEqual([
+            firstNode,
+            secondNode,
+            thirdNode,
+            fourthNode,
+        ]);
     });
 
     it('should drop nodes until a matching node is found', () => {
-        // @todo what happened to the list? include an assertion to make it clear
         const targetNode = JsonPrimitiveNode.of('bar');
         const manipulator = new NodeManipulator([
             JsonPrimitiveNode.of('foo'),
@@ -651,13 +696,17 @@ describe('NodeManipulator', () => {
 
         expect(manipulator.dropUntil(matcher)).toBeTrue();
 
-        expect(manipulator.position).toBe(1);
+        expect(manipulator.values).toStrictEqual([
+            targetNode,
+            new JsonTokenNode({
+                type: JsonTokenType.WHITESPACE,
+                value: ' ',
+            }),
+        ]);
     });
 
-    it('should drop insignificant nodes until a significant node is found', () => {
-        // @todo what happened to the list? include an assertion to make it clear
-        const targetNode = JsonPrimitiveNode.of('bar');
-        const manipulator = new NodeManipulator([
+    it('should not drop insignificant nodes until a significant node is found', () => {
+        const insignificantNodes = [
             new JsonTokenNode({
                 type: JsonTokenType.WHITESPACE,
                 value: ' ',
@@ -666,6 +715,10 @@ describe('NodeManipulator', () => {
                 type: JsonTokenType.NEWLINE,
                 value: '\n',
             }),
+        ];
+        const targetNode = JsonPrimitiveNode.of('bar');
+        const manipulator = new NodeManipulator([
+            ...insignificantNodes,
             targetNode,
         ]);
 
@@ -673,13 +726,13 @@ describe('NodeManipulator', () => {
 
         expect(manipulator.dropUntil(matcher)).toBeTrue();
 
-        expect(manipulator.current).toBe(targetNode);
-
-        expect(manipulator.position).toBe(2);
+        expect(manipulator.values).toStrictEqual([
+            ...insignificantNodes,
+            targetNode,
+        ]);
     });
 
     it('should drop all nodes if no matching node is found', () => {
-        // @todo what happened to the list? include an assertion to make it clear
         const manipulator = new NodeManipulator([
             JsonPrimitiveNode.of('foo'),
             new JsonTokenNode({
@@ -693,15 +746,16 @@ describe('NodeManipulator', () => {
 
         expect(manipulator.dropUntil(matcher)).toBeFalse();
 
-        expect(manipulator.done()).toBeTrue();
+        expect(manipulator.values).toBeEmpty();
     });
 
-    it('should drop nothing if no nodes left', () => {
+    it('should drop nothing if there are no nodes left', () => {
         const manipulator = new NodeManipulator([]);
 
         const matcher = (node: JsonNode): boolean => node.isEquivalent(JsonPrimitiveNode.of('foo'));
 
         expect(manipulator.dropUntil(matcher)).toBeFalse();
+
         expect(manipulator.done()).toBeTrue();
     });
 
@@ -727,23 +781,10 @@ describe('NodeManipulator', () => {
 
         expect(manipulator.dropUntil(matcher)).toBeTrue();
         expect(manipulator.current).toBe(targetNode);
-        expect(manipulator.position).toBe(2);
 
         manipulator.next();
 
-        expect(manipulator.current).toEqual(
-            // @todo: which of the tokens should be here? use toBe to make it more clear
-            new JsonTokenNode({
-                type: JsonTokenType.WHITESPACE,
-                value: ' ',
-            }),
-        );
-    });
-
-    // @todo: we should assert what we expect to happen to the list
-    it('should handle consecutive insignificant nodes when dropping nodes', () => {
-        const targetNode = JsonPrimitiveNode.of('bar');
-        const manipulator = new NodeManipulator([
+        expect(manipulator.values).toStrictEqual([
             new JsonTokenNode({
                 type: JsonTokenType.WHITESPACE,
                 value: ' ',
@@ -752,11 +793,62 @@ describe('NodeManipulator', () => {
                 type: JsonTokenType.NEWLINE,
                 value: '\n',
             }),
+            targetNode,
             new JsonTokenNode({
-                type: JsonTokenType.LINE_COMMENT,
-                value: '// comment',
+                type: JsonTokenType.WHITESPACE,
+                value: ' ',
+            }),
+        ]);
+    });
+
+    it('should handle consecutive insignificant nodes when dropping nodes', () => {
+        const targetNode = new JsonPropertyNode({
+            children: [],
+            key: JsonPrimitiveNode.of('baz'),
+            value: JsonPrimitiveNode.of('qux'),
+        });
+        const manipulator = new NodeManipulator([
+            new JsonTokenNode({
+                type: JsonTokenType.BRACE_LEFT,
+                value: '{',
+            }),
+            new JsonTokenNode({
+                type: JsonTokenType.NEWLINE,
+                value: '\n',
+            }),
+            new JsonTokenNode({
+                type: JsonTokenType.BLOCK_COMMENT,
+                value: '/* comment */',
+            }),
+            new JsonTokenNode({
+                type: JsonTokenType.NEWLINE,
+                value: '\n',
+            }),
+            new JsonTokenNode({
+                type: JsonTokenType.WHITESPACE,
+                value: '   ',
+            }),
+            new JsonPropertyNode({
+                key: JsonPrimitiveNode.of('foo'),
+                value: JsonPrimitiveNode.of('baz'),
+            }),
+            new JsonTokenNode({
+                type: JsonTokenType.NEWLINE,
+                value: '\n',
+            }),
+            new JsonTokenNode({
+                type: JsonTokenType.WHITESPACE,
+                value: '   ',
             }),
             targetNode,
+            new JsonTokenNode({
+                type: JsonTokenType.NEWLINE,
+                value: '\n',
+            }),
+            new JsonTokenNode({
+                type: JsonTokenType.BRACE_RIGHT,
+                value: '}',
+            }),
         ]);
 
         const matcher = (node: JsonNode): boolean => node.isEquivalent(targetNode);
@@ -764,27 +856,37 @@ describe('NodeManipulator', () => {
         expect(manipulator.dropUntil(matcher)).toBeTrue();
         expect(manipulator.current).toBe(targetNode);
         expect(manipulator.position).toBe(3);
-    });
 
-    // @todo: not sure what it's doing
-    it('should handle dropping nodes until the end of the list', () => {
-        const manipulator = new NodeManipulator([
-            JsonPrimitiveNode.of('foo'),
+        expect(manipulator.values).toStrictEqual([
+            new JsonTokenNode({
+                type: JsonTokenType.BLOCK_COMMENT,
+                value: '/* comment */',
+            }),
+            new JsonTokenNode({
+                type: JsonTokenType.NEWLINE,
+                value: '\n',
+            }),
             new JsonTokenNode({
                 type: JsonTokenType.WHITESPACE,
-                value: ' ',
+                value: '   ',
             }),
-            JsonPrimitiveNode.of('bar'),
+            targetNode,
+            new JsonTokenNode({
+                type: JsonTokenType.NEWLINE,
+                value: '\n',
+            }),
+            new JsonTokenNode({
+                type: JsonTokenType.BRACE_RIGHT,
+                value: '}',
+            }),
         ]);
-
-        const matcher = (node: JsonNode): boolean => node.isEquivalent(JsonPrimitiveNode.of('baz'));
-
-        expect(manipulator.dropUntil(matcher)).toBeFalse();
-        expect(manipulator.done()).toBeTrue();
     });
 
     it('should drop all remaining nodes', () => {
-        const list = [JsonPrimitiveNode.of('foo')];
+        const list = [
+            JsonPrimitiveNode.of('foo'),
+            JsonPrimitiveNode.of('bar'),
+        ];
 
         const manipulator = new NodeManipulator(list);
 

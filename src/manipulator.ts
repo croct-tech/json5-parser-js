@@ -114,6 +114,10 @@ export class NodeManipulator {
         return this.list[this.index];
     }
 
+    public get values(): JsonNode[] {
+        return this.list;
+    }
+
     public matchesPreviousToken(type: JsonTokenType): boolean {
         if (this.index === 0) {
             return false;
