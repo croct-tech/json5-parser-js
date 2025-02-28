@@ -96,7 +96,7 @@ console.log(node.toString());
 
 Output:
 
-```json
+```json5
 {
     // Comment
     "name": "John Doe",
@@ -107,7 +107,7 @@ Output:
 
 Formatting is applied at a block level, handling different styles within the same document:
 
-```json
+```json5
 {
   "name": "My Project",
   "version": "1.0.0",
@@ -123,7 +123,7 @@ node.set('stack', ['react', 'typescript']);
 
 Output:
 
-```json
+```json5
 {
   "name": "My Project",
   "version": "1.0.0",
@@ -142,7 +142,7 @@ console.log(node.toString({ indentationLevel: 2 }));
 
 Output:
 
-```json
+```json5
 {
   "name": "My Project",
   "version": "1.0.0",
