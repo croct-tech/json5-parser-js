@@ -8,16 +8,15 @@
     A lossless JSON5 tokenizer and parser for Node.js that maintains indentation, spacing, and comments.
 </p>
 <p align="center">
-    <img alt="Build" src="https://img.shields.io/badge/build-passing-green" />
-    <img alt="Coverage" src="https://img.shields.io/badge/coverage-100%25-green" />
-    <img alt="Maintainability" src="https://img.shields.io/badge/maintainability-100-green" />
+    <img alt="Coverage" src="https://api.codeclimate.com/v1/badges/e527bdbf3e2b58919c97/maintainability" />
+    <img alt="Maintainability" src="https://api.codeclimate.com/v1/badges/e527bdbf3e2b58919c97/test_coverage" />
     <br />
     <br />
-    <a href="https://github.com/croct-tech/repository-template-typescript/releases">📦 Releases</a>
+    <a href="https://github.com/croct-tech/json5-parser-js/releases">📦 Releases</a>
     ·
-    <a href="https://github.com/croct-tech/repository-template-typescript/issues/new?labels=bug&template=bug-report.md">🐞 Report Bug</a>
+    <a href="https://github.com/croct-tech/json5-parser-js/issues/new?labels=bug&template=bug-report.md">🐞 Report Bug</a>
     ·
-    <a href="https://github.com/croct-tech/repository-template-typescript/issues/new?labels=enhancement&template=feature-request.md">✨ Request Feature</a>
+    <a href="https://github.com/croct-tech/json5-parser-js/issues/new?labels=enhancement&template=feature-request.md">✨ Request Feature</a>
 </p>
 
 ## Overview
