@@ -3,9 +3,9 @@
         <img src="https://cdn.croct.io/brand/logo/repo-icon-green.svg" alt="Croct" height="80"/>
     </a>
     <br />
-    <strong>TypeScript Project Title</strong>
+    <strong>JSON5 Parser</strong>
     <br />
-    A brief description about the project.
+    A lossless JSON5 tokenizer and parser for Node.js that maintains indentation, spacing, and comments.
 </p>
 <p align="center">
     <img alt="Build" src="https://img.shields.io/badge/build-passing-green" />
