@@ -64,7 +64,7 @@ describe('Node', () => {
                 column: 1,
             },
         },
-    }))('should not be equal other node with different %s', (_, location) => {
+    }))('should not be equal to a node with different %s', (_, location) => {
         const left = TestJsonNode.fromDefinition({
             location: sourceLocation,
         });
@@ -76,7 +76,7 @@ describe('Node', () => {
         expect(left.equals(right)).toBeFalse();
     });
 
-    it('should be equal to other node', () => {
+    it('should be equal to other node with the same location', () => {
         const left = TestJsonNode.fromDefinition({
             location: sourceLocation,
         });
