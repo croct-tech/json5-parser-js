@@ -44,7 +44,27 @@ npm install @croct/json5-parser
 
 ## Usage
 
-Use the `JsonParser.parse` method to parse a JSON5 document:
+The library provides a simple API for parsing, manipulating, and serializing JSON5 documents.
+
+### Lexing
+
+Usually, you don't need to interact with the lexer directly. However, you can use it to tokenize a JSON5 document:
+
+```ts
+import {JsonLexer} from '@croct/json5-parser';
+
+const tokens = JsonLexer.tokenize(
+    `{
+        // Comment
+        "name": "John Doe",
+        "age": 42,
+    }`
+);
+```
+
+### Parsing
+
+To parse a JSON5 document:
 
 ```ts
 import {JsonParser} from '@croct/json5-parser';
@@ -91,6 +111,7 @@ New entries adopt the document's existing style:
 
 ```ts
 node.set('country', 'USA');
+
 console.log(node.toString());
 ```
 
