@@ -1,7 +1,8 @@
 import {JsonValue} from '@croct/json';
 import {
     JsonCompositeNode,
-    JsonObjectDefinition, JsonParser,
+    JsonObjectDefinition,
+    JsonParser,
     JsonPrimitiveNode,
     JsonPropertyNode,
     JsonStructureNode,
