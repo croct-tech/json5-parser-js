@@ -10,10 +10,8 @@
 <p align="center">
     <a href="https://www.npmjs.com/package/@croct-tech/json5-parser-js"><img alt="Version" src="https://img.shields.io/npm/v/@croct-tech/json5-parser-js"/></a>
     <a href="https://github.com/croct-tech/json5-parser-js/actions/workflows/branch-validations.yaml"><img alt="Build" src="https://github.com/croct-tech/json5-parser-js/actions/workflows/branch-validations.yaml/badge.svg" /></a>
-    <a><img alt="Coverage" src="https://api.codeclimate.com/v1/badges/e527bdbf3e2b58919c97/maintainability" /></a>
-    <a><img alt="Maintainability" src="https://api.codeclimate.com/v1/badges/e527bdbf3e2b58919c97/test_coverage" /></a>
-    <a href="https://codeclimate.com/repos/67c21d34cbf7e400df9b5dbc/test_coverage"><img src="https://api.codeclimate.com/v1/badges/692b087d6472a80bb509/test_coverage" /></a>
-    <a href="https://codeclimate.com/repos/67c21d34cbf7e400df9b5dbc/maintainability"><img src="https://api.codeclimate.com/v1/badges/692b087d6472a80bb509/maintainability" /></a>
+    <a href="https://codeclimate.com/repos/67c21d34cbf7e400df9b5dbc/test_coverage"><img src="https://api.codeclimate.com/v1/badges/e527bdbf3e2b58919c97/test_coverage" /></a>
+    <a href="https://codeclimate.com/repos/67c21d34cbf7e400df9b5dbc/maintainability"><img src="https://api.codeclimate.com/v1/badges/e527bdbf3e2b58919c97/maintainability" /></a>
     <br />
     <br />
     <a href="https://github.com/croct-tech/json5-parser-js/releases">📦 Releases</a>
