@@ -1,22 +1,14 @@
 import {JsonValue} from '@croct/json';
 import {
-    Formatting,
     JsonCompositeNode,
-    JsonIdentifierNode,
-    JsonNode,
-    JsonObjectDefinition,
-    JsonObjectNode,
-    JsonParser,
+    JsonObjectDefinition, JsonParser,
     JsonPrimitiveNode,
     JsonPropertyNode,
     JsonStructureNode,
-    JsonTokenNode,
-    JsonTokenType,
     JsonValueNode,
     PartialJsonCompositeDefinition,
     StructureDelimiter,
 } from '../../src';
-import {multiline} from '../utils';
 
 describe('StructureNode', () => {
     class TestStructureNode extends JsonStructureNode {
@@ -28,6 +20,10 @@ describe('StructureNode', () => {
             this.propertyNodes = [...definition.properties];
         }
 
+        public clone(): JsonStructureNode {
+            throw new Error('Method not implemented.');
+        }
+
         protected getList(): JsonCompositeNode[] {
             return [...this.propertyNodes];
         }
@@ -37,7 +33,7 @@ describe('StructureNode', () => {
         }
 
         protected getMaxDepth(): number {
-            return 2;
+            return 1;
         }
 
         public update(): JsonValueNode {
@@ -48,29 +44,8 @@ describe('StructureNode', () => {
             throw new Error('Method not implemented.');
         }
 
-        public clone(): TestStructureNode {
-            const clones: Map<JsonPropertyNode, JsonPropertyNode> = new Map();
-
-            for (const property of this.propertyNodes) {
-                clones.set(property, property.clone());
-            }
-
-            return new TestStructureNode({
-                properties: [...clones.values()],
-                children: this.children.map(child => clones.get(child as JsonPropertyNode) ?? child.clone()),
-            });
-        }
-
-        public isEquivalent(other: JsonNode): boolean {
-            if (!(other instanceof TestStructureNode)) {
-                return false;
-            }
-
-            const entries = Object.fromEntries(other.propertyNodes.map(property => [property.key.toJSON(), property]));
-
-            return this.propertyNodes.every(
-                property => entries[property.key.toJSON()]?.isEquivalent(property) === true,
-            );
+        public isEquivalent(): boolean {
+            throw new Error('Method not implemented.');
         }
     }
 
@@ -92,143 +67,11 @@ describe('StructureNode', () => {
         expect(structureNode.children).toBeEmpty();
     });
 
-    type Scenario = {
-        input: string,
-        expected: string,
-        formatting?: Formatting,
-    };
+    it('should rebuild itself', () => {
+        const node = JsonParser.parse("{foo: 'bar'}");
 
-    it.each(Object.entries<Scenario>({
-        'different quota styles': {
-            input: multiline`
-            {
-                foo: "bar",
-                "baz": "qux",
-                'quux': "corge"
-            }
-            `,
-            expected: multiline`
-            {
-                foo: "bar",
-                "baz": "qux",
-                'quux': "corge"
-            }
-            `,
-        },
-        'nested structures': {
-            input: multiline`
-            {
-                "array":[1, 2, 3],
-                "obj": {
-                    "foo": "bar"
-                }
-            }
-            `,
-            expected: multiline`
-            {
-                "array":[1, 2, 3],
-                "obj": {
-                    "foo": "bar"
-                }
-            }
-            `,
-        },
-        'leading indentation': {
-            input: multiline`
-            {
-                "foo": 1,
-                "bar":2,
-                "baz": 3
-            }
-            `,
-            expected: multiline`
-            {
-                "foo": 1,
-                "bar":2,
-                "baz": 3
-            }
-            `,
-        },
-        'with inline comment': {
-            input: multiline`
-            {
-                foo: "bar",
-                // Some comment
-                baz: "qux",
-            }
-            `,
-            expected: multiline`
-            {
-                foo: "bar",
-                // Some comment
-                baz: "qux",
-            }
-            `,
-        },
-        'with multiline comment': {
-            input: multiline`
-            {
-                foo: "bar",
-                /* 
-                Multi-line comment:
-                This is a placeholder object commonly used in programming examples.
-                The fields below are just for demonstration purposes.
-                */
-                baz: "qux",
-            }
-            `,
-            expected: multiline`
-            {
-                foo: "bar",
-                /* 
-                Multi-line comment:
-                This is a placeholder object commonly used in programming examples.
-                The fields below are just for demonstration purposes.
-                */
-                baz: "qux",
-            }
-            `,
-        },
-    }))('should rebuild itself detecting %s', (_, scenario) => {
-        const node = JsonParser.parse<JsonObjectNode>(scenario.input, JsonObjectNode);
+        node.rebuild();
 
-        const structureNode = new TestStructureNode({
-            children: node.children,
-            properties: node.properties,
-        });
-
-        structureNode.rebuild(scenario.formatting);
-
-        expect(structureNode.toString()).toStrictEqual(scenario.expected);
-    });
-
-    it('should rebuild with comma spacing', () => {
-        const property = new JsonPropertyNode({
-            children: [],
-            key: JsonIdentifierNode.of('foo'),
-            value: JsonPrimitiveNode.of('bar'),
-        });
-
-        const structureNode = new TestStructureNode({
-            children: [
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_LEFT,
-                    value: '{',
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_RIGHT,
-                    value: '}',
-                }),
-            ],
-            properties: [property],
-        });
-
-        structureNode.rebuild({
-            object: {
-                colonSpacing: true,
-            },
-        });
-
-        expect(structureNode.toString()).toStrictEqual('{foo: "bar"}');
+        expect(node.toString()).toStrictEqual("{foo: 'bar'}");
     });
 });

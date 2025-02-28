@@ -1,6 +1,5 @@
 import {JsonValue} from '@croct/json';
 import {JsonParser, JsonIdentifierNode, JsonObjectNode, JsonArrayNode, JsonValueNode, Formatting} from '../src';
-import {multiline} from './utils';
 
 describe('Functional test', () => {
     type ParseScenario = {
@@ -3048,5 +3047,20 @@ describe('Functional test', () => {
                     ]
             ),
         );
+    }
+
+    function multiline(strings: TemplateStringsArray): string {
+        const lines = strings.join('').split('\n');
+
+        if (lines.length < 2) {
+            return strings.join('');
+        }
+
+        const indent = lines[1].search(/\S/);
+
+        return lines
+            .map(line => line.slice(indent))
+            .join('\n')
+            .trim();
     }
 });
