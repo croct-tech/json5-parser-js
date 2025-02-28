@@ -100,10 +100,23 @@ export class JsonPropertyNode extends JsonCompositeNode implements JsonPropertyD
     }
 
     public clone(): JsonPropertyNode {
+        const keyClone = this.key.clone();
+        const valueClone = this.value.clone();
+
         return new JsonPropertyNode({
-            key: this.key,
-            value: this.value,
-            children: this.children.map(child => child.clone()),
+            key: keyClone,
+            value: valueClone,
+            children: this.children.map(child => {
+                if (child === this.key) {
+                    return keyClone;
+                }
+
+                if (child === this.value) {
+                    return valueClone;
+                }
+
+                return child.clone();
+            }),
             location: this.location,
         });
     }

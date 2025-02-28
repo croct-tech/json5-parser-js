@@ -54,9 +54,11 @@ export class JsonIdentifierNode extends JsonValueNode implements JsonIdentifierD
     }
 
     public clone(): JsonIdentifierNode {
+        const tokenClone = this.token.clone();
+
         return new JsonIdentifierNode({
-            token: this.token,
-            children: this.children.map(child => child.clone()),
+            token: tokenClone,
+            children: this.children.map(child => (child === this.token ? tokenClone : child)),
             location: this.location,
         });
     }

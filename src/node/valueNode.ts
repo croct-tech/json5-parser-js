@@ -3,7 +3,9 @@ import {JsonCompositeNode} from './compositeNode';
 import {JsonError} from '../error';
 
 export abstract class JsonValueNode extends JsonCompositeNode {
-    public abstract update(other: JsonValueNode|JsonValue, merge?: boolean): JsonValueNode;
+    public abstract update(other: JsonValueNode|JsonValue): JsonValueNode;
+
+    public abstract clone(): JsonValueNode;
 
     public cast<T extends JsonValueNode>(type: new (definition: any) => T): T {
         if (!(this instanceof type)) {

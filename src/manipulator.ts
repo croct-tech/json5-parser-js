@@ -70,8 +70,8 @@ export class NodeManipulator {
      */
     private fixing = false;
 
-    public constructor(children: JsonNode[]) {
-        this.list = children;
+    public constructor(list: JsonNode[]) {
+        this.list = list;
     }
 
     public done(): boolean {
@@ -112,6 +112,10 @@ export class NodeManipulator {
         }
 
         return this.list[this.index];
+    }
+
+    public get nodeList(): JsonNode[] {
+        return this.list;
     }
 
     public matchesPreviousToken(type: JsonTokenType): boolean {

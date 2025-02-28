@@ -103,10 +103,12 @@ export class JsonPrimitiveNode<T extends JsonPrimitiveTokenType = JsonPrimitiveT
     }
 
     public clone(): JsonPrimitiveNode<T> {
+        const tokenClone = this.token.clone();
+
         return new JsonPrimitiveNode({
-            token: this.token,
+            token: tokenClone,
             value: this.value,
-            children: this.children.map(child => child.clone()),
+            children: this.children.map(child => (child === this.token ? tokenClone : child.clone())),
             location: this.location,
         });
     }
