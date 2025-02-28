@@ -82,7 +82,7 @@ describe('IdentifierNode', () => {
         ]);
     });
 
-    it('should clone the node', () => {
+    it('should create a clone', () => {
         const token = new JsonTokenNode({
             type: JsonTokenType.IDENTIFIER,
             value: 'foo',

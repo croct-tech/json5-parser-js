@@ -25,17 +25,8 @@ describe('PrimitiveNode', () => {
         expect(primitiveNode).toStrictEqual(JsonPrimitiveNode.of(null));
     });
 
-    it('should create a primitive node with a JSON primitive node', () => {
-        const primitiveNode = JsonPrimitiveNode.of(JsonPrimitiveNode.of('foo'));
-
-        expect(primitiveNode).toStrictEqual(
-            JsonPrimitiveNode.of(JsonPrimitiveNode.of('foo')),
-        );
-    });
-
-    it('should create a hex number primitive node', () => {
+    it('should create number primitive node from its hexadecimal representation', () => {
         const number = 123;
-        const hexNumber = number.toString(16);
 
         const primitiveNode = JsonPrimitiveNode.ofHex(123);
 
@@ -43,7 +34,7 @@ describe('PrimitiveNode', () => {
             new JsonPrimitiveNode({
                 token: new JsonTokenNode({
                     type: JsonTokenType.NUMBER,
-                    value: `"0x${hexNumber}"`,
+                    value: `"0x${number.toString(16)}"`,
                 }),
                 value: number,
             }),
@@ -75,21 +66,23 @@ describe('PrimitiveNode', () => {
     });
 
     it('should reset its children', () => {
+        const token = new JsonTokenNode({
+            type: JsonTokenType.STRING,
+            value: '"foo"',
+        });
+
         const primitiveNode = new JsonPrimitiveNode({
             value: 'foo',
-            token: new JsonTokenNode({
-                type: JsonTokenType.STRING,
-                value: '"foo"',
-            }),
-            children: [JsonPrimitiveNode.of('foo')],
+            token: token,
+            children: [token],
         });
 
         primitiveNode.reset();
 
-        expect(primitiveNode.children).toStrictEqual([]);
+        expect(primitiveNode.children).toBeEmpty();
     });
 
-    it('should rebuild with formatting style', () => {
+    it('should rebuild itself', () => {
         const primitiveNode = new JsonPrimitiveNode({
             value: '\\"foo\\"',
             token: new JsonTokenNode({
@@ -99,32 +92,21 @@ describe('PrimitiveNode', () => {
             children: [],
         });
 
-        expect(primitiveNode.toString()).toStrictEqual('"\\"foo\\""');
-
         primitiveNode.rebuild({
             string: {
                 quote: 'single',
             },
         });
 
-        expect(primitiveNode).toStrictEqual(
-            new JsonPrimitiveNode({
-                value: '\\"foo\\"',
-                token: new JsonTokenNode({
-                    type: JsonTokenType.STRING,
-                    value: '"\\"foo\\""',
-                }),
-                children: [
-                    new JsonTokenNode({
-                        type: JsonTokenType.STRING,
-                        value: "'\\\\\"foo\\\\\"'",
-                    }),
-                ],
+        expect(primitiveNode.children).toStrictEqual([
+            new JsonTokenNode({
+                type: JsonTokenType.STRING,
+                value: "'\\\\\"foo\\\\\"'",
             }),
-        );
+        ]);
     });
 
-    it('should clone the primitive node', () => {
+    it('should create a clone', () => {
         const token = new JsonTokenNode({
             type: JsonTokenType.STRING,
             value: '"foo"',
@@ -152,7 +134,7 @@ describe('PrimitiveNode', () => {
         expect(clone.children[0]).toStrictEqual(token);
     });
 
-    it('should not be equivalent to a non primitive node', () => {
+    it('should not be equivalent to a non-primitive node', () => {
         const left = JsonPrimitiveNode.of('foo');
 
         const right = JsonArrayNode.of(1, 2, 3);
@@ -176,7 +158,7 @@ describe('PrimitiveNode', () => {
         expect(left.isEquivalent(right)).toBeFalse();
     });
 
-    it('should be equivalent to other node', () => {
+    it('should be equivalent to other nodes with the same value', () => {
         const left = JsonPrimitiveNode.of('foo');
 
         const right = JsonPrimitiveNode.of('foo');

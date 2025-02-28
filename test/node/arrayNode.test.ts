@@ -210,7 +210,7 @@ describe('ArrayNode', () => {
         expect(node).toStrictEqual(JsonArrayNode.of(...scenario.expectedItems));
     });
 
-    it('should clone the array node', () => {
+    it('should create a clone', () => {
         const node = JsonArrayNode.of(1, 2, 3);
 
         node.rebuild();

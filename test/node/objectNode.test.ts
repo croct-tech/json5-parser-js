@@ -222,7 +222,7 @@ describe('ObjectNode', () => {
         expect(node.get('foo', JsonPrimitiveNode)).toStrictEqual(JsonPrimitiveNode.of('bar'));
     });
 
-    it('should clone the object node', () => {
+    it('should create a clone', () => {
         const property = new JsonPropertyNode({
             key: JsonPrimitiveNode.of('foo'),
             value: JsonPrimitiveNode.of('bar'),

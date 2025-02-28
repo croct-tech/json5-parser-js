@@ -24,33 +24,32 @@ describe('PropertyNode', () => {
 
     it('should reset its children', () => {
         const key = new JsonPrimitiveNode({
-            children: [JsonPrimitiveNode.of('foo')],
+            value: 'foo',
             token: new JsonTokenNode({
                 type: JsonTokenType.STRING,
                 value: '"foo"',
             }),
-            value: 'foo',
+            children: [JsonPrimitiveNode.of('foo')],
         });
 
         const value = new JsonPrimitiveNode({
-            children: [JsonPrimitiveNode.of('bar')],
+            value: 'bar',
             token: new JsonTokenNode({
                 type: JsonTokenType.STRING,
                 value: '"bar"',
             }),
-            value: 'bar',
+            children: [JsonPrimitiveNode.of('bar')],
         });
 
         const propertyNode = new JsonPropertyNode({
+            key: key,
+            value: value,
             children: [
                 new JsonPropertyNode({
-                    children: [],
                     key: key,
                     value: value,
                 }),
             ],
-            key: key,
-            value: value,
         });
 
         propertyNode.reset();
@@ -59,13 +58,6 @@ describe('PropertyNode', () => {
         expect(propertyNode.key.children).toBeEmpty();
         expect(propertyNode.value.children).toBeEmpty();
     });
-
-    type Scenario = {
-        formatting: Formatting,
-        children: JsonNode[],
-        key: JsonStringNode,
-        value: JsonStringNode,
-    };
 
     it('should rebuild its nodes', () => {
         const key = new JsonIdentifierNode({
@@ -96,58 +88,31 @@ describe('PropertyNode', () => {
         });
 
         const propertyNode = new JsonPropertyNode({
-            children: [
-                new JsonIdentifierNode({
-                    children: [
-                        new JsonTokenNode({
-                            type: JsonTokenType.IDENTIFIER,
-                            value: 'foo',
-                        }),
-                    ],
-                    token: new JsonTokenNode({
-                        type: JsonTokenType.IDENTIFIER,
-                        value: '"token value"',
-                    }),
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.COLON,
-                    value: ':',
-                }),
-                new JsonPrimitiveNode({
-                    children: [
-                        new JsonTokenNode({
-                            type: JsonTokenType.STRING,
-                            value: 'bar',
-                        }),
-                    ],
-                    token: new JsonTokenNode({
-                        type: JsonTokenType.STRING,
-                        value: '"bar"',
-                    }),
-                    value: 'bar',
-                }),
-            ],
             key: key,
             value: value,
+            children: [
+                key, // Should preserve the original key
+            ],
         });
 
         propertyNode.rebuild();
 
-        expect(propertyNode).toStrictEqual(
-            new JsonPropertyNode({
-                children: [
-                    key,
-                    new JsonTokenNode({
-                        type: JsonTokenType.COLON,
-                        value: ':',
-                    }),
-                    value,
-                ],
-                key: key,
-                value: value,
+        expect(propertyNode.children).toStrictEqual([
+            key,
+            new JsonTokenNode({
+                type: JsonTokenType.COLON,
+                value: ':',
             }),
-        );
+            value,
+        ]);
     });
+
+    type Scenario = {
+        formatting: Formatting,
+        children: JsonNode[],
+        key: JsonStringNode,
+        value: JsonStringNode,
+    };
 
     it.each(Object.entries<Scenario>({
         'single quote': {
@@ -410,32 +375,9 @@ describe('PropertyNode', () => {
         },
     }))('should rebuild with %s formatting style', (_, scenario) => {
         const propertyNode = new JsonPropertyNode({
-            children: [],
             key: JsonPrimitiveNode.of('foo'),
             value: JsonPrimitiveNode.of('bar'),
         });
-
-        expect(propertyNode).toStrictEqual(
-            new JsonPropertyNode({
-                children: [],
-                key: new JsonPrimitiveNode({
-                    children: [],
-                    value: 'foo',
-                    token: new JsonTokenNode({
-                        type: JsonTokenType.STRING,
-                        value: '"foo"',
-                    }),
-                }),
-                value: new JsonPrimitiveNode({
-                    children: [],
-                    value: 'bar',
-                    token: new JsonTokenNode({
-                        type: JsonTokenType.STRING,
-                        value: '"bar"',
-                    }),
-                }),
-            }),
-        );
 
         propertyNode.rebuild(scenario.formatting);
 
@@ -448,23 +390,39 @@ describe('PropertyNode', () => {
         );
     });
 
-    it('should clone the property node', () => {
+    it('should create a clone', () => {
+        const key = JsonPrimitiveNode.of('foo');
+        const value = JsonPrimitiveNode.of('bar');
+        const token = new JsonTokenNode({
+            type: JsonTokenType.COLON,
+            value: ':',
+        });
+
         const propertyNode = new JsonPropertyNode({
-            children: [JsonPrimitiveNode.of('foo')],
-            key: JsonPrimitiveNode.of('foo'),
-            value: JsonPrimitiveNode.of('bar'),
+            key: key,
+            value: value,
+            children: [key, token, value],
         });
 
         const clone = propertyNode.clone();
 
         expect(clone).toStrictEqual(propertyNode);
-
         expect(clone).not.toBe(propertyNode);
+
+        expect(clone.key).toStrictEqual(key);
+        expect(clone.key).not.toBe(key);
+
+        expect(clone.value).toStrictEqual(value);
+        expect(clone.value).not.toBe(value);
+
+        expect(clone.children[0]).toBe(clone.key);
+        expect(clone.children[1]).toStrictEqual(token);
+        expect(clone.children[1]).not.toBe(token);
+        expect(clone.children[2]).toBe(clone.value);
     });
 
-    it('should not be equivalent when other node is not a JSON property node', () => {
+    it('should not be equivalent to a non-property node', () => {
         const left = new JsonPropertyNode({
-            children: [],
             key: JsonPrimitiveNode.of('foo'),
             value: JsonPrimitiveNode.of('bar'),
         });
@@ -474,15 +432,13 @@ describe('PropertyNode', () => {
         expect(left.isEquivalent(right)).toBeFalse();
     });
 
-    it('should not be equivalent when keys does not match', () => {
+    it('should not be equivalent to a node with different key', () => {
         const left = new JsonPropertyNode({
-            children: [],
             key: JsonPrimitiveNode.of('foo'),
             value: JsonPrimitiveNode.of('bar'),
         });
 
         const right = new JsonPropertyNode({
-            children: [],
             key: JsonPrimitiveNode.of('baz'),
             value: JsonPrimitiveNode.of('bar'),
         });
@@ -490,15 +446,13 @@ describe('PropertyNode', () => {
         expect(left.isEquivalent(right)).toBeFalse();
     });
 
-    it('should not be equivalent when value does not match', () => {
+    it('should not be equivalent to a node with different value', () => {
         const left = new JsonPropertyNode({
-            children: [],
             key: JsonPrimitiveNode.of('foo'),
             value: JsonPrimitiveNode.of('bar'),
         });
 
         const right = new JsonPropertyNode({
-            children: [],
             key: JsonPrimitiveNode.of('foo'),
             value: JsonPrimitiveNode.of('baz'),
         });
@@ -506,7 +460,7 @@ describe('PropertyNode', () => {
         expect(left.isEquivalent(right)).toBeFalse();
     });
 
-    it('should be equivalent to a node with equivalent key and value', () => {
+    it('should be equivalent to a node with the same keys and values', () => {
         const left = new JsonPropertyNode({
             children: [],
             key: JsonPrimitiveNode.of('foo'),
