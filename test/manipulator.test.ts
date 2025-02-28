@@ -757,7 +757,7 @@ describe('NodeManipulator', () => {
         expect(manipulator.done()).toBeTrue();
     });
 
-    it('should preserve spacing after dropping nodes', () => {
+    it('should preserve spacing before the target node when dropping nodes', () => {
         const targetNode = JsonPrimitiveNode.of('bar');
         const manipulator = new NodeManipulator([
             new JsonTokenNode({
