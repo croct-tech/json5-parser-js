@@ -78,7 +78,7 @@ const node = JsonParser.parse(
 );
 ```
 
-Optionally, specify the expected root node type:
+Optionally, specify the expected root node type to narrow down the result:
 
 ```ts
 import {JsonParser, JsonObjectNode} from '@croct/json5-parser';
