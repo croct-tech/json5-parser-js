@@ -582,6 +582,18 @@ describe('NodeManipulator', () => {
         expect(manipulator.current).toBe(node);
     });
 
+    it('should match and replace single non-primitive nodes', () => {
+        const manipulator = new NodeManipulator([
+            JsonArrayNode.of(1),
+        ]);
+
+        manipulator.nodes([
+            JsonArrayNode.of(3),
+        ]);
+
+        expect(manipulator.nodeList).toStrictEqual([JsonArrayNode.of(3)]);
+    });
+
     it('should not match and replace a list matching multiple nodes', () => {
         const firstNode = JsonPrimitiveNode.of('foo');
         const secondNode = JsonPrimitiveNode.of('bar');
@@ -880,7 +892,7 @@ describe('NodeManipulator', () => {
         ]);
     });
 
-    it('should drop all remaining nodes', () => {
+    it('should remove all remaining nodes', () => {
         const list = [
             JsonPrimitiveNode.of('foo'),
             JsonPrimitiveNode.of('bar'),
@@ -895,9 +907,7 @@ describe('NodeManipulator', () => {
     });
 
     it('should remove all insignificant nodes', () => {
-        const list = [JsonPrimitiveNode.of('foo')];
-
-        const manipulator = new NodeManipulator(list);
+        const manipulator = new NodeManipulator([JsonPrimitiveNode.of('foo')]);
 
         manipulator.nodes([
             new JsonTokenNode({
@@ -914,6 +924,25 @@ describe('NodeManipulator', () => {
 
         expect(manipulator.done()).toBeTrue();
 
-        expect(list).toBeEmpty();
+        expect(manipulator.nodeList).toBeEmpty();
+    });
+
+    it('should remove all significant tokens', () => {
+        const manipulator = new NodeManipulator([
+            new JsonTokenNode({
+                type: JsonTokenType.NUMBER,
+                value: '1',
+            }),
+        ]);
+
+        manipulator.nodes([
+            JsonPrimitiveNode.of('foo'),
+        ]);
+
+        manipulator.end();
+
+        expect(manipulator.done()).toBeTrue();
+
+        expect(manipulator.nodeList).toStrictEqual([JsonPrimitiveNode.of('foo')]);
     });
 });
