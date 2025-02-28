@@ -1,10 +1,12 @@
 import {JsonValue} from '@croct/json';
 import {
-    JsonArrayNode,
+    Formatting,
     JsonCompositeNode,
     JsonIdentifierNode,
     JsonNode,
     JsonObjectDefinition,
+    JsonObjectNode,
+    JsonParser,
     JsonPrimitiveNode,
     JsonPropertyNode,
     JsonStructureNode,
@@ -14,6 +16,7 @@ import {
     PartialJsonCompositeDefinition,
     StructureDelimiter,
 } from '../../src';
+import {multiline} from '../utils';
 
 describe('StructureNode', () => {
     class TestStructureNode extends JsonStructureNode {
@@ -46,7 +49,7 @@ describe('StructureNode', () => {
         }
 
         public clone(): TestStructureNode {
-            const clones = new Map<JsonPropertyNode, JsonPropertyNode>();
+            const clones: Map<JsonPropertyNode, JsonPropertyNode> = new Map();
 
             for (const property of this.propertyNodes) {
                 clones.set(property, property.clone());
@@ -89,35 +92,114 @@ describe('StructureNode', () => {
         expect(structureNode.children).toBeEmpty();
     });
 
-    it('should rebuild with a given indentation size', () => {
-        const property = new JsonPropertyNode({
-            children: [],
-            key: JsonIdentifierNode.of('foo'),
-            value: JsonPrimitiveNode.of('bar'),
-        });
+    type Scenario = {
+        input: string,
+        expected: string,
+        formatting?: Formatting,
+    };
+
+    it.each(Object.entries<Scenario>({
+        'different quota styles': {
+            input: multiline`
+            {
+                foo: "bar",
+                "baz": "qux",
+                'quux': "corge"
+            }
+            `,
+            expected: multiline`
+            {
+                foo: "bar",
+                "baz": "qux",
+                'quux': "corge"
+            }
+            `,
+        },
+        'nested structures': {
+            input: multiline`
+            {
+                "array":[1, 2, 3],
+                "obj": {
+                    "foo": "bar"
+                }
+            }
+            `,
+            expected: multiline`
+            {
+                "array":[1, 2, 3],
+                "obj": {
+                    "foo": "bar"
+                }
+            }
+            `,
+        },
+        'leading indentation': {
+            input: multiline`
+            {
+                "foo": 1,
+                "bar":2,
+                "baz": 3
+            }
+            `,
+            expected: multiline`
+            {
+                "foo": 1,
+                "bar":2,
+                "baz": 3
+            }
+            `,
+        },
+        'with inline comment': {
+            input: multiline`
+            {
+                foo: "bar",
+                // Some comment
+                baz: "qux",
+            }
+            `,
+            expected: multiline`
+            {
+                foo: "bar",
+                // Some comment
+                baz: "qux",
+            }
+            `,
+        },
+        'with multiline comment': {
+            input: multiline`
+            {
+                foo: "bar",
+                /* 
+                Multi-line comment:
+                This is a placeholder object commonly used in programming examples.
+                The fields below are just for demonstration purposes.
+                */
+                baz: "qux",
+            }
+            `,
+            expected: multiline`
+            {
+                foo: "bar",
+                /* 
+                Multi-line comment:
+                This is a placeholder object commonly used in programming examples.
+                The fields below are just for demonstration purposes.
+                */
+                baz: "qux",
+            }
+            `,
+        },
+    }))('should rebuild itself detecting %s', (_, scenario) => {
+        const node = JsonParser.parse<JsonObjectNode>(scenario.input, JsonObjectNode);
 
         const structureNode = new TestStructureNode({
-            children: [
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_LEFT,
-                    value: '{',
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_RIGHT,
-                    value: '}',
-                }),
-            ],
-            properties: [property],
+            children: node.children,
+            properties: node.properties,
         });
 
-        structureNode.rebuild({
-            object: {
-                indentationSize: 4,
-                leadingIndentation: true,
-            },
-        });
+        structureNode.rebuild(scenario.formatting);
 
-        expect(structureNode.toString()).toBe('{foo:"bar"}');
+        expect(structureNode.toString()).toStrictEqual(scenario.expected);
     });
 
     it('should rebuild with comma spacing', () => {
@@ -147,1066 +229,6 @@ describe('StructureNode', () => {
             },
         });
 
-        expect(structureNode).toStrictEqual(new TestStructureNode({
-            children: [
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_LEFT,
-                    value: '{',
-                }),
-                new JsonPropertyNode({
-                    children: [
-                        new JsonIdentifierNode({
-                            children: [
-                                new JsonTokenNode({
-                                    type: JsonTokenType.IDENTIFIER,
-                                    value: 'foo',
-                                }),
-                            ],
-                            token: new JsonTokenNode({
-                                type: JsonTokenType.IDENTIFIER,
-                                value: 'foo',
-                            }),
-                        }),
-                        new JsonTokenNode({
-                            type: JsonTokenType.COLON,
-                            value: ':',
-                        }),
-                        new JsonTokenNode({
-                            type: JsonTokenType.WHITESPACE,
-                            value: ' ',
-                        }),
-                        new JsonPrimitiveNode({
-                            children: [
-                                new JsonTokenNode({
-                                    type: JsonTokenType.STRING,
-                                    value: '"bar"',
-                                }),
-                            ],
-                            token: new JsonTokenNode({
-                                type: JsonTokenType.STRING,
-                                value: '"bar"',
-                            }),
-                            value: 'bar',
-                        }),
-                    ],
-                    key: new JsonIdentifierNode({
-                        children: [
-                            new JsonTokenNode({
-                                type: JsonTokenType.IDENTIFIER,
-                                value: 'foo',
-                            }),
-                        ],
-                        token: new JsonTokenNode({
-                            type: JsonTokenType.IDENTIFIER,
-                            value: 'foo',
-                        }),
-                    }),
-                    value: new JsonPrimitiveNode({
-                        children: [
-                            new JsonTokenNode({
-                                type: JsonTokenType.STRING,
-                                value: '"bar"',
-                            }),
-                        ],
-                        token: new JsonTokenNode({
-                            type: JsonTokenType.STRING,
-                            value: '"bar"',
-                        }),
-                        value: 'bar',
-                    }),
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_RIGHT,
-                    value: '}',
-                }),
-            ],
-            properties: [property],
-        }));
-    });
-
-    it('should rebuild with entry indentation', () => {
-        const property = new JsonPropertyNode({
-            children: [],
-            key: JsonIdentifierNode.of('foo'),
-            value: JsonPrimitiveNode.of('bar'),
-        });
-
-        const structureNode = new TestStructureNode({
-            children: [
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_LEFT,
-                    value: '{',
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_RIGHT,
-                    value: '}',
-                }),
-            ],
-            properties: [property],
-        });
-
-        structureNode.rebuild({
-            object: {
-                entryIndentation: true,
-            },
-        });
-
-        expect(structureNode).toStrictEqual(new TestStructureNode({
-            children: [
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_LEFT,
-                    value: '{',
-                }),
-                new JsonPropertyNode({
-                    children: [
-                        new JsonIdentifierNode({
-                            children: [
-                                new JsonTokenNode({
-                                    type: JsonTokenType.IDENTIFIER,
-                                    value: 'foo',
-                                }),
-                            ],
-                            token: new JsonTokenNode({
-                                type: JsonTokenType.IDENTIFIER,
-                                value: 'foo',
-                            }),
-                        }),
-                        new JsonTokenNode({
-                            type: JsonTokenType.COLON,
-                            value: ':',
-                        }),
-                        new JsonPrimitiveNode({
-                            children: [
-                                new JsonTokenNode({
-                                    type: JsonTokenType.STRING,
-                                    value: '"bar"',
-                                }),
-                            ],
-                            token: new JsonTokenNode({
-                                type: JsonTokenType.STRING,
-                                value: '"bar"',
-                            }),
-                            value: 'bar',
-                        }),
-                    ],
-                    key: new JsonIdentifierNode({
-                        children: [
-                            new JsonTokenNode({
-                                type: JsonTokenType.IDENTIFIER,
-                                value: 'foo',
-                            }),
-                        ],
-                        token: new JsonTokenNode({
-                            type: JsonTokenType.IDENTIFIER,
-                            value: 'foo',
-                        }),
-                    }),
-                    value: new JsonPrimitiveNode({
-                        children: [
-                            new JsonTokenNode({
-                                type: JsonTokenType.STRING,
-                                value: '"bar"',
-                            }),
-                        ],
-                        token: new JsonTokenNode({
-                            type: JsonTokenType.STRING,
-                            value: '"bar"',
-                        }),
-                        value: 'bar',
-                    }),
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_RIGHT,
-                    value: '}',
-                }),
-            ],
-            properties: [property],
-        }));
-    });
-
-    it('should rebuild with leading indentation', () => {
-        const firstElement = new JsonPrimitiveNode({
-            children: [
-                new JsonTokenNode({
-                    type: JsonTokenType.NUMBER,
-                    value: '1',
-                }),
-            ],
-            token: new JsonTokenNode({
-                type: JsonTokenType.NUMBER,
-                value: '1',
-            }),
-            value: 1,
-        });
-
-        const secondElement = new JsonPrimitiveNode({
-            children: [
-                new JsonTokenNode({
-                    type: JsonTokenType.NUMBER,
-                    value: '2',
-                }),
-            ],
-            token: new JsonTokenNode({
-                type: JsonTokenType.NUMBER,
-                value: '2',
-            }),
-            value: 2,
-        });
-
-        const thirdElement = new JsonPrimitiveNode({
-            children: [
-                new JsonTokenNode({
-                    type: JsonTokenType.NUMBER,
-                    value: '3',
-                }),
-            ],
-            token: new JsonTokenNode({
-                type: JsonTokenType.NUMBER,
-                value: '3',
-            }),
-            value: 3,
-        });
-
-        const arrayNode = new JsonArrayNode({
-            children: [
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACKET_LEFT,
-                    value: '[',
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.NEWLINE,
-                    value: '\n',
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.WHITESPACE,
-                    value: ' ',
-                }),
-                firstElement,
-                new JsonTokenNode({
-                    type: JsonTokenType.COMMA,
-                    value: ',',
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.NEWLINE,
-                    value: '\n',
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.WHITESPACE,
-                    value: ' ',
-                }),
-                thirdElement,
-                new JsonTokenNode({
-                    type: JsonTokenType.NEWLINE,
-                    value: '\n',
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACKET_RIGHT,
-                    value: ']',
-                }),
-            ],
-            elements: [firstElement, secondElement, thirdElement],
-        });
-
-        const property = new JsonPropertyNode({
-            children: [],
-            key: JsonIdentifierNode.of('foo'),
-            value: arrayNode,
-        });
-
-        const structureNode = new TestStructureNode({
-            children: [
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_LEFT,
-                    value: '{',
-                }),
-                property,
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_RIGHT,
-                    value: '}',
-                }),
-            ],
-            properties: [property],
-        });
-
-        structureNode.rebuild({
-            object: {
-                leadingIndentation: true,
-                indentationSize: 4,
-            },
-        });
-
-        expect(structureNode).toStrictEqual(new TestStructureNode({
-            children: [
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_LEFT,
-                    value: '{',
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.NEWLINE,
-                    value: '\n',
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.WHITESPACE,
-                    value: '    ',
-                }),
-                new JsonPropertyNode({
-                    children: [
-                        new JsonIdentifierNode({
-                            children: [
-                                new JsonTokenNode({
-                                    type: JsonTokenType.IDENTIFIER,
-                                    value: 'foo',
-                                }),
-                            ],
-                            token: new JsonTokenNode({
-                                type: JsonTokenType.IDENTIFIER,
-                                value: 'foo',
-                            }),
-                        }),
-                        new JsonTokenNode({
-                            type: JsonTokenType.COLON,
-                            value: ':',
-                        }),
-                        new JsonArrayNode({
-                            children: [
-                                new JsonTokenNode({
-                                    type: JsonTokenType.BRACKET_LEFT,
-                                    value: '[',
-                                }),
-                                new JsonTokenNode({
-                                    type: JsonTokenType.NEWLINE,
-                                    value: '\n',
-                                }),
-                                new JsonTokenNode({
-                                    type: JsonTokenType.WHITESPACE,
-                                    value: ' ',
-                                }),
-                                firstElement,
-                                new JsonTokenNode({
-                                    type: JsonTokenType.COMMA,
-                                    value: ',',
-                                }),
-                                new JsonTokenNode({
-                                    type: JsonTokenType.NEWLINE,
-                                    value: '\n',
-                                }),
-                                new JsonTokenNode({
-                                    type: JsonTokenType.WHITESPACE,
-                                    value: ' ',
-                                }),
-                                secondElement,
-                                new JsonTokenNode({
-                                    type: JsonTokenType.COMMA,
-                                    value: ',',
-                                }),
-                                new JsonTokenNode({
-                                    type: JsonTokenType.NEWLINE,
-                                    value: '\n',
-                                }),
-                                new JsonTokenNode({
-                                    type: JsonTokenType.WHITESPACE,
-                                    value: '  ',
-                                }),
-                                thirdElement,
-                                new JsonTokenNode({
-                                    type: JsonTokenType.NEWLINE,
-                                    value: '\n',
-                                }),
-                                new JsonTokenNode({
-                                    type: JsonTokenType.WHITESPACE,
-                                    value: ' ',
-                                }),
-                                new JsonTokenNode({
-                                    type: JsonTokenType.BRACKET_RIGHT,
-                                    value: ']',
-                                }),
-                            ],
-                            elements: [firstElement, secondElement, thirdElement],
-                        }),
-                    ],
-                    key: new JsonIdentifierNode({
-                        children: [
-                            new JsonTokenNode({
-                                type: JsonTokenType.IDENTIFIER,
-                                value: 'foo',
-                            }),
-                        ],
-                        token: new JsonTokenNode({
-                            type: JsonTokenType.IDENTIFIER,
-                            value: 'foo',
-                        }),
-                    }),
-                    value: new JsonArrayNode({
-                        children: [
-                            new JsonTokenNode({
-                                type: JsonTokenType.BRACKET_LEFT,
-                                value: '[',
-                            }),
-                            new JsonTokenNode({
-                                type: JsonTokenType.NEWLINE,
-                                value: '\n',
-                            }),
-                            new JsonTokenNode({
-                                type: JsonTokenType.WHITESPACE,
-                                value: ' ',
-                            }),
-                            firstElement,
-                            new JsonTokenNode({
-                                type: JsonTokenType.COMMA,
-                                value: ',',
-                            }),
-                            new JsonTokenNode({
-                                type: JsonTokenType.NEWLINE,
-                                value: '\n',
-                            }),
-                            new JsonTokenNode({
-                                type: JsonTokenType.WHITESPACE,
-                                value: ' ',
-                            }),
-                            secondElement,
-                            new JsonTokenNode({
-                                type: JsonTokenType.COMMA,
-                                value: ',',
-                            }),
-                            new JsonTokenNode({
-                                type: JsonTokenType.NEWLINE,
-                                value: '\n',
-                            }),
-                            new JsonTokenNode({
-                                type: JsonTokenType.WHITESPACE,
-                                value: '  ',
-                            }),
-                            thirdElement,
-                            new JsonTokenNode({
-                                type: JsonTokenType.NEWLINE,
-                                value: '\n',
-                            }),
-                            new JsonTokenNode({
-                                type: JsonTokenType.WHITESPACE,
-                                value: ' ',
-                            }),
-                            new JsonTokenNode({
-                                type: JsonTokenType.BRACKET_RIGHT,
-                                value: ']',
-                            }),
-                        ],
-                        elements: [firstElement, secondElement, thirdElement],
-                    }),
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_RIGHT,
-                    value: '}',
-                }),
-            ],
-            properties: [property],
-        }));
-    });
-
-    it('should rebuild with trailing indentation', () => {
-        const property = new JsonPropertyNode({
-            children: [],
-            key: JsonIdentifierNode.of('foo'),
-            value: JsonPrimitiveNode.of('bar'),
-        });
-
-        const structureNode = new TestStructureNode({
-            children: [
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_LEFT,
-                    value: '{',
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_RIGHT,
-                    value: '}',
-                }),
-            ],
-            properties: [property],
-        });
-
-        structureNode.rebuild({
-            object: {
-                trailingIndentation: true,
-                indentationSize: 4,
-            },
-        });
-
-        expect(structureNode).toStrictEqual(new TestStructureNode({
-            children: [
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_LEFT,
-                    value: '{',
-                }),
-                new JsonPropertyNode({
-                    children: [
-                        new JsonIdentifierNode({
-                            children: [
-                                new JsonTokenNode({
-                                    type: JsonTokenType.IDENTIFIER,
-                                    value: 'foo',
-                                }),
-                            ],
-                            token: new JsonTokenNode({
-                                type: JsonTokenType.IDENTIFIER,
-                                value: 'foo',
-                            }),
-                        }),
-                        new JsonTokenNode({
-                            type: JsonTokenType.COLON,
-                            value: ':',
-                        }),
-                        new JsonPrimitiveNode({
-                            children: [
-                                new JsonTokenNode({
-                                    type: JsonTokenType.STRING,
-                                    value: '"bar"',
-                                }),
-                            ],
-                            token: new JsonTokenNode({
-                                type: JsonTokenType.STRING,
-                                value: '"bar"',
-                            }),
-                            value: 'bar',
-                        }),
-                    ],
-                    key: new JsonIdentifierNode({
-                        children: [
-                            new JsonTokenNode({
-                                type: JsonTokenType.IDENTIFIER,
-                                value: 'foo',
-                            }),
-                        ],
-                        token: new JsonTokenNode({
-                            type: JsonTokenType.IDENTIFIER,
-                            value: 'foo',
-                        }),
-                    }),
-                    value: new JsonPrimitiveNode({
-                        children: [
-                            new JsonTokenNode({
-                                type: JsonTokenType.STRING,
-                                value: '"bar"',
-                            }),
-                        ],
-                        token: new JsonTokenNode({
-                            type: JsonTokenType.STRING,
-                            value: '"bar"',
-                        }),
-                        value: 'bar',
-                    }),
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.NEWLINE,
-                    value: '\n',
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.WHITESPACE,
-                    value: '',
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_RIGHT,
-                    value: '}',
-                }),
-            ],
-            properties: [property],
-        }));
-    });
-
-    it('should rebuild with trailing comma', () => {
-        const property = new JsonPropertyNode({
-            children: [],
-            key: JsonIdentifierNode.of('foo'),
-            value: JsonPrimitiveNode.of('bar'),
-        });
-
-        const structureNode = new TestStructureNode({
-            children: [
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_LEFT,
-                    value: '{',
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_RIGHT,
-                    value: '}',
-                }),
-            ],
-            properties: [property],
-        });
-
-        structureNode.rebuild({
-            object: {
-                trailingComma: true,
-            },
-        });
-
-        expect(structureNode).toStrictEqual(new TestStructureNode({
-            children: [
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_LEFT,
-                    value: '{',
-                }),
-                new JsonPropertyNode({
-                    children: [
-                        new JsonIdentifierNode({
-                            children: [
-                                new JsonTokenNode({
-                                    type: JsonTokenType.IDENTIFIER,
-                                    value: 'foo',
-                                }),
-                            ],
-                            token: new JsonTokenNode({
-                                type: JsonTokenType.IDENTIFIER,
-                                value: 'foo',
-                            }),
-                        }),
-                        new JsonTokenNode({
-                            type: JsonTokenType.COLON,
-                            value: ':',
-                        }),
-                        new JsonPrimitiveNode({
-                            children: [
-                                new JsonTokenNode({
-                                    type: JsonTokenType.STRING,
-                                    value: '"bar"',
-                                }),
-                            ],
-                            token: new JsonTokenNode({
-                                type: JsonTokenType.STRING,
-                                value: '"bar"',
-                            }),
-                            value: 'bar',
-                        }),
-                    ],
-                    key: new JsonIdentifierNode({
-                        children: [
-                            new JsonTokenNode({
-                                type: JsonTokenType.IDENTIFIER,
-                                value: 'foo',
-                            }),
-                        ],
-                        token: new JsonTokenNode({
-                            type: JsonTokenType.IDENTIFIER,
-                            value: 'foo',
-                        }),
-                    }),
-                    value: new JsonPrimitiveNode({
-                        children: [
-                            new JsonTokenNode({
-                                type: JsonTokenType.STRING,
-                                value: '"bar"',
-                            }),
-                        ],
-                        token: new JsonTokenNode({
-                            type: JsonTokenType.STRING,
-                            value: '"bar"',
-                        }),
-                        value: 'bar',
-                    }),
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.COMMA,
-                    value: ',',
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_RIGHT,
-                    value: '}',
-                }),
-            ],
-            properties: [property],
-        }));
-    });
-
-    it('should rebuild with block comment', () => {
-        const property = new JsonPropertyNode({
-            children: [],
-            key: JsonIdentifierNode.of('foo'),
-            value: JsonPrimitiveNode.of('bar'),
-        });
-
-        const structureNode = new TestStructureNode({
-            children: [
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_LEFT,
-                    value: '{',
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.WHITESPACE,
-                    value: ' ',
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.BLOCK_COMMENT,
-                    value: '/* comment */',
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_RIGHT,
-                    value: '}',
-                }),
-            ],
-            properties: [property],
-        });
-
-        structureNode.rebuild({});
-
-        expect(structureNode).toStrictEqual(new TestStructureNode({
-            children: [
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_LEFT,
-                    value: '{',
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.WHITESPACE,
-                    value: ' ',
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.BLOCK_COMMENT,
-                    value: '/* comment */',
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.WHITESPACE,
-                    value: ' ',
-                }),
-                new JsonPropertyNode({
-                    children: [
-                        new JsonIdentifierNode({
-                            children: [
-                                new JsonTokenNode({
-                                    type: JsonTokenType.IDENTIFIER,
-                                    value: 'foo',
-                                }),
-                            ],
-                            token: new JsonTokenNode({
-                                type: JsonTokenType.IDENTIFIER,
-                                value: 'foo',
-                            }),
-                        }),
-                        new JsonTokenNode({
-                            type: JsonTokenType.COLON,
-                            value: ':',
-                        }),
-                        new JsonPrimitiveNode({
-                            children: [
-                                new JsonTokenNode({
-                                    type: JsonTokenType.STRING,
-                                    value: '"bar"',
-                                }),
-                            ],
-                            token: new JsonTokenNode({
-                                type: JsonTokenType.STRING,
-                                value: '"bar"',
-                            }),
-                            value: 'bar',
-                        }),
-                    ],
-                    key: new JsonIdentifierNode({
-                        children: [
-                            new JsonTokenNode({
-                                type: JsonTokenType.IDENTIFIER,
-                                value: 'foo',
-                            }),
-                        ],
-                        token: new JsonTokenNode({
-                            type: JsonTokenType.IDENTIFIER,
-                            value: 'foo',
-                        }),
-                    }),
-                    value: new JsonPrimitiveNode({
-                        children: [
-                            new JsonTokenNode({
-                                type: JsonTokenType.STRING,
-                                value: '"bar"',
-                            }),
-                        ],
-                        token: new JsonTokenNode({
-                            type: JsonTokenType.STRING,
-                            value: '"bar"',
-                        }),
-                        value: 'bar',
-                    }),
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_RIGHT,
-                    value: '}',
-                }),
-            ],
-            properties: [property],
-        }));
-    });
-
-    it('should rebuild with string key', () => {
-        const property = new JsonPropertyNode({
-            children: [
-                new JsonPrimitiveNode({
-                    children: [
-                        new JsonTokenNode({
-                            type: JsonTokenType.STRING,
-                            value: '"foo"',
-                        }),
-                    ],
-                    token: new JsonTokenNode({
-                        type: JsonTokenType.STRING,
-                        value: '"foo"',
-                    }),
-                    value: 'foo',
-                }),
-                new JsonPrimitiveNode({
-                    children: [
-                        new JsonTokenNode({
-                            type: JsonTokenType.STRING,
-                            value: 'foo',
-                        }),
-                    ],
-                    token: new JsonTokenNode({
-                        type: JsonTokenType.STRING,
-                        value: 'foo',
-                    }),
-                    value: 'foo',
-                }),
-            ],
-            key: new JsonPrimitiveNode({
-                children: [
-                    new JsonTokenNode({
-                        type: JsonTokenType.STRING,
-                        value: '"foo"',
-                    }),
-                ],
-                token: new JsonTokenNode({
-                    type: JsonTokenType.STRING,
-                    value: '"foo"',
-                }),
-                value: '"foo"',
-            }),
-            value: new JsonPrimitiveNode({
-                children: [
-                    new JsonTokenNode({
-                        type: JsonTokenType.STRING,
-                        value: '"bar"',
-                    }),
-                ],
-                token: new JsonTokenNode({
-                    type: JsonTokenType.STRING,
-                    value: '"bar"',
-                }),
-                value: '"bar"',
-            }),
-        });
-
-        const structureNode = new TestStructureNode({
-            children: [
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_LEFT,
-                    value: '{',
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.NEWLINE,
-                    value: '\n',
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.WHITESPACE,
-                    value: ' ',
-                }),
-                property,
-                new JsonTokenNode({
-                    type: JsonTokenType.NEWLINE,
-                    value: '\n',
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_RIGHT,
-                    value: '}',
-                }),
-            ],
-            properties: [property],
-        });
-
-        structureNode.rebuild({
-            object: {
-                entryIndentation: true,
-            },
-        });
-
-        expect(structureNode).toStrictEqual(new TestStructureNode({
-            children: [
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_LEFT,
-                    value: '{',
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.NEWLINE,
-                    value: '\n',
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.WHITESPACE,
-                    value: ' ',
-                }),
-                new JsonPropertyNode({
-                    children: [
-                        new JsonPrimitiveNode({
-                            children: [
-                                new JsonTokenNode({
-                                    type: JsonTokenType.STRING,
-                                    value: '"foo"',
-                                }),
-                            ],
-                            token: new JsonTokenNode({
-                                type: JsonTokenType.STRING,
-                                value: '"foo"',
-                            }),
-                            value: '"foo"',
-                        }),
-                        new JsonTokenNode({
-                            type: JsonTokenType.COLON,
-                            value: ':',
-                        }),
-                        new JsonPrimitiveNode({
-                            children: [
-                                new JsonTokenNode({
-                                    type: JsonTokenType.STRING,
-                                    value: '"bar"',
-                                }),
-                            ],
-                            token: new JsonTokenNode({
-                                type: JsonTokenType.STRING,
-                                value: '"bar"',
-                            }),
-                            value: '"bar"',
-                        }),
-                    ],
-                    key: new JsonPrimitiveNode({
-                        children: [
-                            new JsonTokenNode({
-                                type: JsonTokenType.STRING,
-                                value: '"foo"',
-                            }),
-                        ],
-                        token: new JsonTokenNode({
-                            type: JsonTokenType.STRING,
-                            value: '"foo"',
-                        }),
-                        value: '"foo"',
-                    }),
-                    value: new JsonPrimitiveNode({
-                        children: [
-                            new JsonTokenNode({
-                                type: JsonTokenType.STRING,
-                                value: '"bar"',
-                            }),
-                        ],
-                        token: new JsonTokenNode({
-                            type: JsonTokenType.STRING,
-                            value: '"bar"',
-                        }),
-                        value: '"bar"',
-                    }),
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.NEWLINE,
-                    value: '\n',
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.WHITESPACE,
-                    value: '',
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_RIGHT,
-                    value: '}',
-                }),
-            ],
-            properties: [property],
-        }));
-    });
-
-    it('should rebuild with nested structure node', () => {
-        const property = new JsonPropertyNode({
-            children: [],
-            key: JsonIdentifierNode.of('foo'),
-            value: JsonPrimitiveNode.of('bar'),
-        });
-
-        const structureNode = new TestStructureNode({
-            children: [
-                property,
-                new TestStructureNode({
-                    children: [property],
-                    properties: [],
-                }),
-            ],
-            properties: [property],
-        });
-
-        structureNode.rebuild({
-            object: {
-                entryIndentation: true,
-            },
-        });
-
-        expect(structureNode).toStrictEqual(new TestStructureNode({
-            children: [
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_LEFT,
-                    value: '{',
-                }),
-                new JsonPropertyNode({
-                    children: [
-                        new JsonIdentifierNode({
-                            children: [
-                                new JsonTokenNode({
-                                    type: JsonTokenType.IDENTIFIER,
-                                    value: 'foo',
-                                }),
-                            ],
-                            token: new JsonTokenNode({
-                                type: JsonTokenType.IDENTIFIER,
-                                value: 'foo',
-                            }),
-                        }),
-                        new JsonTokenNode({
-                            type: JsonTokenType.COLON,
-                            value: ':',
-                        }),
-                        new JsonPrimitiveNode({
-                            children: [
-                                new JsonTokenNode({
-                                    type: JsonTokenType.STRING,
-                                    value: '"bar"',
-                                }),
-                            ],
-                            token: new JsonTokenNode({
-                                type: JsonTokenType.STRING,
-                                value: '"bar"',
-                            }),
-                            value: 'bar',
-                        }),
-                    ],
-                    key: new JsonIdentifierNode({
-                        children: [
-                            new JsonTokenNode({
-                                type: JsonTokenType.IDENTIFIER,
-                                value: 'foo',
-                            }),
-                        ],
-                        token: new JsonTokenNode({
-                            type: JsonTokenType.IDENTIFIER,
-                            value: 'foo',
-                        }),
-                    }),
-                    value: new JsonPrimitiveNode({
-                        children: [
-                            new JsonTokenNode({
-                                type: JsonTokenType.STRING,
-                                value: '"bar"',
-                            }),
-                        ],
-                        token: new JsonTokenNode({
-                            type: JsonTokenType.STRING,
-                            value: '"bar"',
-                        }),
-                        value: 'bar',
-                    }),
-                }),
-                new JsonTokenNode({
-                    type: JsonTokenType.BRACE_RIGHT,
-                    value: '}',
-                }),
-            ],
-            properties: [property],
-        }));
+        expect(structureNode.toString()).toStrictEqual('{foo: "bar"}');
     });
 });
