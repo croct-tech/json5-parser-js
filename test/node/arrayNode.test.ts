@@ -1,4 +1,4 @@
-import {JsonArrayNode, JsonObjectNode, JsonPrimitiveNode} from '../../src';
+import {JsonArrayNode, JsonObjectNode, JsonPrimitiveNode, JsonTokenNode, JsonTokenType} from '../../src';
 import {JsonError} from '../../src/error';
 
 describe('ArrayNode', () => {
@@ -55,108 +55,109 @@ describe('ArrayNode', () => {
             ],
         },
     ])('should create a node with $entries', ({entries, elements}) => {
-        const arrayNode = JsonArrayNode.of(...entries);
+        const node = JsonArrayNode.of(...entries);
 
-        expect(arrayNode.elements).toStrictEqual(elements);
+        expect(node.elements).toStrictEqual(elements);
     });
 
     it('should get its elements', () => {
-        const arrayNode = JsonArrayNode.of(1, 2, 3);
+        const node = JsonArrayNode.of(1, 2, 3);
 
-        expect(arrayNode.elements).toStrictEqual([
+        expect(node.elements).toStrictEqual([
             JsonPrimitiveNode.of(1),
             JsonPrimitiveNode.of(2),
             JsonPrimitiveNode.of(3),
         ]);
     });
 
-    it('should fail to get an array element when the element type doesn\'t match', () => {
-        const arrayNode = JsonArrayNode.of(1, 2, 3);
+    it('should fail to get an array element if the element type does not match', () => {
+        const node = JsonArrayNode.of(1, 2, 3);
 
-        expect(() => arrayNode.get(1, JsonArrayNode)).toThrowWithMessage(
+        expect(() => node.get(1, JsonArrayNode)).toThrowWithMessage(
             JsonError,
             'Expected JsonArrayNode at index 1, but got JsonPrimitiveNode.',
         );
     });
 
-    it('should get an array element', () => {
-        const arrayNode = JsonArrayNode.of(1, 2, 3);
+    it('should get the element at a specific index', () => {
+        const element = JsonPrimitiveNode.of(2);
+        const node = JsonArrayNode.of(1, element, 3);
 
-        expect(arrayNode.get(1, JsonPrimitiveNode)).toStrictEqual(JsonPrimitiveNode.of(2));
+        expect(node.get(1, JsonPrimitiveNode)).toBe(element);
     });
 
-    it('should fail to set an array element when the index is out of the array limits', () => {
-        const arrayNode = JsonArrayNode.of(1, 2, 3);
+    it('should fail to set an element if the index is out of the array limits', () => {
+        const node = JsonArrayNode.of(1, 2, 3);
 
-        expect(() => arrayNode.set(-1, 4)).toThrowWithMessage(
+        expect(() => node.set(-1, 4)).toThrowWithMessage(
             Error,
             'Index -1 is out of bounds.',
         );
     });
 
-    it('should set an array element', () => {
-        const arrayNode = JsonArrayNode.of(1, 2, 3);
+    it('should set an element at a specific index', () => {
+        const node = JsonArrayNode.of(1, 2, 3);
 
-        arrayNode.set(2, 4);
+        node.set(2, 4);
 
-        expect(arrayNode).toStrictEqual(JsonArrayNode.of(1, 2, 4));
+        expect(node).toStrictEqual(JsonArrayNode.of(1, 2, 4));
     });
 
-    it('should clear the array elements', () => {
-        const arrayNode = JsonArrayNode.of(1, 2, 3);
+    it('should clear the elements', () => {
+        const node = JsonArrayNode.of(1, 2, 3);
 
-        arrayNode.clear();
+        node.clear();
 
-        expect(arrayNode).toStrictEqual(JsonArrayNode.of());
+        expect(node).toStrictEqual(JsonArrayNode.of());
     });
 
-    it('should fail to delete an array element when the index is out of the array limits', () => {
-        const arrayNode = JsonArrayNode.of(1, 2, 3);
+    it('should fail to delete an element if the index is out of the array limits', () => {
+        const node = JsonArrayNode.of(1, 2, 3);
 
-        expect(() => arrayNode.delete(-1)).toThrowWithMessage(
+        expect(() => node.delete(-1)).toThrowWithMessage(
             Error,
             'Index -1 is out of bounds.',
         );
     });
 
-    it('should delete an array element', () => {
-        const arrayNode = JsonArrayNode.of(1, 2, 3);
+    it('should delete an element', () => {
+        const node = JsonArrayNode.of(1, 2, 3);
 
-        arrayNode.delete(2);
+        node.delete(2);
 
-        expect(arrayNode).toStrictEqual(JsonArrayNode.of(1, 2));
+        expect(node).toStrictEqual(JsonArrayNode.of(1, 2));
     });
 
     it('should unshift elements in the array', () => {
-        const arrayNode = JsonArrayNode.of(1, 2, 3);
+        const node = JsonArrayNode.of(1, 2, 3);
 
-        arrayNode.unshift(-1, 0);
+        node.unshift(-1, 0);
 
-        expect(arrayNode).toStrictEqual(JsonArrayNode.of(-1, 0, 1, 2, 3));
+        expect(node).toStrictEqual(JsonArrayNode.of(-1, 0, 1, 2, 3));
     });
 
     it('should push elements in the array', () => {
-        const arrayNode = JsonArrayNode.of(1, 2, 3);
+        const node = JsonArrayNode.of(1, 2, 3);
 
-        arrayNode.push(4, 5);
+        node.push(4, 5);
 
-        expect(arrayNode).toStrictEqual(JsonArrayNode.of(1, 2, 3, 4, 5));
+        expect(node).toStrictEqual(JsonArrayNode.of(1, 2, 3, 4, 5));
     });
 
     it('should shift elements from the array', () => {
-        const arrayNode = JsonArrayNode.of(1, 2, 3);
+        const node = JsonArrayNode.of(1, 2, 3);
 
-        arrayNode.shift();
+        node.shift();
 
-        expect(arrayNode).toStrictEqual(JsonArrayNode.of(2, 3));
+        expect(node).toStrictEqual(JsonArrayNode.of(2, 3));
     });
 
     it('should pop elements from the array', () => {
-        const arrayNode = JsonArrayNode.of(1, 2, 3);
+        const node = JsonArrayNode.of(1, 2, 3);
 
-        arrayNode.pop();
+        node.pop();
 
-        expect(arrayNode).toStrictEqual(JsonArrayNode.of(1, 2));
+        expect(node).toStrictEqual(JsonArrayNode.of(1, 2));
     });
 
     it.each(Object.entries({
@@ -196,9 +197,9 @@ describe('ArrayNode', () => {
             expectedItems: ['one', 'two', 3],
         },
     }))('should splice the array %s', (_, scenario) => {
-        const arrayNode = JsonArrayNode.of(1, 2, 3);
+        const node = JsonArrayNode.of(1, 2, 3);
 
-        const removedItems = arrayNode.splice(
+        const removedItems = node.splice(
             scenario.initialIndex,
             scenario.amountToRemove,
             ...scenario.replacementElements,
@@ -206,75 +207,74 @@ describe('ArrayNode', () => {
 
         expect(removedItems).toStrictEqual(scenario.removedItems);
 
-        expect(arrayNode).toStrictEqual(JsonArrayNode.of(...scenario.expectedItems));
+        expect(node).toStrictEqual(JsonArrayNode.of(...scenario.expectedItems));
     });
 
     it('should clone the array node', () => {
-        const arrayNode = JsonArrayNode.of(1, 2, 3);
+        const node = JsonArrayNode.of(1, 2, 3);
 
-        const clone = arrayNode.clone();
+        node.rebuild();
 
-        expect(arrayNode).toStrictEqual(clone);
+        expect(node.children).toHaveLength(7);
 
-        expect(arrayNode).not.toBe(clone);
+        const clone = node.clone();
+
+        expect(node).toStrictEqual(clone);
+        expect(node).not.toBe(clone);
+
+        expect(node.elements[0]).not.toBe(clone.elements[0]);
+        expect(node.elements[1]).not.toBe(clone.elements[1]);
+        expect(node.elements[2]).not.toBe(clone.elements[2]);
+
+        expect(clone.children[1]).toBe(clone.elements[0]);
+        expect(clone.children[3]).toBe(clone.elements[1]);
+        expect(clone.children[5]).toBe(clone.elements[2]);
+
+        expect(node.children[0]).not.toBe(clone.children[0]);
+        expect(node.children[1]).not.toBe(clone.children[1]);
+        expect(node.children[2]).not.toBe(clone.children[2]);
+        expect(node.children[3]).not.toBe(clone.children[3]);
+        expect(node.children[4]).not.toBe(clone.children[4]);
+        expect(node.children[5]).not.toBe(clone.children[5]);
+        expect(node.children[6]).not.toBe(clone.children[6]);
     });
 
-    it('should update the node with a non array value', () => {
-        const arrayNode = JsonArrayNode.of('foo', 'bar');
+    it('should update the node with a non-array value', () => {
+        const node = JsonArrayNode.of('foo', 'bar');
 
-        const updatedNode = arrayNode.update('baz');
+        const updatedNode = node.update('baz');
 
         expect(updatedNode).toStrictEqual(JsonPrimitiveNode.of('baz'));
 
-        expect(arrayNode).toStrictEqual(JsonArrayNode.of('foo', 'bar'));
+        expect(node).toStrictEqual(JsonArrayNode.of('foo', 'bar'));
     });
 
-    it('should update the node with an array value without merging', () => {
-        const arrayNode = JsonArrayNode.of(1, 2, 3);
+    it('should update the node removing old elements', () => {
+        const one = JsonPrimitiveNode.of(1);
+        const node = JsonArrayNode.of(one, 2, 3, 4, 5);
+        const expected = JsonArrayNode.of(1, 7, 8);
 
-        const updatedNode = arrayNode.update([4, 5, 6, 7]);
+        expect(node.update([1, 7, 8])).toStrictEqual(expected);
 
-        const expected = JsonArrayNode.of(4, 5, 6, 7);
+        expect(node).toStrictEqual(expected);
 
-        expect(updatedNode).toStrictEqual(expected);
-
-        expect(arrayNode).toStrictEqual(expected);
+        expect(node.elements[0]).toBe(one);
     });
 
-    it('should update the node merging an array value', () => {
-        const arrayNode = JsonArrayNode.of(1, 2, 3, 4, 5);
+    it('should update the node adding new elements', () => {
+        const one = JsonPrimitiveNode.of(1);
+        const two = JsonPrimitiveNode.of(2);
+        const three = JsonPrimitiveNode.of(3);
+        const node = JsonArrayNode.of(one, two, three);
+        const expected = JsonArrayNode.of(1, 2, 3, 4, 5);
 
-        const updatedNode = arrayNode.update([1, 2], true);
+        expect(node.update([1, 2, 3, 4, 5])).toStrictEqual(expected);
 
-        const expected = JsonArrayNode.of(1, 2);
+        expect(node).toStrictEqual(expected);
 
-        expect(updatedNode).toStrictEqual(expected);
-
-        expect(arrayNode).toStrictEqual(expected);
-    });
-
-    it('should update the node with a node value without merging', () => {
-        const arrayNode = JsonArrayNode.of(1, 2, 3);
-
-        const updatedNode = arrayNode.update(JsonArrayNode.of(4, 5, 6, 7));
-
-        const expected = JsonArrayNode.of(4, 5, 6, 7);
-
-        expect(updatedNode).toStrictEqual(expected);
-
-        expect(arrayNode).toStrictEqual(expected);
-    });
-
-    it('should update the node merging a node value', () => {
-        const arrayNode = JsonArrayNode.of(1, 2, 3);
-
-        const updatedNode = arrayNode.update(JsonArrayNode.of(4, 5, 6, 7), true);
-
-        const expected = JsonArrayNode.of(4, 5, 6, 7);
-
-        expect(updatedNode).toStrictEqual(expected);
-
-        expect(arrayNode).toStrictEqual(expected);
+        expect(node.elements[0]).toBe(one);
+        expect(node.elements[1]).toBe(two);
+        expect(node.elements[2]).toBe(three);
     });
 
     it('should not be equivalent to a non-array node', () => {
@@ -284,28 +284,28 @@ describe('ArrayNode', () => {
         expect(left.isEquivalent(right)).toBeFalse();
     });
 
-    it('should not be equivalent when other node have extra elements', () => {
+    it('should not be equivalent if the other node have extra elements', () => {
         const left = JsonArrayNode.of(1, 2, 3);
         const right = JsonArrayNode.of(1, 2, 3, 4);
 
         expect(left.isEquivalent(right)).toBeFalse();
     });
 
-    it('should not be equivalent when other node have different element', () => {
+    it('should not be equivalent if the other node have a different element', () => {
         const left = JsonArrayNode.of(1, 2, 3);
         const right = JsonArrayNode.of(1, 2, 'three');
 
         expect(left.isEquivalent(right)).toBeFalse();
     });
 
-    it('should not be equivalent when other node have elements with different order', () => {
+    it('should not be equivalent if the other node have elements in a different order', () => {
         const left = JsonArrayNode.of(1, 2, 3);
         const right = JsonArrayNode.of(1, 3, 2);
 
         expect(left.isEquivalent(right)).toBeFalse();
     });
 
-    it('should be equivalent when every element is equivalent', () => {
+    it('should be equivalent if every element is equivalent', () => {
         const left = JsonArrayNode.of(1, 2, 3);
         const right = JsonArrayNode.of(1, 2, 3);
 
@@ -326,9 +326,37 @@ describe('ArrayNode', () => {
         'nested array': [1, 2, 3],
         'empty object': {},
         'empty array': [],
-    }))('should serialize %s to its JSON format', (_, value) => {
-        const arrayNode = JsonArrayNode.of(value);
+    }))('should serialize %s to JSON', (_, value) => {
+        const node = JsonArrayNode.of(value);
 
-        expect(arrayNode.toJSON()).toStrictEqual([value]);
+        expect(node.toJSON()).toStrictEqual([value]);
+    });
+
+    it('should rebuild itself', () => {
+        const node = JsonArrayNode.of(1, 2, 3);
+
+        node.rebuild();
+
+        expect(node.children).toStrictEqual([
+            new JsonTokenNode({
+                type: JsonTokenType.BRACKET_LEFT,
+                value: '[',
+            }),
+            node.elements[0],
+            new JsonTokenNode({
+                type: JsonTokenType.COMMA,
+                value: ',',
+            }),
+            node.elements[1],
+            new JsonTokenNode({
+                type: JsonTokenType.COMMA,
+                value: ',',
+            }),
+            node.elements[2],
+            new JsonTokenNode({
+                type: JsonTokenType.BRACKET_RIGHT,
+                value: ']',
+            }),
+        ]);
     });
 });
