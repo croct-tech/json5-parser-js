@@ -97,12 +97,23 @@ describe('IdentifierNode', () => {
     });
 
     it('should clone the node', () => {
-        const identifierNode = JsonIdentifierNode.of('foo');
+        const token = new JsonTokenNode({
+            type: JsonTokenType.IDENTIFIER,
+            value: 'foo',
+        });
+
+        const identifierNode = new JsonIdentifierNode({
+            token: token,
+            children: [token],
+        });
 
         const clone = identifierNode.clone();
 
         expect(identifierNode).toStrictEqual(clone);
         expect(identifierNode).not.toBe(clone);
+
+        expect(clone.children[0]).not.toBe(token);
+        expect(clone.children[0]).toStrictEqual(token);
     });
 
     it('should not be equivalent to a non-identifier node', () => {

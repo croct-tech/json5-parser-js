@@ -91,15 +91,15 @@ describe('PrimitiveNode', () => {
 
     it('should rebuild with formatting style', () => {
         const primitiveNode = new JsonPrimitiveNode({
-            value: 'foo',
+            value: '\\"foo\\"',
             token: new JsonTokenNode({
                 type: JsonTokenType.STRING,
-                value: '"foo"',
+                value: '"\\"foo\\""',
             }),
             children: [],
         });
 
-        expect(primitiveNode.toString()).toStrictEqual('"foo"');
+        expect(primitiveNode.toString()).toStrictEqual('"\\"foo\\""');
 
         primitiveNode.rebuild({
             string: {
@@ -109,15 +109,15 @@ describe('PrimitiveNode', () => {
 
         expect(primitiveNode).toStrictEqual(
             new JsonPrimitiveNode({
-                value: 'foo',
+                value: '\\"foo\\"',
                 token: new JsonTokenNode({
                     type: JsonTokenType.STRING,
-                    value: '"foo"',
+                    value: '"\\"foo\\""',
                 }),
                 children: [
                     new JsonTokenNode({
                         type: JsonTokenType.STRING,
-                        value: '\'foo\'',
+                        value: "'\\\\\"foo\\\\\"'",
                     }),
                 ],
             }),

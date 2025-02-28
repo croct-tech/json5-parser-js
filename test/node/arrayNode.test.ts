@@ -1,4 +1,4 @@
-import {JsonArrayNode, JsonObjectNode, JsonPrimitiveNode} from '../../src';
+import {JsonArrayNode, JsonObjectNode, JsonPrimitiveNode, JsonTokenNode, JsonTokenType} from '../../src';
 import {JsonError} from '../../src/error';
 
 describe('ArrayNode', () => {
@@ -210,13 +210,28 @@ describe('ArrayNode', () => {
     });
 
     it('should clone the array node', () => {
-        const arrayNode = JsonArrayNode.of(1, 2, 3);
+        const elementNode = new JsonPrimitiveNode({
+            children: [],
+            token: new JsonTokenNode({
+                type: JsonTokenType.STRING,
+                value: 'foo',
+            }),
+            value: 'foo',
+        });
+
+        const arrayNode = new JsonArrayNode({
+            elements: [elementNode],
+            children: [elementNode],
+        });
 
         const clone = arrayNode.clone();
 
         expect(arrayNode).toStrictEqual(clone);
 
         expect(arrayNode).not.toBe(clone);
+
+        expect(clone.children[0]).not.toBe(elementNode);
+        expect(clone.children[0]).toStrictEqual(elementNode);
     });
 
     it('should update the node with a non array value', () => {
@@ -232,9 +247,9 @@ describe('ArrayNode', () => {
     it('should update the node with an array value without merging', () => {
         const arrayNode = JsonArrayNode.of(1, 2, 3);
 
-        const updatedNode = arrayNode.update([4, 5, 6, 7]);
+        const updatedNode = arrayNode.update([4, 5]);
 
-        const expected = JsonArrayNode.of(4, 5, 6, 7);
+        const expected = JsonArrayNode.of(4, 5);
 
         expect(updatedNode).toStrictEqual(expected);
 
