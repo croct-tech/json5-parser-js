@@ -7,7 +7,9 @@ describe('CompositeNode', () => {
         }
 
         public clone(): JsonCompositeNode {
-            return this;
+            return new TestCompositeNode({
+                children: this.children.map(children => children.clone()),
+            });
         }
 
         public reset(): void {

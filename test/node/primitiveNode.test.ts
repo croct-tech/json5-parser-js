@@ -125,7 +125,15 @@ describe('PrimitiveNode', () => {
     });
 
     it('should clone the primitive node', () => {
-        const primitiveNode = JsonPrimitiveNode.of('foo');
+        const token = new JsonTokenNode({
+            type: JsonTokenType.STRING,
+            value: '"foo"',
+        });
+        const primitiveNode = new JsonPrimitiveNode({
+            children: [token],
+            token: token,
+            value: 'foo',
+        });
 
         const clone = primitiveNode.clone();
 
@@ -139,6 +147,9 @@ describe('PrimitiveNode', () => {
         );
 
         expect(clone).not.toBe(primitiveNode);
+
+        expect(clone.children[0]).not.toBe(token);
+        expect(clone.children[0]).toStrictEqual(token);
     });
 
     it('should not be equivalent to a non primitive node', () => {

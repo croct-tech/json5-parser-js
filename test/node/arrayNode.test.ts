@@ -327,6 +327,44 @@ describe('ArrayNode', () => {
         expect(left.isEquivalent(right)).toBeTrue();
     });
 
+    it('should rebuild its children', () => {
+        const arrayNode = JsonArrayNode.of('1');
+
+        arrayNode.rebuild({
+            array: {
+                trailingComma: true,
+            },
+        });
+
+        expect(arrayNode.children).toStrictEqual([
+            new JsonTokenNode({
+                type: JsonTokenType.BRACKET_LEFT,
+                value: '[',
+            }),
+            new JsonPrimitiveNode({
+                children: [
+                    new JsonTokenNode({
+                        type: JsonTokenType.STRING,
+                        value: '"1"',
+                    }),
+                ],
+                token: new JsonTokenNode({
+                    type: JsonTokenType.STRING,
+                    value: '"1"',
+                }),
+                value: '1',
+            }),
+            new JsonTokenNode({
+                type: JsonTokenType.COMMA,
+                value: ',',
+            }),
+            new JsonTokenNode({
+                type: JsonTokenType.BRACKET_RIGHT,
+                value: ']',
+            }),
+        ]);
+    });
+
     it.each(Object.entries({
         null: null,
         integer: 42,

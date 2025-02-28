@@ -6,6 +6,8 @@ import {
     JsonPrimitiveNode,
     JsonPropertyNode,
     JsonStringNode,
+    JsonTokenNode,
+    JsonTokenType,
     JsonValueNode,
 } from '../../src';
 import {JsonError} from '../../src/error';
@@ -391,6 +393,91 @@ describe('ObjectNode', () => {
         });
 
         expect(left.isEquivalent(right)).toBeTrue();
+    });
+
+    it('should rebuild itself', () => {
+        const node = new JsonObjectNode({
+            properties: [
+                new JsonPropertyNode({
+                    children: [],
+                    key: JsonPrimitiveNode.of('foo'),
+                    value: JsonPrimitiveNode.of('bar'),
+                }),
+            ],
+        });
+
+        node.rebuild();
+
+        expect(node.children).toStrictEqual([
+            new JsonTokenNode({
+                type: JsonTokenType.BRACE_LEFT,
+                value: '{',
+            }),
+            new JsonPropertyNode({
+                children: [
+                    new JsonPrimitiveNode({
+                        children: [
+                            new JsonTokenNode({
+                                type: JsonTokenType.STRING,
+                                value: '"foo"',
+                            }),
+                        ],
+                        token: new JsonTokenNode({
+                            type: JsonTokenType.STRING,
+                            value: '"foo"',
+                        }),
+                        value: 'foo',
+                    }),
+                    new JsonTokenNode({
+                        type: JsonTokenType.COLON,
+                        value: ':',
+                    }),
+                    new JsonPrimitiveNode({
+                        children: [
+                            new JsonTokenNode({
+                                type: JsonTokenType.STRING,
+                                value: '"bar"',
+                            }),
+                        ],
+                        token: new JsonTokenNode({
+                            type: JsonTokenType.STRING,
+                            value: '"bar"',
+                        }),
+                        value: 'bar',
+                    }),
+                ],
+                key: new JsonPrimitiveNode({
+                    children: [
+                        new JsonTokenNode({
+                            type: JsonTokenType.STRING,
+                            value: '"foo"',
+                        }),
+                    ],
+                    token: new JsonTokenNode({
+                        type: JsonTokenType.STRING,
+                        value: '"foo"',
+                    }),
+                    value: 'foo',
+                }),
+                value: new JsonPrimitiveNode({
+                    children: [
+                        new JsonTokenNode({
+                            type: JsonTokenType.STRING,
+                            value: '"bar"',
+                        }),
+                    ],
+                    token: new JsonTokenNode({
+                        type: JsonTokenType.STRING,
+                        value: '"bar"',
+                    }),
+                    value: 'bar',
+                }),
+            }),
+            new JsonTokenNode({
+                type: JsonTokenType.BRACE_RIGHT,
+                value: '}',
+            }),
+        ]);
     });
 
     it.each(Object.entries({

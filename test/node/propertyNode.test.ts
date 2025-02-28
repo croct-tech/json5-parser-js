@@ -67,6 +67,88 @@ describe('PropertyNode', () => {
         value: JsonStringNode,
     };
 
+    it('should rebuild its nodes', () => {
+        const key = new JsonIdentifierNode({
+            children: [
+                new JsonTokenNode({
+                    type: JsonTokenType.IDENTIFIER,
+                    value: 'foo',
+                }),
+            ],
+            token: new JsonTokenNode({
+                type: JsonTokenType.IDENTIFIER,
+                value: '"token value"',
+            }),
+        });
+
+        const value = new JsonPrimitiveNode({
+            children: [
+                new JsonTokenNode({
+                    type: JsonTokenType.STRING,
+                    value: 'bar',
+                }),
+            ],
+            token: new JsonTokenNode({
+                type: JsonTokenType.STRING,
+                value: '"bar"',
+            }),
+            value: 'bar',
+        });
+
+        const propertyNode = new JsonPropertyNode({
+            children: [
+                new JsonIdentifierNode({
+                    children: [
+                        new JsonTokenNode({
+                            type: JsonTokenType.IDENTIFIER,
+                            value: 'foo',
+                        }),
+                    ],
+                    token: new JsonTokenNode({
+                        type: JsonTokenType.IDENTIFIER,
+                        value: '"token value"',
+                    }),
+                }),
+                new JsonTokenNode({
+                    type: JsonTokenType.COLON,
+                    value: ':',
+                }),
+                new JsonPrimitiveNode({
+                    children: [
+                        new JsonTokenNode({
+                            type: JsonTokenType.STRING,
+                            value: 'bar',
+                        }),
+                    ],
+                    token: new JsonTokenNode({
+                        type: JsonTokenType.STRING,
+                        value: '"bar"',
+                    }),
+                    value: 'bar',
+                }),
+            ],
+            key: key,
+            value: value,
+        });
+
+        propertyNode.rebuild();
+
+        expect(propertyNode).toStrictEqual(
+            new JsonPropertyNode({
+                children: [
+                    key,
+                    new JsonTokenNode({
+                        type: JsonTokenType.COLON,
+                        value: ':',
+                    }),
+                    value,
+                ],
+                key: key,
+                value: value,
+            }),
+        );
+    });
+
     it.each(Object.entries<Scenario>({
         'single quote': {
             formatting: {
