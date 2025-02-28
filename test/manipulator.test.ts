@@ -89,14 +89,14 @@ describe('NodeManipulator', () => {
             JsonPrimitiveNode.of('bar'),
         ]);
 
-        expect(manipulator.values).toStrictEqual([
+        expect(manipulator.nodeList).toStrictEqual([
             JsonPrimitiveNode.of('foo'),
             JsonPrimitiveNode.of('bar'),
         ]);
 
         manipulator.insert(JsonPrimitiveNode.of('baz'));
 
-        expect(manipulator.values).toStrictEqual([
+        expect(manipulator.nodeList).toStrictEqual([
             JsonPrimitiveNode.of('baz'),
             JsonPrimitiveNode.of('foo'),
             JsonPrimitiveNode.of('bar'),
@@ -542,17 +542,15 @@ describe('NodeManipulator', () => {
     });
 
     it('should not insert a node if it does not exist and is optional', () => {
-        const node = JsonPrimitiveNode.of('foo');
         const manipulator = new NodeManipulator([]);
 
-        manipulator.node(node, true);
+        manipulator.node(JsonPrimitiveNode.of('foo'), true);
 
-        expect(manipulator.values).toBeEmpty();
+        expect(manipulator.nodeList).toBeEmpty();
     });
 
     it('should accommodate a node without replacing any existing node', () => {
         const node = new JsonPropertyNode({
-            children: [],
             key: JsonPrimitiveNode.of('foo'),
             value: JsonPrimitiveNode.of(NaN),
         });
@@ -564,7 +562,7 @@ describe('NodeManipulator', () => {
 
         manipulator.node(node, false);
 
-        expect(manipulator.values).toStrictEqual([
+        expect(manipulator.nodeList).toStrictEqual([
             node,
             JsonPrimitiveNode.of('foo'),
             JsonPrimitiveNode.of('bar'),
@@ -595,7 +593,7 @@ describe('NodeManipulator', () => {
 
         manipulator.nodes([firstNode, secondNode]);
 
-        expect(manipulator.values.length).toBe(2);
+        expect(manipulator.nodeList.length).toBe(2);
 
         manipulator.seek(0);
 
@@ -623,7 +621,7 @@ describe('NodeManipulator', () => {
 
         manipulator.nodes([node], true);
 
-        expect(manipulator.values).toBeEmpty();
+        expect(manipulator.nodeList).toBeEmpty();
     });
 
     it('should insert a node in the current position', () => {
@@ -642,7 +640,7 @@ describe('NodeManipulator', () => {
 
         manipulator.insert(thirdNode);
 
-        expect(manipulator.values).toStrictEqual([
+        expect(manipulator.nodeList).toStrictEqual([
             firstNode,
             secondNode,
             thirdNode,
@@ -673,7 +671,7 @@ describe('NodeManipulator', () => {
 
         manipulator.remove();
 
-        expect(manipulator.values).toStrictEqual([
+        expect(manipulator.nodeList).toStrictEqual([
             firstNode,
             secondNode,
             thirdNode,
@@ -683,25 +681,24 @@ describe('NodeManipulator', () => {
 
     it('should drop nodes until a matching node is found', () => {
         const targetNode = JsonPrimitiveNode.of('bar');
+        const whitespace = new JsonTokenNode({
+            type: JsonTokenType.WHITESPACE,
+            value: ' ',
+        });
+
         const manipulator = new NodeManipulator([
             JsonPrimitiveNode.of('foo'),
             targetNode,
-            new JsonTokenNode({
-                type: JsonTokenType.WHITESPACE,
-                value: ' ',
-            }),
+            whitespace,
         ]);
 
         const matcher = (node: JsonNode): boolean => node.isEquivalent(targetNode);
 
         expect(manipulator.dropUntil(matcher)).toBeTrue();
 
-        expect(manipulator.values).toStrictEqual([
+        expect(manipulator.nodeList).toStrictEqual([
             targetNode,
-            new JsonTokenNode({
-                type: JsonTokenType.WHITESPACE,
-                value: ' ',
-            }),
+            whitespace,
         ]);
     });
 
@@ -716,20 +713,21 @@ describe('NodeManipulator', () => {
                 value: '\n',
             }),
         ];
+
         const targetNode = JsonPrimitiveNode.of('bar');
-        const manipulator = new NodeManipulator([
+
+        const initialList = [
             ...insignificantNodes,
             targetNode,
-        ]);
+        ];
+
+        const manipulator = new NodeManipulator([...initialList]);
 
         const matcher = (node: JsonNode): boolean => node.isEquivalent(targetNode);
 
         expect(manipulator.dropUntil(matcher)).toBeTrue();
 
-        expect(manipulator.values).toStrictEqual([
-            ...insignificantNodes,
-            targetNode,
-        ]);
+        expect(manipulator.nodeList).toStrictEqual(initialList);
     });
 
     it('should drop all nodes if no matching node is found', () => {
@@ -746,7 +744,7 @@ describe('NodeManipulator', () => {
 
         expect(manipulator.dropUntil(matcher)).toBeFalse();
 
-        expect(manipulator.values).toBeEmpty();
+        expect(manipulator.nodeList).toBeEmpty();
     });
 
     it('should drop nothing if there are no nodes left', () => {
@@ -784,7 +782,7 @@ describe('NodeManipulator', () => {
 
         manipulator.next();
 
-        expect(manipulator.values).toStrictEqual([
+        expect(manipulator.nodeList).toStrictEqual([
             new JsonTokenNode({
                 type: JsonTokenType.WHITESPACE,
                 value: ' ',
@@ -801,7 +799,7 @@ describe('NodeManipulator', () => {
         ]);
     });
 
-    it('should handle consecutive insignificant nodes when dropping nodes', () => {
+    it('should preserve leading comments when dropping nodes', () => {
         const targetNode = new JsonPropertyNode({
             children: [],
             key: JsonPrimitiveNode.of('baz'),
@@ -857,7 +855,7 @@ describe('NodeManipulator', () => {
         expect(manipulator.current).toBe(targetNode);
         expect(manipulator.position).toBe(3);
 
-        expect(manipulator.values).toStrictEqual([
+        expect(manipulator.nodeList).toStrictEqual([
             new JsonTokenNode({
                 type: JsonTokenType.BLOCK_COMMENT,
                 value: '/* comment */',

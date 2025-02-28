@@ -19,9 +19,7 @@ export class JsonArrayNode extends JsonStructureNode implements JsonArrayDefinit
     }
 
     public static of(...elements: readonly JsonValue[]): JsonArrayNode {
-        return new JsonArrayNode({
-            elements: elements.map(JsonValueFactory.create),
-        });
+        return new JsonArrayNode({elements: elements.map(JsonValueFactory.create)});
     }
 
     public update(other: JsonValueNode|JsonValue, merge = false): JsonValueNode {
