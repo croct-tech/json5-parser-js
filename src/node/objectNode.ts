@@ -33,7 +33,7 @@ export class JsonObjectNode extends JsonStructureNode implements JsonCompositeDe
         });
     }
 
-    public update(other: JsonValueNode|JsonValue, merge = false): JsonValueNode {
+    public update(other: JsonValueNode|JsonValue): JsonValueNode {
         if (!(other instanceof JsonValueNode)) {
             if (typeof other !== 'object' || other === null || Array.isArray(other)) {
                 return JsonValueFactory.create(other);
@@ -57,13 +57,11 @@ export class JsonObjectNode extends JsonStructureNode implements JsonCompositeDe
                 this.set(key, value);
             }
 
-            if (!merge) {
-                for (const property of this.propertyNodes) {
-                    const key = property.key.toJSON();
+            for (const property of this.propertyNodes) {
+                const key = property.key.toJSON();
 
-                    if (other[key] === undefined) {
-                        this.delete(property.key.toJSON());
-                    }
+                if (other[key] === undefined) {
+                    this.delete(property.key.toJSON());
                 }
             }
 
@@ -86,13 +84,11 @@ export class JsonObjectNode extends JsonStructureNode implements JsonCompositeDe
             }
         }
 
-        if (!merge) {
-            for (const property of this.propertyNodes) {
-                const key = property.key.toJSON();
+        for (const property of this.propertyNodes) {
+            const key = property.key.toJSON();
 
-                if (!other.has(key)) {
-                    this.delete(key);
-                }
+            if (!other.has(key)) {
+                this.delete(key);
             }
         }
 
@@ -169,9 +165,15 @@ export class JsonObjectNode extends JsonStructureNode implements JsonCompositeDe
     }
 
     public clone(): JsonObjectNode {
+        const clones: Map<JsonPropertyNode, JsonPropertyNode> = new Map();
+
+        for (const property of this.propertyNodes) {
+            clones.set(property, property.clone());
+        }
+
         return new JsonObjectNode({
-            properties: this.propertyNodes,
-            children: this.children.map(child => child.clone()),
+            properties: [...clones.values()],
+            children: this.children.map(child => clones.get(child as JsonPropertyNode) ?? child.clone()),
             location: this.location,
         });
     }

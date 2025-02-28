@@ -461,7 +461,7 @@ describe('JsonParser', () => {
 
         expect(caughtError).toEqual(
             new JsonParseError(
-                'Bad Unicode escape in JSON at 1:5.',
+                'Unexpected token { in JSON at position 3',
                 {
                     start: {
                         index: 1,

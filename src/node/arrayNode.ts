@@ -18,11 +18,11 @@ export class JsonArrayNode extends JsonStructureNode implements JsonArrayDefinit
         this.elementNodes = [...definition.elements];
     }
 
-    public static of(...elements: readonly JsonValue[]): JsonArrayNode {
+    public static of(...elements: ReadonlyArray<JsonValue|JsonValueNode>): JsonArrayNode {
         return new JsonArrayNode({elements: elements.map(JsonValueFactory.create)});
     }
 
-    public update(other: JsonValueNode|JsonValue, merge = false): JsonValueNode {
+    public update(other: JsonValueNode|JsonValue): JsonValueNode {
         if (!(other instanceof JsonArrayNode) && !Array.isArray(other)) {
             return JsonValueFactory.create(other);
         }
@@ -38,7 +38,7 @@ export class JsonArrayNode extends JsonStructureNode implements JsonArrayDefinit
             );
         }
 
-        if (!merge && otherElements.length < elements.length) {
+        if (otherElements.length < elements.length) {
             this.splice(otherElements.length, elements.length - otherElements.length);
         }
 
@@ -116,9 +116,15 @@ export class JsonArrayNode extends JsonStructureNode implements JsonArrayDefinit
     }
 
     public clone(): JsonArrayNode {
+        const clones: Map<JsonValueNode, JsonValueNode> = new Map();
+
+        for (const element of this.elementNodes) {
+            clones.set(element, element.clone());
+        }
+
         return new JsonArrayNode({
-            children: this.children.map(child => child.clone()),
-            elements: this.elementNodes,
+            elements: [...clones.values()],
+            children: this.children.map(child => clones.get(child as JsonValueNode) ?? child.clone()),
             location: this.location,
         });
     }

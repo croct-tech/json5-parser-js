@@ -169,23 +169,18 @@ describe('ObjectNode', () => {
             corge: 'grault',
         });
 
-        const updatedNode = objectNode.update(
-            JsonObjectNode.of({
-                foo: 'baz',
-                corge: 'garply',
-            }),
-            true,
-        );
+        const updatedNode = objectNode.update(JsonObjectNode.of({
+            foo: 'baz',
+            corge: 'garply',
+        }));
 
         expect(updatedNode).toStrictEqual(JsonObjectNode.of({
             foo: 'bar',
-            qux: 'quux',
             corge: 'grault',
         }));
 
         expect(updatedNode).toStrictEqual(JsonObjectNode.of({
             foo: 'bar',
-            qux: 'quux',
             corge: 'grault',
         }));
     });
