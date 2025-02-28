@@ -6,10 +6,88 @@ import {
     JsonPrimitiveNode,
     JsonPropertyNode,
     JsonStructureNode,
+    JsonTokenNode,
+    JsonTokenType,
     JsonValueNode,
     PartialJsonCompositeDefinition,
     StructureDelimiter,
 } from '../../src';
+
+describe('StructureDelimiter', () => {
+    it('should determine whether the token is a start token', () => {
+        const leftBrace = new JsonTokenNode({
+            type: JsonTokenType.BRACE_LEFT,
+            value: '{',
+        });
+
+        const leftBracket = new JsonTokenNode({
+            type: JsonTokenType.BRACKET_LEFT,
+            value: '[',
+        });
+
+        const other = new JsonTokenNode({
+            type: JsonTokenType.COLON,
+            value: ':',
+        });
+
+        expect(StructureDelimiter.isStartToken(leftBrace)).toBeTrue();
+        expect(StructureDelimiter.isStartToken(leftBracket)).toBeTrue();
+        expect(StructureDelimiter.isStartToken(other)).toBeFalse();
+    });
+
+    it('should determine whether the token is an end token', () => {
+        const rightBrace = new JsonTokenNode({
+            type: JsonTokenType.BRACE_RIGHT,
+            value: '}',
+        });
+
+        const rightBracket = new JsonTokenNode({
+            type: JsonTokenType.BRACKET_RIGHT,
+            value: ']',
+        });
+
+        const other = new JsonTokenNode({
+            type: JsonTokenType.COLON,
+            value: ':',
+        });
+
+        expect(StructureDelimiter.isEndToken(rightBrace)).toBeTrue();
+        expect(StructureDelimiter.isEndToken(rightBracket)).toBeTrue();
+        expect(StructureDelimiter.isEndToken(other)).toBeFalse();
+    });
+
+    it('should return the start token for the delimiter', () => {
+        expect(StructureDelimiter.getStartToken(StructureDelimiter.OBJECT)).toStrictEqual(
+            new JsonTokenNode({
+                type: JsonTokenType.BRACE_LEFT,
+                value: '{',
+            }),
+        );
+
+        expect(StructureDelimiter.getStartToken(StructureDelimiter.ARRAY)).toStrictEqual(
+            new JsonTokenNode({
+                type: JsonTokenType.BRACKET_LEFT,
+                value: '[',
+            }),
+        );
+    });
+
+    it('should return the end token for the delimiter', () => {
+        expect(StructureDelimiter.getEndToken(StructureDelimiter.OBJECT)).toStrictEqual(
+            new JsonTokenNode({
+                type: JsonTokenType.BRACE_RIGHT,
+                value: '}',
+            }),
+        );
+
+        expect(StructureDelimiter.getEndToken(StructureDelimiter.ARRAY)).toStrictEqual(
+            new JsonTokenNode({
+                type: JsonTokenType.BRACKET_RIGHT,
+                value: ']',
+            }),
+        );
+    });
+});
 
 describe('StructureNode', () => {
     class TestStructureNode extends JsonStructureNode {
