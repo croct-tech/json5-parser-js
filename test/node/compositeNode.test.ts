@@ -1,4 +1,5 @@
 import {Formatting, JsonArrayNode, JsonCompositeNode, PartialJsonCompositeDefinition} from '../../src';
+import spyOn = jest.spyOn;
 
 describe('CompositeNode', () => {
     class TestCompositeNode extends JsonCompositeNode {
@@ -7,17 +8,20 @@ describe('CompositeNode', () => {
         }
 
         public clone(): JsonCompositeNode {
-            return new TestCompositeNode({
-                children: this.children.map(children => children.clone()),
+            return TestCompositeNode.fromDefinition({
+                children: this.children.map(child => child.clone()),
             });
         }
 
         public reset(): void {
-            // NOOP
         }
 
-        public rebuild(): void {
-            // NOOP
+        public rebuild(formatting?: Formatting): void {
+            for (const child of this.children) {
+                if (child instanceof JsonArrayNode) {
+                    child.rebuild(formatting);
+                }
+            }
         }
 
         public isEquivalent(): boolean {
@@ -26,11 +30,19 @@ describe('CompositeNode', () => {
     }
 
     it('should serialize to string', () => {
-        const compositeNode = TestCompositeNode.fromDefinition({
-            children: [JsonArrayNode.of(1, 2, 3)],
-        });
+        const child = JsonArrayNode.of(1, 2, 3);
+        const node = TestCompositeNode.fromDefinition({children: [child]});
+        const clone = node.clone();
 
-        expect(compositeNode.toString()).toStrictEqual('');
+        const formatting = {
+            array: {
+                commaSpacing: true,
+            },
+        };
+
+        expect(node.toString(formatting)).toStrictEqual('[1, 2, 3]');
+
+        expect(node).toStrictEqual(clone);
     });
 
     it('should reformat the node', () => {
@@ -38,19 +50,20 @@ describe('CompositeNode', () => {
             children: [JsonArrayNode.of(1, 2, 3)],
         });
 
+        expect(compositeNode.toString()).toStrictEqual('[1,2,3]');
+
         const formatting: Formatting = {
             array: {
-                indentationSize: 4,
                 commaSpacing: true,
-                leadingIndentation: true,
             },
         };
 
-        jest.spyOn(compositeNode, 'rebuild');
+        spyOn(compositeNode, 'reset');
+        spyOn(compositeNode, 'rebuild');
 
         compositeNode.reformat(formatting);
 
-        expect(compositeNode.rebuild).toHaveBeenCalledTimes(1);
+        expect(compositeNode.reset).toHaveBeenCalled();
         expect(compositeNode.rebuild).toHaveBeenCalledWith(formatting);
     });
 });
