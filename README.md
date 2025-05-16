@@ -195,8 +195,8 @@ The `update` method reconciles the new content with the existing document, prese
 
 Contributions are welcome!
 
-- Report issues on the [issue tracker](https://github.com/croct-tech/project-ts/issues).
-- For major changes, [open an issue](https://github.com/croct-tech/project-ts/issues) first to discuss.
+- Report issues on the [issue tracker](https://github.com/croct-tech/json5-parser-js/issues).
+- For major changes, [open an issue](https://github.com/croct-tech/json5-parser-js/issues) first to discuss.
 - Ensure test coverage is updated accordingly.
 
 ## Testing
