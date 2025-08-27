@@ -84,7 +84,7 @@ Optionally, specify the expected root node type to narrow down the result:
 ```ts
 import {JsonParser, JsonObjectNode} from '@croct/json5-parser';
 
-const node = JsonParser.parse<JsonObjectNode>(
+const node = JsonParser.parse(
     `{
         // Comment
         "name": "John Doe",
