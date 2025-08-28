@@ -310,13 +310,18 @@ Output style:
 }
 ```
 
-##### 2) Tabs everywhere, single quotes, unquoted props where valid
+##### 2) Tabs everywhere, single quotes, properties quoted only when necessary
 
 ```ts
 node.toString({
   indentationCharacter: 'tab',
-  string: {quote: 'single'},
-  property: {quote: 'single', unquoted: true},
+  string: {
+      quote: 'single'
+  },
+  property: {
+      quote: 'single', 
+      unquoted: true
+  },
   object: {
     leadingIndentation: true,
     entryIndentation: true,
