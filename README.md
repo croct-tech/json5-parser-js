@@ -250,27 +250,27 @@ the formatter falls back to a compact style with no extra spaces or indentation.
 
 #### Options
 
-| Option                       | Type/Values            | Description                                            |
-|------------------------------|------------------------|--------------------------------------------------------|
-| `indentationLevel`           | `number`               | Base indentation level for the document.               |
-| `indentationCharacter`       | `'space' \| 'tab'`     | Character used for indentation.                        |
-| `string.quote`               | `'single' \| 'double'` | Quotation style for string values.                     |
-| `property.quote`             | `'single' \| 'double'` | Quotation style for property keys.                     |
-| `property.unquoted`          | `boolean`              | Allow unquoted property keys when valid.               |
-| `array.indentationSize`      | `number`               | Indentation size for array entries.                    |
-| `array.trailingIndentation`  | `boolean`              | Indent closing bracket on a new line.                  |
-| `array.leadingIndentation`   | `boolean`              | Indent opening bracket on a new line.                  |
-| `array.entryIndentation`     | `boolean`              | Indent each array entry.                               |
-| `array.trailingComma`        | `boolean`              | Append a trailing comma after the last entry.          |
-| `array.commaSpacing`         | `boolean`              | Add space after commas in arrays.                      |
-| `array.colonSpacing`         | `boolean`              | Add space after colons in arrays (for objects inline). |
-| `object.indentationSize`     | `number`               | Indentation size for object properties.                |
-| `object.trailingIndentation` | `boolean`              | Indent closing brace on a new line.                    |
-| `object.leadingIndentation`  | `boolean`              | Indent opening brace on a new line.                    |
-| `object.entryIndentation`    | `boolean`              | Indent each object property.                           |
-| `object.trailingComma`       | `boolean`              | Append a trailing comma after the last property.       |
-| `object.commaSpacing`        | `boolean`              | Add space after commas in objects.                     |
-| `object.colonSpacing`        | `boolean`              | Add space after colons in objects.                     |
+| Option                       | Type/Values          | Description                                            |
+|------------------------------|----------------------|--------------------------------------------------------|
+| `indentationLevel`           | `number`             | Base indentation level for the document.               |
+| `indentationCharacter`       | `'space'\|'tab'`     | Character used for indentation.                        |
+| `string.quote`               | `'single'\|'double'` | Quotation style for string values.                     |
+| `property.quote`             | `'single'\|'double'` | Quotation style for property keys.                     |
+| `property.unquoted`          | `boolean`            | Allow unquoted property keys when valid.               |
+| `array.indentationSize`      | `number`             | Indentation size for array entries.                    |
+| `array.trailingIndentation`  | `boolean`            | Indent closing bracket on a new line.                  |
+| `array.leadingIndentation`   | `boolean`            | Indent opening bracket on a new line.                  |
+| `array.entryIndentation`     | `boolean`            | Indent each array entry.                               |
+| `array.trailingComma`        | `boolean`            | Append a trailing comma after the last entry.          |
+| `array.commaSpacing`         | `boolean`            | Add space after commas in arrays.                      |
+| `array.colonSpacing`         | `boolean`            | Add space after colons in arrays (for objects inline). |
+| `object.indentationSize`     | `number`             | Indentation size for object properties.                |
+| `object.trailingIndentation` | `boolean`            | Indent closing brace on a new line.                    |
+| `object.leadingIndentation`  | `boolean`            | Indent opening brace on a new line.                    |
+| `object.entryIndentation`    | `boolean`            | Indent each object property.                           |
+| `object.trailingComma`       | `boolean`            | Append a trailing comma after the last property.       |
+| `object.commaSpacing`        | `boolean`            | Add space after commas in objects.                     |
+| `object.colonSpacing`        | `boolean`            | Add space after colons in objects.                     |
 
 #### Quick recipes
 
