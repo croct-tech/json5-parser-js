@@ -191,7 +191,13 @@ node.update({
 
 The `update` method reconciles the new content with the existing document, preserving comments, indentation, and spacing.
 
-To merge two documents while preserving comments, use the `merge` method:
+For single updates, prefer the `set` method for better performance:
+
+```ts
+node.set('version', '2.0.0');
+```
+
+To merge two documents while preserving comments and formatting from both, use the `merge` method:
 
 ```ts
 
@@ -214,7 +220,9 @@ const sourceCode = `{
 const source = JsonParser.parse(sourceCode, JsonObjectNode);
 const destination = JsonParser.parse(destinationCode, JsonObjectNode);
 
-console.log(JsonObjectNode.merge(source, destination).toString());
+destination.merge(source)
+
+console.log(destination.toString());
 ```
 
 Output:
@@ -229,8 +237,6 @@ Output:
   "baz": true /* Another inline comment */
 }
 ```
-
-The `merge` method removes any existing destination properties that clash with source, along with their leading/trailing trivia, to avoid duplicate keys.
 
 ## Contributing
 
