@@ -248,35 +248,35 @@ When you call `toString(options)` you can control how the output is formatted.
 If an option is omitted, the formatter learns from the current document and keeps its style. If no style can be inferred, 
 the formatter falls back to a compact style with no extra spaces or indentation.
 
-### Options
+#### Options
 
-| Option                         | Type/Values            | Description                                            |
-|--------------------------------|------------------------|--------------------------------------------------------|
-| **indentationLevel**           | `number`               | Base indentation level for the document.               |
-| **indentationCharacter**       | `'space' \| 'tab'`     | Character used for indentation.                        |
-| **string.quote**               | `'single' \| 'double'` | Quotation style for string values.                     |
-| **property.quote**             | `'single' \| 'double'` | Quotation style for property keys.                     |
-| **property.unquoted**          | `boolean`              | Allow unquoted property keys when valid.               |
-| **array.indentationSize**      | `number`               | Indentation size for array entries.                    |
-| **array.trailingIndentation**  | `boolean`              | Indent closing bracket on a new line.                  |
-| **array.leadingIndentation**   | `boolean`              | Indent opening bracket on a new line.                  |
-| **array.entryIndentation**     | `boolean`              | Indent each array entry.                               |
-| **array.trailingComma**        | `boolean`              | Append a trailing comma after the last entry.          |
-| **array.commaSpacing**         | `boolean`              | Add space after commas in arrays.                      |
-| **array.colonSpacing**         | `boolean`              | Add space after colons in arrays (for objects inline). |
-| **object.indentationSize**     | `number`               | Indentation size for object properties.                |
-| **object.trailingIndentation** | `boolean`              | Indent closing brace on a new line.                    |
-| **object.leadingIndentation**  | `boolean`              | Indent opening brace on a new line.                    |
-| **object.entryIndentation**    | `boolean`              | Indent each object property.                           |
-| **object.trailingComma**       | `boolean`              | Append a trailing comma after the last property.       |
-| **object.commaSpacing**        | `boolean`              | Add space after commas in objects.                     |
-| **object.colonSpacing**        | `boolean`              | Add space after colons in objects.                     |
+| Option                       | Type/Values            | Description                                            |
+|------------------------------|------------------------|--------------------------------------------------------|
+| `indentationLevel`           | `number`               | Base indentation level for the document.               |
+| `indentationCharacter`       | `'space' \| 'tab'`     | Character used for indentation.                        |
+| `string.quote`               | `'single' \| 'double'` | Quotation style for string values.                     |
+| `property.quote`             | `'single' \| 'double'` | Quotation style for property keys.                     |
+| `property.unquoted`          | `boolean`              | Allow unquoted property keys when valid.               |
+| `array.indentationSize`      | `number`               | Indentation size for array entries.                    |
+| `array.trailingIndentation`  | `boolean`              | Indent closing bracket on a new line.                  |
+| `array.leadingIndentation`   | `boolean`              | Indent opening bracket on a new line.                  |
+| `array.entryIndentation`     | `boolean`              | Indent each array entry.                               |
+| `array.trailingComma`        | `boolean`              | Append a trailing comma after the last entry.          |
+| `array.commaSpacing`         | `boolean`              | Add space after commas in arrays.                      |
+| `array.colonSpacing`         | `boolean`              | Add space after colons in arrays (for objects inline). |
+| `object.indentationSize`     | `number`               | Indentation size for object properties.                |
+| `object.trailingIndentation` | `boolean`              | Indent closing brace on a new line.                    |
+| `object.leadingIndentation`  | `boolean`              | Indent opening brace on a new line.                    |
+| `object.entryIndentation`    | `boolean`              | Indent each object property.                           |
+| `object.trailingComma`       | `boolean`              | Append a trailing comma after the last property.       |
+| `object.commaSpacing`        | `boolean`              | Add space after commas in objects.                     |
+| `object.colonSpacing`        | `boolean`              | Add space after colons in objects.                     |
 
-### Quick recipes
+#### Quick recipes
 
 Here are some common formatting styles you can achieve by combining different options.
 
-#### 1) Compact, single-line arrays; pretty multi-line objects
+##### 1) Compact, single-line arrays; pretty multi-line objects
 
 ```ts
 node.toString({
@@ -310,7 +310,7 @@ Output style:
 }
 ```
 
-#### 2) Tabs everywhere, single quotes, unquoted props where valid
+##### 2) Tabs everywhere, single quotes, unquoted props where valid
 
 ```ts
 node.toString({
@@ -340,7 +340,7 @@ Output style:
 }
 ```
 
-#### 3) Strict compact style (no spaces after commas/colons)
+##### 3) Strict compact style (no spaces after commas/colons)
 
 ```ts
 node.toString({
