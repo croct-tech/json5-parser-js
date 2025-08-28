@@ -8,6 +8,8 @@ import {JsonPrimitiveNode, JsonStringNode} from './primitiveNode';
 import {JsonValueFactory} from './factory';
 import {JsonIdentifierNode} from './identifierNode';
 import {JsonError} from '../error';
+import { JsonTokenNode } from './tokenNode';
+import { JsonTokenType } from '../token';
 
 export interface JsonObjectDefinition extends JsonCompositeDefinition {
     readonly properties: readonly JsonPropertyNode[];
@@ -31,6 +33,45 @@ export class JsonObjectNode extends JsonStructureNode implements JsonCompositeDe
                 }),
             ),
         });
+    }
+
+    public static merge(source: JsonObjectNode, destination: JsonObjectNode): JsonObjectNode {
+        const isTrivia = (node: JsonNode): boolean => {
+            if (!(node instanceof JsonTokenNode)) {
+                return false;
+            }
+            return node.isType(JsonTokenType.LINE_COMMENT)
+                || node.isType(JsonTokenType.BLOCK_COMMENT)
+                || node.isType(JsonTokenType.NEWLINE)
+                || node.isType(JsonTokenType.WHITESPACE);
+        }
+
+        for (const property of source.properties) {
+            const key = property.key.toJSON();
+            const index = destination.children.findIndex(
+                (node) => node instanceof JsonPropertyNode && node.key.toJSON() === key,
+            );
+
+            if (index >= 0) {
+                let startIndex = index;
+                let endIndex = index;
+                while (startIndex > 0 && isTrivia(destination.children[startIndex - 1])) {
+                    startIndex--;
+                }
+                while (endIndex + 1 < destination.children.length && isTrivia(destination.children[endIndex + 1])) {
+                    endIndex++;
+                }
+                destination.children.splice(startIndex, endIndex - startIndex + 1);
+                destination.delete(key);
+            }
+        }
+
+        for (const property of source.properties) {
+            destination.set(property.key, property.value);
+        }
+
+        destination.children.push(...source.children);
+        return destination;
     }
 
     public update(other: JsonValueNode|JsonValue): JsonValueNode {

@@ -381,4 +381,60 @@ describe('ObjectNode', () => {
             key: value,
         });
     });
+
+    it.each([
+		{
+			sourceCode: `{
+                /* Source pre-bar comment */
+                "bar": 123, /* Inline comment */
+                /* Source post-bar comment */
+                "baz": true /* Another inline comment */ }`,
+			destinationCode: `{
+                // Destination pre-foo comment
+                "foo": "value",
+                // Destination post-foo comment
+                "baz": [1, 2, 3] }`,
+			expected: `{			
+                // Destination pre-foo comment
+                "foo": "value",
+                /* Source pre-bar comment */
+                "bar": 123, /* Inline comment */
+                /* Source post-bar comment */
+                "baz": true /* Another inline comment */ }`,
+		},
+		{
+			sourceCode: `{
+                /* Source pre-bar comment */ 
+                "bar": 123, /* Inline comment */
+                /* Source post-bar comment */
+                "baz": true /* Another inline comment */ }`,
+			destinationCode: `{           
+                // Destination pre-foo comment
+                "foo": "value",
+                // Destination post-foo comment
+                "fizz": 42 }`,
+			expected: `{
+                // Destination pre-foo comment
+                "foo": "value",
+                // Destination post-foo comment
+                "fizz": 42,
+                /* Source pre-bar comment */
+                "bar": 123, /* Inline comment */
+                /* Source post-bar comment */
+                "baz": true /* Another inline comment */ }`,
+		},
+	])(
+		'should merge two JsonObjectNode',
+		({ sourceCode, destinationCode, expected }) => {
+			const source = JsonParser.parse(sourceCode, JsonObjectNode);
+			const destination = JsonParser.parse(destinationCode, JsonObjectNode);
+
+			const node = JsonObjectNode.merge(source, destination);
+
+			const removeWhiteSpaces = (str: string) => str.replace(/\s+/g, ' ');
+			expect(removeWhiteSpaces(node.toString())).toStrictEqual(
+				removeWhiteSpaces(expected)
+			);
+		}
+	);
 });
