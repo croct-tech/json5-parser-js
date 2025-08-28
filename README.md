@@ -280,20 +280,21 @@ Here are some common formatting styles you can achieve by combining different op
 
 ```ts
 node.toString({
-  array: {
-    leadingIndentation: false,   // keep arrays inline when short
-    trailingComma: false,
-    commaSpacing: true,
-  },
-  object: {
-    leadingIndentation: true,    // multi-line objects
-    entryIndentation: true,
-    trailingIndentation: true,
-    indentationSize: 2,
-    trailingComma: true,
-    commaSpacing: true,
-    colonSpacing: true,
-  },
+    array: {
+        leadingIndentation: false,   // keep arrays inline
+        trailingIndentation: false,
+        trailingComma: false,
+        commaSpacing: true,
+    },
+    object: {
+        entryIndentation: true,      // multi-line objects
+        leadingIndentation: true,    
+        trailingIndentation: true,
+        indentationSize: 2,
+        trailingComma: true,
+        commaSpacing: true,
+        colonSpacing: true,
+    },
 });
 ```
 
@@ -348,19 +349,7 @@ Output style:
 ##### 3) Strict compact style (no spaces after commas/colons)
 
 ```ts
-node.toString({
-  array: {
-    leadingIndentation: false,
-    trailingComma: false,
-    commaSpacing: false,
-  },
-  object: {
-    leadingIndentation: false,
-    trailingComma: false,
-    commaSpacing: false,
-    colonSpacing: false,
-  },
-});
+node.toString();
 ```
 
 Output style:
