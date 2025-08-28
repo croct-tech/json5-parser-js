@@ -52,15 +52,21 @@ export class JsonObjectNode extends JsonStructureNode implements JsonCompositeDe
             return;
         }
 
+        if (this.children.length === 0) {
+            this.rebuild({...source.detectFormatting(), indentationLevel: 0});
+        }
+
         for (const property of source.propertyNodes) {
             const key = property.key.toJSON();
             const sourceRange = source.findPropertyRange(key);
 
-            let sourceChildren: JsonNode[] = [property];
+            if (sourceRange === null) {
+                this.set(property.key, property.value.clone());
 
-            if (sourceRange !== null) {
-                sourceChildren = source.children.slice(sourceRange[0], sourceRange[1] + 1);
+                continue;
             }
+
+            let sourceChildren = source.children.slice(sourceRange[0], sourceRange[1] + 1);
 
             const newProperty = property.clone();
 
@@ -276,7 +282,8 @@ export class JsonObjectNode extends JsonStructureNode implements JsonCompositeDe
     }
 
     public set(name: string|JsonStringNode|JsonIdentifierNode, value: JsonValue|JsonValueNode): void {
-        const index = this.propertyNodes.findIndex(current => current.key.toJSON() === name);
+        const normalizedName = typeof name === 'string' ? name : name.toJSON();
+        const index = this.propertyNodes.findIndex(current => current.key.toJSON() === normalizedName);
 
         if (index >= 0) {
             this.propertyNodes[index].set(value);

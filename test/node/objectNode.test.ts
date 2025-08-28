@@ -137,12 +137,26 @@ describe('ObjectNode', () => {
                 qux: 'quux',
             }),
         },
+        'a literal string key-value pair (overriding)': {
+            name: 'foo',
+            value: 'quux',
+            result: JsonObjectNode.of({
+                foo: 'quux',
+            }),
+        },
         'a JSON primitive node key-value pair': {
             name: JsonPrimitiveNode.of('qux'),
             value: JsonPrimitiveNode.of('quux'),
             result: JsonObjectNode.of({
                 foo: 'bar',
                 qux: 'quux',
+            }),
+        },
+        'a JSON primitive node key-value pair (overriding)': {
+            name: JsonPrimitiveNode.of('foo'),
+            value: JsonPrimitiveNode.of('quux'),
+            result: JsonObjectNode.of({
+                foo: 'quux',
             }),
         },
         'a JSON identifier node key-value pair': {
@@ -156,6 +170,18 @@ describe('ObjectNode', () => {
                     }),
                     new JsonPropertyNode({
                         key: JsonIdentifierNode.of('qux'),
+                        value: JsonPrimitiveNode.of('quux'),
+                    }),
+                ],
+            }),
+        },
+        'a JSON identifier node key-value pair (overriding)': {
+            name: JsonIdentifierNode.of('foo'),
+            value: JsonPrimitiveNode.of('quux'),
+            result: new JsonObjectNode({
+                properties: [
+                    new JsonPropertyNode({
+                        key: JsonPrimitiveNode.of('foo'),
                         value: JsonPrimitiveNode.of('quux'),
                     }),
                 ],
@@ -386,7 +412,9 @@ describe('ObjectNode', () => {
     type MergeScenario = {
         description: string,
         sourceCode: string,
+        emptySourceChildren?: boolean,
         destinationCode: string,
+        emptyDestinationChildren?: boolean,
         expected: string,
     };
 
@@ -412,8 +440,33 @@ describe('ObjectNode', () => {
             }`,
         },
         {
+            description: 'non-empty source with no children',
+            sourceCode: multiline`
+            {
+              "foo": "new value", 
+              "bar": 123
+            }`,
+            emptySourceChildren: true,
+            destinationCode: multiline`
+            {
+                // Destination pre-foo comment
+                "foo": "value",
+                // Destination post-foo comment
+                "baz": [1, 2, 3]
+            }`,
+            expected: multiline`
+            {
+                // Destination pre-foo comment
+                "foo": "new value",
+                // Destination post-foo comment
+                "baz": [1, 2, 3],
+                "bar": 123
+            }`,
+        },
+        {
             description: 'empty source children',
-            sourceCode: '',
+            sourceCode: '{}',
+            emptySourceChildren: true,
             destinationCode: multiline`
             {
                 // Destination pre-foo comment
@@ -450,6 +503,30 @@ describe('ObjectNode', () => {
             }`,
         },
         {
+            description: 'non-empty destination and empty children',
+            sourceCode: multiline`
+            {
+                /* Source pre-bar comment */
+                "bar": 123, /* Inline comment */
+                /* Source post-bar comment */
+                "baz": true /* Another inline comment */
+            }`,
+            destinationCode: multiline`
+            {
+                "foo": "value",
+                "baz": [1, 2, 3]
+            }`,
+            emptyDestinationChildren: true,
+            expected: multiline`
+            {
+                "foo": "value",
+                /* Source post-bar comment */
+                "baz": true, /* Another inline comment */
+                /* Source pre-bar comment */
+                "bar": 123, /* Inline comment */
+            }`,
+        },
+        {
             description: 'empty destination children',
             sourceCode: multiline`
             {
@@ -458,7 +535,8 @@ describe('ObjectNode', () => {
                 /* Source post-bar comment */
                 "baz": true /* Another inline comment */
             }`,
-            destinationCode: '',
+            destinationCode: '{}',
+            emptyDestinationChildren: true,
             expected: multiline`
             {
                 /* Source pre-bar comment */
@@ -576,18 +654,22 @@ describe('ObjectNode', () => {
                 "baz": true /* Another inline comment */
             }`,
         },
-    ])('should merge objects with $description', ({sourceCode, destinationCode, expected}) => {
-        const source = sourceCode === ''
-            ? JsonObjectNode.of({})
-            : JsonParser.parse(sourceCode, JsonObjectNode);
+    ])('should merge objects with $description', scenario => {
+        const source = JsonParser.parse(scenario.sourceCode, JsonObjectNode);
 
-        const destination = destinationCode === ''
-            ? JsonObjectNode.of({})
-            : JsonParser.parse(destinationCode, JsonObjectNode);
+        if (scenario.emptySourceChildren === true) {
+            source.reset();
+        }
+
+        const destination = JsonParser.parse(scenario.destinationCode, JsonObjectNode);
+
+        if (scenario.emptyDestinationChildren === true) {
+            destination.reset();
+        }
 
         destination.merge(source);
 
-        expect(destination.toString()).toStrictEqual(expected);
+        expect(destination.toString()).toStrictEqual(scenario.expected);
     });
 
     function multiline(strings: TemplateStringsArray): string {

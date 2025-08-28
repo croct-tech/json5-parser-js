@@ -273,7 +273,7 @@ export abstract class JsonStructureNode extends JsonValueNode {
 
     protected abstract getMaxDepth(): number;
 
-    private detectFormatting(parent: Formatting = {}): Formatting {
+    protected detectFormatting(parent: Formatting = {}): Formatting {
         let blockStart = false;
         let lineStart = true;
         let inlineComma = false;
