@@ -8,8 +8,13 @@ import {JsonPrimitiveNode, JsonStringNode} from './primitiveNode';
 import {JsonValueFactory} from './factory';
 import {JsonIdentifierNode} from './identifierNode';
 import {JsonError} from '../error';
-import { JsonTokenNode } from './tokenNode';
-import { JsonTokenType } from '../token';
+import {NodeMatcher} from '../manipulator';
+import {JsonTokenNode} from './tokenNode';
+import {JsonTokenType} from '../token';
+import INSIGNIFICANT = NodeMatcher.INSIGNIFICANT;
+import NEWLINE = NodeMatcher.NEWLINE;
+import SIGNIFICANT = NodeMatcher.SIGNIFICANT;
+import SPACE = NodeMatcher.SPACE;
 
 export interface JsonObjectDefinition extends JsonCompositeDefinition {
     readonly properties: readonly JsonPropertyNode[];
@@ -35,43 +40,157 @@ export class JsonObjectNode extends JsonStructureNode implements JsonCompositeDe
         });
     }
 
-    public static merge(source: JsonObjectNode, destination: JsonObjectNode): JsonObjectNode {
-        const isTrivia = (node: JsonNode): boolean => {
-            if (!(node instanceof JsonTokenNode)) {
-                return false;
-            }
-            return node.isType(JsonTokenType.LINE_COMMENT)
-                || node.isType(JsonTokenType.BLOCK_COMMENT)
-                || node.isType(JsonTokenType.NEWLINE)
-                || node.isType(JsonTokenType.WHITESPACE);
+    public merge(source: JsonObjectNode): void {
+        if (source.propertyNodes.length === 0) {
+            return;
         }
 
-        for (const property of source.properties) {
+        if (this.propertyNodes.length === 0) {
+            this.propertyNodes.push(...source.propertyNodes.map(property => property.clone()));
+            this.children.splice(0, this.children.length, ...source.children.map(child => child.clone()));
+
+            return;
+        }
+
+        for (const property of source.propertyNodes) {
             const key = property.key.toJSON();
-            const index = destination.children.findIndex(
-                (node) => node instanceof JsonPropertyNode && node.key.toJSON() === key,
-            );
+            const sourceRange = source.findPropertyRange(key);
 
-            if (index >= 0) {
-                let startIndex = index;
-                let endIndex = index;
-                while (startIndex > 0 && isTrivia(destination.children[startIndex - 1])) {
-                    startIndex--;
+            let sourceChildren: JsonNode[] = [property];
+
+            if (sourceRange !== null) {
+                sourceChildren = source.children.slice(sourceRange[0], sourceRange[1] + 1);
+            }
+
+            const newProperty = property.clone();
+
+            sourceChildren = sourceChildren.map(node => (node === property ? newProperty : node.clone()));
+
+            const range = this.findPropertyRange(key);
+
+            if (range === null) {
+                this.propertyNodes.push(newProperty);
+                this.insert(sourceChildren);
+
+                continue;
+            }
+
+            const currentIndex = this.propertyNodes.findIndex(candidate => candidate.key.toJSON() === key);
+
+            this.propertyNodes.splice(currentIndex, 1, newProperty);
+            this.children.splice(range[0], range[1] - range[0] + 1, ...sourceChildren);
+        }
+    }
+
+    private insert(nodes: JsonNode[]): void {
+        let insertionIndex = this.children.length;
+
+        for (let index = this.children.length - 1; index >= 0; index--) {
+            const child = this.children[index];
+
+            if (child instanceof JsonTokenNode) {
+                if (child.isType(JsonTokenType.BRACE_RIGHT)) {
+                    insertionIndex = index;
+
+                    continue;
                 }
-                while (endIndex + 1 < destination.children.length && isTrivia(destination.children[endIndex + 1])) {
-                    endIndex++;
+
+                if (child.isType(JsonTokenType.COMMA)) {
+                    insertionIndex = index + 1;
+
+                    break;
                 }
-                destination.children.splice(startIndex, endIndex - startIndex + 1);
-                destination.delete(key);
+            }
+
+            if (SIGNIFICANT(child)) {
+                break;
+            }
+
+            if (NEWLINE(child)) {
+                while (index > 0 && SPACE(this.children[index - 1])) {
+                    index--;
+                }
+
+                insertionIndex = index;
+
+                break;
+            }
+
+            insertionIndex = index;
+        }
+
+        let needsComma = false;
+
+        for (let index = insertionIndex - 1; index >= 0; index--) {
+            const child = this.children[index];
+
+            if (child instanceof JsonTokenNode) {
+                if (child.isType(JsonTokenType.COMMA)) {
+                    needsComma = false;
+
+                    break;
+                }
+            }
+
+            if (SIGNIFICANT(child)) {
+                needsComma = true;
+
+                break;
             }
         }
 
-        for (const property of source.properties) {
-            destination.set(property.key, property.value);
+        if (needsComma) {
+            this.children.splice(insertionIndex, 0, new JsonTokenNode({
+                type: JsonTokenType.COMMA,
+                value: ',',
+            }));
+
+            insertionIndex++;
         }
 
-        destination.children.push(...source.children);
-        return destination;
+        this.children.splice(insertionIndex, 0, ...nodes);
+    }
+
+    private findPropertyRange(name: string): [number, number] | null {
+        let startIndex = this.children.findIndex(
+            node => node instanceof JsonPropertyNode && node.key.toJSON() === name,
+        );
+
+        if (startIndex === -1) {
+            return null;
+        }
+
+        let endIndex = startIndex;
+
+        for (let lookBehind = startIndex - 1; lookBehind >= 0; lookBehind--) {
+            const child = this.children[lookBehind];
+
+            if (!INSIGNIFICANT(child)) {
+                break;
+            }
+
+            if (NEWLINE(child)) {
+                startIndex = lookBehind;
+            }
+        }
+
+        for (let lookAhead = endIndex + 1; lookAhead < this.children.length; lookAhead++) {
+            const child = this.children[lookAhead];
+
+            if (!(child instanceof JsonTokenNode) || (SIGNIFICANT(child) && !child.isType(JsonTokenType.COMMA))) {
+                break;
+            }
+
+            if (NEWLINE(child)) {
+                endIndex = lookAhead - 1;
+
+                break;
+            }
+
+            endIndex = lookAhead;
+        }
+
+        return [startIndex, endIndex];
     }
 
     public update(other: JsonValueNode|JsonValue): JsonValueNode {
