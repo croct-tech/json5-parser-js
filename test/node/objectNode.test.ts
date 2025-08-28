@@ -3,6 +3,7 @@ import {
     JsonArrayNode,
     JsonIdentifierNode,
     JsonObjectNode,
+    JsonParser,
     JsonPrimitiveNode,
     JsonPropertyNode,
     JsonStringNode,
@@ -381,4 +382,226 @@ describe('ObjectNode', () => {
             key: value,
         });
     });
+
+    type MergeScenario = {
+        description: string,
+        sourceCode: string,
+        destinationCode: string,
+        expected: string,
+    };
+
+    it.each<MergeScenario>([
+        {
+            description: 'empty source',
+            sourceCode: multiline`
+            {
+            }`,
+            destinationCode: multiline`
+            {
+                // Destination pre-foo comment
+                "foo": "value",
+                // Destination post-foo comment
+                "baz": [1, 2, 3]
+            }`,
+            expected: multiline`
+            {
+                // Destination pre-foo comment
+                "foo": "value",
+                // Destination post-foo comment
+                "baz": [1, 2, 3]
+            }`,
+        },
+        {
+            description: 'empty source children',
+            sourceCode: '',
+            destinationCode: multiline`
+            {
+                // Destination pre-foo comment
+                "foo": "value",
+                // Destination post-foo comment
+                "baz": [1, 2, 3]
+            }`,
+            expected: multiline`
+            {
+                // Destination pre-foo comment
+                "foo": "value",
+                // Destination post-foo comment
+                "baz": [1, 2, 3]
+            }`,
+        },
+        {
+            description: 'empty destination',
+            sourceCode: multiline`
+            {
+                /* Source pre-bar comment */
+                "bar": 123, /* Inline comment */
+                /* Source post-bar comment */
+                "baz": true /* Another inline comment */
+            }`,
+            destinationCode: multiline`
+            {
+            }`,
+            expected: multiline`
+            {
+                /* Source pre-bar comment */
+                "bar": 123, /* Inline comment */
+                /* Source post-bar comment */
+                "baz": true /* Another inline comment */
+            }`,
+        },
+        {
+            description: 'empty destination children',
+            sourceCode: multiline`
+            {
+                /* Source pre-bar comment */
+                "bar": 123, /* Inline comment */
+                /* Source post-bar comment */
+                "baz": true /* Another inline comment */
+            }`,
+            destinationCode: '',
+            expected: multiline`
+            {
+                /* Source pre-bar comment */
+                "bar": 123, /* Inline comment */
+                /* Source post-bar comment */
+                "baz": true /* Another inline comment */
+            }`,
+        },
+        {
+            description: 'without line breaks',
+            sourceCode: multiline`
+            {/* Source pre-bar comment */ "bar": 123, /* Inline comment */}
+            `,
+            destinationCode: multiline`
+            { "foo": "value" }
+            `,
+            expected: multiline`
+            { "foo": "value","bar": 123, /* Inline comment */ }
+            `,
+        },
+        {
+            description: 'destination with multiple line breaks',
+            sourceCode: multiline`
+            {
+              /* Source pre-bar comment */ 
+              "bar": 123, /* Inline comment */
+            }
+            `,
+            destinationCode: multiline`
+            {
+              "foo": "value"
+              
+              
+            }
+            `,
+            expected: multiline`
+            {
+              "foo": "value",
+              /* Source pre-bar comment */ 
+              "bar": 123, /* Inline comment */
+              
+              
+            }
+            `,
+        },
+        {
+            description: 'destination with trailing comma and closing brace without preceding newline',
+            sourceCode: multiline`
+            {
+                /* Source pre-bar comment */
+                "bar": 123, /* Inline comment */
+            }`,
+            destinationCode: multiline`
+            {
+                // Destination pre-foo comment
+                "foo": "value",}`,
+            expected: multiline`
+            {
+                // Destination pre-foo comment
+                "foo": "value",
+                /* Source pre-bar comment */
+                "bar": 123, /* Inline comment */}`,
+        },
+        {
+            description: 'overlapping properties',
+            sourceCode: multiline`
+            {
+                /* Source pre-bar comment */
+                "bar": 123, /* Inline comment */
+                /* Source post-bar comment */
+                "baz": true /* Another inline comment */
+            }`,
+            destinationCode: multiline`
+            {
+                // Destination pre-foo comment
+                "foo": "value",
+                // Destination post-foo comment
+                "baz": [1, 2, 3]
+            }`,
+            expected: multiline`
+            {
+                // Destination pre-foo comment
+                "foo": "value",
+                /* Source post-bar comment */
+                "baz": true, /* Another inline comment */
+                /* Source pre-bar comment */
+                "bar": 123, /* Inline comment */
+            }`,
+        },
+        {
+            description: 'disjoint properties',
+            sourceCode: multiline`
+            {
+                /* Source pre-bar comment */
+                "bar": 123, /* Inline comment */
+                /* Source post-bar comment */
+                "baz": true /* Another inline comment */
+            }`,
+            destinationCode: multiline`
+            {
+                // Destination pre-foo comment
+                "foo": "value",
+                // Destination post-foo comment
+                "fizz": 42
+            }`,
+            expected: multiline`
+            {
+                // Destination pre-foo comment
+                "foo": "value",
+                // Destination post-foo comment
+                "fizz": 42,
+                /* Source pre-bar comment */
+                "bar": 123, /* Inline comment */
+                /* Source post-bar comment */
+                "baz": true /* Another inline comment */
+            }`,
+        },
+    ])('should merge objects with $description', ({sourceCode, destinationCode, expected}) => {
+        const source = sourceCode === ''
+            ? JsonObjectNode.of({})
+            : JsonParser.parse(sourceCode, JsonObjectNode);
+
+        const destination = destinationCode === ''
+            ? JsonObjectNode.of({})
+            : JsonParser.parse(destinationCode, JsonObjectNode);
+
+        destination.merge(source);
+
+        expect(destination.toString()).toStrictEqual(expected);
+    });
+
+    function multiline(strings: TemplateStringsArray): string {
+        const lines = strings.join('').split('\n');
+
+        if (lines.length < 2) {
+            return strings.join('');
+        }
+
+        const indent = lines[1].search(/\S/);
+
+        return lines
+            .map(line => line.slice(indent))
+            .join('\n')
+            .trim();
+    }
 });
