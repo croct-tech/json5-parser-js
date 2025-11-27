@@ -240,8 +240,6 @@ Output:
 }
 ```
 
-Here’s a drop-in README section that documents those options clearly, with concise tables and runnable examples.
-
 ### Formatting
 
 When you call `toString(options)` you can control how the output is formatted.
