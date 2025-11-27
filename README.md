@@ -33,7 +33,7 @@ Ideal for editing configuration files (e.g., `package.json`, `tsconfig.json`) or
 - **Preserve formatting** – Read, modify, and write JSON5 files without losing comments, indentation, or spacing.
 - **Style learning** – Automatically applies the document's existing formatting style to new entries.
 - **Reformatting** – Customize output formatting with flexible options.
-- **Type Safety** – Fully typed API for working with JSON5 documents.
+- **Type safety** – Fully typed API for working with JSON5 documents.
 
 ## Installation
 
