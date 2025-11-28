@@ -252,6 +252,7 @@ the formatter falls back to a compact style with no extra spaces or indentation.
 |------------------------------|----------------------|--------------------------------------------------------|
 | `indentationLevel`           | `number`             | Base indentation level for the document.               |
 | `indentationCharacter`       | `'space'\|'tab'`     | Character used for indentation.                        |
+| `newlineCharacter`           | `'LF'\|'CRLF'`       | Newline character to use in the document.              |
 | `string.quote`               | `'single'\|'double'` | Quotation style for string values.                     |
 | `property.quote`             | `'single'\|'double'` | Quotation style for property keys.                     |
 | `property.unquoted`          | `boolean`            | Allow unquoted property keys when valid.               |
