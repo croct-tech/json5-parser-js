@@ -214,6 +214,13 @@ describe('Functional test', () => {
             input: "'\uD83C\uDFBC'",
             expected: '🎼',
         },
+        {
+            input: '{\r\n  "foo": "1",\r\n  "bar": "2"\r\n}',
+            expected: {
+                foo: '1',
+                bar: '2',
+            },
+        },
     ])('should parse $input', ({input, expected}) => {
         const parser = new JsonParser(input);
         const node = parser.parseValue();
@@ -332,6 +339,17 @@ describe('Functional test', () => {
             type: JsonObjectNode,
             mutation: (node: JsonObjectNode): void => {
                 node.set('bar', 2);
+            },
+        },
+        {
+            description: 'use \\r\\n line endings when detected',
+            // language=JSON
+            input: '{\r\n  "foo": "1"\r\n}',
+            // language=JSON
+            output: '{\r\n  "foo": "1",\r\n  "bar": "2"\r\n}',
+            type: JsonObjectNode,
+            mutation: (node: JsonObjectNode): void => {
+                node.set('bar', '2');
             },
         },
         {

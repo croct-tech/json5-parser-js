@@ -11,6 +11,7 @@ export type BlockFormatting = {
 export type Formatting = {
     indentationLevel?: number,
     indentationCharacter?: 'space' | 'tab',
+    newlineCharacter?: 'LF' | 'CRLF',
     string?: {
         quote?: 'single' | 'double',
     },
