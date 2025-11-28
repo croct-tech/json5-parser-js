@@ -365,9 +365,9 @@ export abstract class JsonStructureNode extends JsonValueNode {
 
             if (NEWLINE(token)) {
                 if (token.value.includes('\r\n')) {
-                    formatting.newlineCharacter = 'CRLF';
+                    formatting.newLineCharacter = 'CRLF';
                 } else {
-                    formatting.newlineCharacter = 'LF';
+                    formatting.newLineCharacter = 'LF';
                 }
             }
 
@@ -507,7 +507,7 @@ export abstract class JsonStructureNode extends JsonValueNode {
     }
 
     private getNewlineToken(formatting: Formatting): JsonTokenNode {
-        const newlineChar = formatting.newlineCharacter === 'CRLF' ? '\r\n' : '\n';
+        const newlineChar = formatting.newLineCharacter === 'CRLF' ? '\r\n' : '\n';
         return new JsonTokenNode({
             type: JsonTokenType.NEWLINE,
             value: newlineChar,
