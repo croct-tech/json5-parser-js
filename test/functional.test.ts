@@ -3046,6 +3046,28 @@ describe('Functional test', () => {
                 node.set('bar', 'qux');
             },
         },
+        {
+            description: 'preserve carriage return and line feed as line ending',
+            // language=JSON5
+            input: '{\r\n  "foo": 1,\r\n  "bar": 2\r\n}',
+            // language=JSON5
+            output: '{\r\n  "foo": 1\r\n}',
+            type: JsonObjectNode,
+            mutation: (node: JsonObjectNode): void => {
+                node.delete('bar');
+            },
+        },
+        {
+            description: 'detect carriage return and line feed as line ending',
+            // language=JSON5
+            input: '{\r\n  "foo": 1,\r\n  "bar": 2\r\n}',
+            // language=JSON5
+            output: '{\r\n  "foo": 1\r\n}',
+            type: JsonObjectNode,
+            mutation: (node: JsonObjectNode): void => {
+                node.delete('bar');
+            },
+        },
     ])('should $description', ({input, output, type, mutation, format}) => {
         const node = JsonParser.parse(input, type);
 

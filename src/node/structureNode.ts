@@ -164,7 +164,7 @@ export abstract class JsonStructureNode extends JsonValueNode {
                     if (indentationSize > 0 && manipulator.matchesNext(node => endToken.isEquivalent(node))) {
                         // If the following token is the end token, always indent.
                         // This ensures it won't consume the indentation of the end delimiter.
-                        manipulator.node(this.getNewlineToken(formatting));                           
+                        manipulator.node(this.getNewlineToken(formatting));
 
                         if (
                             manipulator.matchesToken(JsonTokenType.WHITESPACE)
@@ -364,11 +364,7 @@ export abstract class JsonStructureNode extends JsonValueNode {
             }
 
             if (NEWLINE(token)) {
-                if (token.value.includes('\r\n')) {
-                    formatting.newLineCharacter = 'CRLF';
-                } else {
-                    formatting.newLineCharacter = 'LF';
-                }
+                formatting.lineEnding = token.value.includes('\r\n') ? 'crlf' : 'lf';
             }
 
             if (inlineComma && index > 0 && tokens[index - 1].depth === 0) {
@@ -507,10 +503,9 @@ export abstract class JsonStructureNode extends JsonValueNode {
     }
 
     private getNewlineToken(formatting: Formatting): JsonTokenNode {
-        const newlineChar = formatting.newLineCharacter === 'CRLF' ? '\r\n' : '\n';
         return new JsonTokenNode({
             type: JsonTokenType.NEWLINE,
-            value: newlineChar,
+            value: formatting.lineEnding === 'crlf' ? '\r\n' : '\n',
         });
     }
 
