@@ -39,7 +39,7 @@ export abstract class JsonCompositeNode extends JsonNode {
 
     private static flatten(node: JsonNode): JsonNode[] {
         if (node instanceof JsonCompositeNode) {
-            return node.children.flatMap(void JsonCompositeNode.flatten);
+            return node.children.flatMap(JsonCompositeNode.flatten);
         }
 
         return [node];

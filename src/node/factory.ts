@@ -1,13 +1,7 @@
 import type {JsonArray, JsonObject, JsonPrimitive, JsonValue} from '@croct/json';
 import type {JsonArrayNode} from './arrayNode';
 import type {JsonObjectNode} from './objectNode';
-import type {
-    JsonPrimitiveNode,
-    type JsonBooleanNode,
-    type JsonNullNode,
-    type JsonNumberNode,
-    type JsonStringNode,
-} from './primitiveNode';
+import type {JsonPrimitiveNode, JsonBooleanNode, JsonNullNode, JsonNumberNode, JsonStringNode} from './primitiveNode';
 import {JsonValueNode} from './valueNode';
 
 export namespace JsonValueFactory {
