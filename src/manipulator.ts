@@ -1,5 +1,6 @@
 import {JsonTokenType} from './token';
-import {JsonNode, JsonTokenNode, JsonValueNode} from './node';
+import type {JsonNode} from './node';
+import {JsonTokenNode, JsonValueNode} from './node';
 
 export type NodeMatcher = (node: JsonNode) => boolean;
 

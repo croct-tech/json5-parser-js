@@ -1,4 +1,4 @@
-import {JsonValue} from '@croct/json';
+import type {JsonValue} from '@croct/json';
 import {JsonPrimitiveNode, JsonValueNode, SourceLocation} from '../../src';
 import {JsonError} from '../../src/error';
 

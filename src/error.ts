@@ -1,4 +1,4 @@
-import {SourceLocation} from './location';
+import type {SourceLocation} from './location';
 
 export class JsonError extends Error {
     public constructor(message: string) {

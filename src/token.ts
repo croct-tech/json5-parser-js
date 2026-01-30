@@ -1,4 +1,4 @@
-import {SourceLocation} from './location';
+import type {SourceLocation} from './location';
 
 export enum JsonTokenType {
     IDENTIFIER = 'IDENTIFIER',

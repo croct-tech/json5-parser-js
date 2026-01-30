@@ -1,18 +1,15 @@
 import {JsonLexer} from './lexer';
-import {JsonToken, JsonTokenType} from './token';
+import type {JsonToken} from './token';
+import {JsonTokenType} from './token';
+import type {JsonValueNode, JsonNumberNode, JsonStringNode, JsonNullNode, JsonBooleanNode} from './node';
 import {
     JsonPropertyNode,
     JsonIdentifierNode,
-    JsonValueNode,
     JsonPrimitiveNode,
     JsonTokenNode,
     JsonArrayNode,
     JsonNode,
     JsonObjectNode,
-    JsonNumberNode,
-    JsonStringNode,
-    JsonNullNode,
-    JsonBooleanNode,
 } from './node';
 import {isReserved} from './identifier';
 import {JsonError, JsonParseError} from './error';
@@ -223,7 +220,7 @@ export class JsonParser {
     }
 
     private parseArray(): JsonArrayNode {
-        const children: Array<JsonNode|JsonToken> = [
+        const children: Array<JsonNode | JsonToken> = [
             this.lexer.consume(JsonTokenType.BRACKET_LEFT),
             ...this.lexer.skipInsignificant(),
         ];
@@ -255,7 +252,7 @@ export class JsonParser {
     }
 
     private parseObject(): JsonObjectNode {
-        const children: Array<JsonNode|JsonToken> = [
+        const children: Array<JsonNode | JsonToken> = [
             this.lexer.consume(JsonTokenType.BRACE_LEFT),
             ...this.lexer.skipInsignificant(),
         ];
@@ -287,7 +284,7 @@ export class JsonParser {
     }
 
     private parseObjectProperty(): JsonPropertyNode {
-        const children: Array<JsonNode|JsonToken> = [];
+        const children: Array<JsonNode | JsonToken> = [];
 
         this.lexer.expect(JsonTokenType.STRING, JsonTokenType.IDENTIFIER);
 
@@ -338,7 +335,7 @@ export class JsonParser {
         });
     }
 
-    private static createChildren(children: Array<JsonNode|JsonToken>): JsonNode[] {
+    private static createChildren(children: Array<JsonNode | JsonToken>): JsonNode[] {
         return children.map(child => {
             if (child instanceof JsonNode) {
                 return child;

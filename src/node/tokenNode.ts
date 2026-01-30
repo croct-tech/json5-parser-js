@@ -1,5 +1,7 @@
-import {JsonToken, JsonTokenType} from '../token';
-import {JsonNode, JsonNodeDefinition, PartialJsonNodeDefinition} from './node';
+import type {JsonTokenType} from '../token';
+import {JsonToken} from '../token';
+import type {JsonNodeDefinition, PartialJsonNodeDefinition} from './node';
+import {JsonNode} from './node';
 
 export interface JsonTokenDefinition<T extends JsonTokenType = JsonTokenType> extends JsonNodeDefinition, JsonToken<T> {
 }

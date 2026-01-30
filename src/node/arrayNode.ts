@@ -1,7 +1,7 @@
-import {JsonArray, JsonValue} from '@croct/json';
-import {JsonValueNode} from './valueNode';
+import type {JsonArray, JsonValue} from '@croct/json';
+import type {JsonValueNode} from './valueNode';
 import {JsonStructureNode, StructureDelimiter} from './structureNode';
-import {JsonCompositeDefinition, JsonCompositeNode, PartialJsonCompositeDefinition} from './compositeNode';
+import type {JsonCompositeDefinition, JsonCompositeNode, PartialJsonCompositeDefinition} from './compositeNode';
 import {JsonValueFactory} from './factory';
 import {JsonError} from '../error';
 
@@ -18,11 +18,11 @@ export class JsonArrayNode extends JsonStructureNode implements JsonArrayDefinit
         this.elementNodes = [...definition.elements];
     }
 
-    public static of(...elements: ReadonlyArray<JsonValue|JsonValueNode>): JsonArrayNode {
+    public static of(...elements: ReadonlyArray<JsonValue | JsonValueNode>): JsonArrayNode {
         return new JsonArrayNode({elements: elements.map(JsonValueFactory.create)});
     }
 
-    public update(other: JsonValueNode|JsonValue): JsonValueNode {
+    public update(other: JsonValueNode | JsonValue): JsonValueNode {
         if (!(other instanceof JsonArrayNode) && !Array.isArray(other)) {
             return JsonValueFactory.create(other);
         }
@@ -75,7 +75,7 @@ export class JsonArrayNode extends JsonStructureNode implements JsonArrayDefinit
         return element;
     }
 
-    public set(index: number, element: JsonValue|JsonValueNode): void {
+    public set(index: number, element: JsonValue | JsonValueNode): void {
         if (index < 0 || index >= this.elementNodes.length) {
             throw new Error(`Index ${index} is out of bounds.`);
         }
@@ -95,23 +95,23 @@ export class JsonArrayNode extends JsonStructureNode implements JsonArrayDefinit
         this.splice(index, 1);
     }
 
-    public unshift(...elements: Array<JsonValue|JsonValueNode>): void {
+    public unshift(...elements: Array<JsonValue | JsonValueNode>): void {
         this.elementNodes.unshift(...elements.map(JsonValueFactory.create));
     }
 
-    public push(...elements: Array<JsonValue|JsonValueNode>): void {
+    public push(...elements: Array<JsonValue | JsonValueNode>): void {
         this.elementNodes.push(...elements.map(JsonValueFactory.create));
     }
 
-    public shift(): JsonValueNode|undefined {
+    public shift(): JsonValueNode | undefined {
         return this.elementNodes.shift();
     }
 
-    public pop(): JsonValueNode|undefined {
+    public pop(): JsonValueNode | undefined {
         return this.elementNodes.pop();
     }
 
-    public splice(start: number, deleteCount: number, ...elements: Array<JsonValue|JsonValueNode>): JsonValueNode[] {
+    public splice(start: number, deleteCount: number, ...elements: Array<JsonValue | JsonValueNode>): JsonValueNode[] {
         return this.elementNodes.splice(start, deleteCount, ...elements.map(JsonValueFactory.create));
     }
 

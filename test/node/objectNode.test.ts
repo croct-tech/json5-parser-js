@@ -1,4 +1,5 @@
-import {JsonValue} from '@croct/json';
+import type {JsonValue} from '@croct/json';
+import type {JsonStringNode, JsonValueNode} from '../../src';
 import {
     JsonArrayNode,
     JsonIdentifierNode,
@@ -6,10 +7,8 @@ import {
     JsonParser,
     JsonPrimitiveNode,
     JsonPropertyNode,
-    JsonStringNode,
     JsonTokenNode,
     JsonTokenType,
-    JsonValueNode,
 } from '../../src';
 import {JsonError} from '../../src/error';
 
