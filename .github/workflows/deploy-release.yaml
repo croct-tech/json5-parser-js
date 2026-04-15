@@ -1,4 +1,4 @@
-name: Release deploy
+name: Deploy release
 
 on:
   release:
@@ -6,7 +6,7 @@ on:
       - published
 
 jobs:
-  deploy-release:
+  deploy:
     uses: croct-tech/shared-public-configs/.github/workflows/publish-public-npm-package.yml@master
     with:
       prepare-script: >-
