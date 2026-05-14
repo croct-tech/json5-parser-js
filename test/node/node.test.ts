@@ -1,4 +1,5 @@
-import {JsonNode, PartialJsonNodeDefinition, SourceLocation} from '../../src';
+import type {PartialJsonNodeDefinition} from '../../src';
+import {JsonNode, SourceLocation} from '../../src';
 
 describe('Node', () => {
     class TestJsonNode extends JsonNode {

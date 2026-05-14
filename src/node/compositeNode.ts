@@ -1,5 +1,6 @@
-import {JsonNode, JsonNodeDefinition} from './node';
-import {Formatting} from '../formatting';
+import type {JsonNodeDefinition} from './node';
+import {JsonNode} from './node';
+import type {Formatting} from '../formatting';
 
 export interface JsonCompositeDefinition extends JsonNodeDefinition {
     readonly children: JsonNode[];

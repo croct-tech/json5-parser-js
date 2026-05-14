@@ -1,4 +1,5 @@
-import {JsonLexer, JsonToken, JsonTokenType, SourcePosition} from '../src';
+import type {JsonToken, SourcePosition} from '../src';
+import {JsonLexer, JsonTokenType} from '../src';
 import 'jest-extended';
 import {JsonParseError} from '../src/error';
 

@@ -1,13 +1,5 @@
-import {
-    Formatting,
-    JsonIdentifierNode,
-    JsonNode,
-    JsonPrimitiveNode,
-    JsonPropertyNode,
-    JsonStringNode,
-    JsonTokenNode,
-    JsonTokenType,
-} from '../../src';
+import type {Formatting, JsonNode, JsonStringNode} from '../../src';
+import {JsonIdentifierNode, JsonPrimitiveNode, JsonPropertyNode, JsonTokenNode, JsonTokenType} from '../../src';
 
 describe('PropertyNode', () => {
     it('should set a value', () => {

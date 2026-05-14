@@ -1,15 +1,17 @@
-import {JsonValue} from '@croct/json';
-import {JsonValueNode} from './valueNode';
-import {JsonNode} from './node';
+import type {JsonValue} from '@croct/json';
+import type {JsonValueNode} from './valueNode';
+import type {JsonNode} from './node';
 import {JsonTokenNode} from './tokenNode';
 import {JsonTokenType} from '../token';
-import {JsonCompositeDefinition, JsonCompositeNode, PartialJsonCompositeDefinition} from './compositeNode';
+import type {JsonCompositeDefinition, PartialJsonCompositeDefinition} from './compositeNode';
+import {JsonCompositeNode} from './compositeNode';
 import {NodeManipulator} from '../manipulator';
 import {JsonValueFactory} from './factory';
 import {JsonIdentifierNode} from './identifierNode';
 import {isIdentifier} from '../identifier';
-import {JsonPrimitiveNode, JsonStringNode} from './primitiveNode';
-import {Formatting} from '../formatting';
+import type {JsonStringNode} from './primitiveNode';
+import {JsonPrimitiveNode} from './primitiveNode';
+import type {Formatting} from '../formatting';
 
 export interface JsonPropertyDefinition extends JsonCompositeDefinition {
     readonly key: JsonStringNode | JsonIdentifierNode;
