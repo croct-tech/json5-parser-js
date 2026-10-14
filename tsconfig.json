@@ -1,12 +1,13 @@
 {
   "compilerOptions": {
-    "module": "CommonJS",
+    "module": "Node16",
     "target": "ES2020",
     "esModuleInterop": true,
-    "moduleResolution": "Node",
+    "moduleResolution": "Node16",
     "stripInternal": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
+    "strict": false,
     "noImplicitAny": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
@@ -16,9 +17,9 @@
     "strictNullChecks": true,
     "removeComments": false,
     "noEmit": true,
-    "downlevelIteration": true,
     "declaration": true,
-    "lib": ["es6"]
+    "lib": ["es2020"],
+    "types": ["jest"]
   },
   "include": [
     "src/**/*.ts",

@@ -1,12 +1,13 @@
-import {JsonObject, JsonValue} from '@croct/json';
+import type {JsonObject, JsonValue} from '@croct/json';
 import {JsonValueNode} from './valueNode';
-import {JsonNode} from './node';
+import type {JsonNode} from './node';
 import {JsonStructureNode, StructureDelimiter} from './structureNode';
 import {JsonPropertyNode} from './propertyNode';
-import {JsonCompositeDefinition, JsonCompositeNode, PartialJsonCompositeDefinition} from './compositeNode';
-import {JsonPrimitiveNode, JsonStringNode} from './primitiveNode';
+import type {JsonCompositeDefinition, JsonCompositeNode, PartialJsonCompositeDefinition} from './compositeNode';
+import type {JsonStringNode} from './primitiveNode';
+import {JsonPrimitiveNode} from './primitiveNode';
 import {JsonValueFactory} from './factory';
-import {JsonIdentifierNode} from './identifierNode';
+import type {JsonIdentifierNode} from './identifierNode';
 import {JsonError} from '../error';
 import {NodeMatcher} from '../manipulator';
 import {JsonTokenNode} from './tokenNode';
@@ -29,7 +30,7 @@ export class JsonObjectNode extends JsonStructureNode implements JsonCompositeDe
         this.propertyNodes = [...definition.properties];
     }
 
-    public static of(properties: Record<string, JsonValueNode|JsonValue>): JsonObjectNode {
+    public static of(properties: Record<string, JsonValueNode | JsonValue>): JsonObjectNode {
         return new JsonObjectNode({
             properties: Object.entries(properties).map(
                 ([key, value]) => new JsonPropertyNode({
@@ -199,7 +200,7 @@ export class JsonObjectNode extends JsonStructureNode implements JsonCompositeDe
         return [startIndex, endIndex];
     }
 
-    public update(other: JsonValueNode|JsonValue): JsonValueNode {
+    public update(other: JsonValueNode | JsonValue): JsonValueNode {
         if (!(other instanceof JsonValueNode)) {
             if (typeof other !== 'object' || other === null || Array.isArray(other)) {
                 return JsonValueFactory.create(other);
@@ -281,7 +282,7 @@ export class JsonObjectNode extends JsonStructureNode implements JsonCompositeDe
         return [...this.propertyNodes];
     }
 
-    public set(name: string|JsonStringNode|JsonIdentifierNode, value: JsonValue|JsonValueNode): void {
+    public set(name: string | JsonStringNode | JsonIdentifierNode, value: JsonValue | JsonValueNode): void {
         const normalizedName = typeof name === 'string' ? name : name.toJSON();
         const index = this.propertyNodes.findIndex(current => current.key.toJSON() === normalizedName);
 

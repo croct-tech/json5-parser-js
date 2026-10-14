@@ -1,5 +1,6 @@
-import {JsonValue} from '@croct/json';
-import {JsonParser, JsonIdentifierNode, JsonObjectNode, JsonArrayNode, JsonValueNode, Formatting} from '../src';
+import type {JsonValue} from '@croct/json';
+import type {JsonValueNode, Formatting} from '../src';
+import {JsonParser, JsonIdentifierNode, JsonObjectNode, JsonArrayNode} from '../src';
 
 describe('Functional test', () => {
     type ParseScenario = {

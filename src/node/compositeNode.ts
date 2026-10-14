@@ -1,5 +1,6 @@
-import {JsonNode, JsonNodeDefinition} from './node';
-import {Formatting} from '../formatting';
+import type {JsonNodeDefinition} from './node';
+import {JsonNode} from './node';
+import type {Formatting} from '../formatting';
 
 export interface JsonCompositeDefinition extends JsonNodeDefinition {
     readonly children: JsonNode[];
@@ -36,7 +37,7 @@ export abstract class JsonCompositeNode extends JsonNode {
 
     public abstract rebuild(formatting?: Formatting): void;
 
-    private static flatten(node: JsonNode): JsonNode[] {
+    private static flatten(this: void, node: JsonNode): JsonNode[] {
         if (node instanceof JsonCompositeNode) {
             return node.children.flatMap(JsonCompositeNode.flatten);
         }

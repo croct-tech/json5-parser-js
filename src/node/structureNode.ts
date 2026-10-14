@@ -1,7 +1,8 @@
 import {JsonValueNode} from './valueNode';
-import {JsonNode} from './node';
+import type {JsonNode} from './node';
 import {JsonTokenType} from '../token';
-import {JsonTokenDefinition, JsonTokenNode} from './tokenNode';
+import type {JsonTokenDefinition} from './tokenNode';
+import {JsonTokenNode} from './tokenNode';
 import {NodeManipulator, NodeMatcher} from '../manipulator';
 import {JsonCompositeNode} from './compositeNode';
 import {JsonPropertyNode} from './propertyNode';
@@ -10,7 +11,7 @@ import WHITESPACE = NodeMatcher.WHITESPACE;
 import NEWLINE = NodeMatcher.NEWLINE;
 import SPACE = NodeMatcher.SPACE;
 import INSIGNIFICANT = NodeMatcher.INSIGNIFICANT;
-import {BlockFormatting, Formatting} from '../formatting';
+import type {BlockFormatting, Formatting} from '../formatting';
 
 type DescendantNode = {
     depth: number,

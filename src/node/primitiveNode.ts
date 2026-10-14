@@ -1,12 +1,13 @@
-import {JsonPrimitive, JsonValue} from '@croct/json';
-import {JsonNode} from './node';
+import type {JsonPrimitive, JsonValue} from '@croct/json';
+import type {JsonNode} from './node';
 import {JsonValueNode} from './valueNode';
-import {JsonCompositeDefinition, PartialJsonCompositeDefinition} from './compositeNode';
+import type {JsonCompositeDefinition, PartialJsonCompositeDefinition} from './compositeNode';
 import {NodeManipulator} from '../manipulator';
 import {JsonTokenNode} from './tokenNode';
-import {JsonPrimitiveTokenType, JsonPrimitiveValue, JsonTokenType} from '../token';
+import type {JsonPrimitiveTokenType, JsonPrimitiveValue} from '../token';
+import {JsonTokenType} from '../token';
 import {JsonValueFactory} from './factory';
-import {Formatting} from '../formatting';
+import type {Formatting} from '../formatting';
 
 export interface JsonPrimitiveDefinition<T extends JsonPrimitiveTokenType> extends JsonCompositeDefinition {
     readonly token: JsonTokenNode<T>;
@@ -44,7 +45,7 @@ export class JsonPrimitiveNode<T extends JsonPrimitiveTokenType = JsonPrimitiveT
 
     public static of(value: JsonPrimitiveNode): JsonPrimitiveNode;
 
-    public static of(value: JsonPrimitive|JsonPrimitiveNode): JsonPrimitiveNode {
+    public static of(value: JsonPrimitive | JsonPrimitiveNode): JsonPrimitiveNode {
         return JsonValueFactory.create(value);
     }
 
@@ -58,7 +59,7 @@ export class JsonPrimitiveNode<T extends JsonPrimitiveTokenType = JsonPrimitiveT
         });
     }
 
-    public update(other: JsonValueNode|JsonValue): JsonValueNode {
+    public update(other: JsonValueNode | JsonValue): JsonValueNode {
         const node = JsonValueFactory.create(other);
 
         if (!this.isEquivalent(node)) {

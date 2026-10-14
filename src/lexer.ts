@@ -1,12 +1,13 @@
-/* eslint-disable max-len -- Long regex patterns */
-import {JsonToken, JsonTokenType} from './token';
-import {SourcePosition} from './location';
+/* eslint-disable @stylistic/max-len -- Long regex patterns */
+import type {JsonToken} from './token';
+import {JsonTokenType} from './token';
+import type {SourcePosition} from './location';
 import {identifierRegex} from './identifier';
 import {JsonParseError} from './error';
 
 type TokenPattern = {
     type: JsonTokenType,
-    pattern: RegExp|string,
+    pattern: RegExp | string,
 };
 
 export class JsonLexer implements Iterable<JsonToken> {
@@ -80,7 +81,7 @@ export class JsonLexer implements Iterable<JsonToken> {
 
     private remaining: string;
 
-    private current: JsonToken|null = null;
+    private current: JsonToken | null = null;
 
     public constructor(source: string) {
         this.remaining = source;

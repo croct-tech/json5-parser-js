@@ -1,4 +1,5 @@
-import {JsonArrayNode, JsonNode, JsonPrimitiveNode, JsonPropertyNode, JsonTokenNode, JsonTokenType} from '../src';
+import type {JsonNode} from '../src';
+import {JsonArrayNode, JsonPrimitiveNode, JsonPropertyNode, JsonTokenNode, JsonTokenType} from '../src';
 import {NodeManipulator, NodeMatcher} from '../src/manipulator';
 
 describe('NodeMatcher', () => {

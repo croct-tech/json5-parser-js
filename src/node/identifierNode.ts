@@ -1,7 +1,7 @@
-import {JsonValue} from '@croct/json';
-import {JsonNode} from './node';
+import type {JsonValue} from '@croct/json';
+import type {JsonNode} from './node';
 import {JsonValueNode} from './valueNode';
-import {JsonCompositeDefinition, PartialJsonCompositeDefinition} from './compositeNode';
+import type {JsonCompositeDefinition, PartialJsonCompositeDefinition} from './compositeNode';
 import {NodeManipulator} from '../manipulator';
 import {JsonTokenNode} from './tokenNode';
 import {JsonTokenType} from '../token';
@@ -35,7 +35,7 @@ export class JsonIdentifierNode extends JsonValueNode implements JsonIdentifierD
         });
     }
 
-    public update(other: JsonValueNode|JsonValue): JsonValueNode {
+    public update(other: JsonValueNode | JsonValue): JsonValueNode {
         const node = JsonValueFactory.create(other);
 
         if (!this.isEquivalent(node)) {

@@ -1,15 +1,12 @@
-import {JsonValue} from '@croct/json';
+import type {JsonValue} from '@croct/json';
+import type {JsonCompositeNode, JsonObjectDefinition, JsonValueNode, PartialJsonCompositeDefinition} from '../../src';
 import {
-    JsonCompositeNode,
-    JsonObjectDefinition,
     JsonParser,
     JsonPrimitiveNode,
     JsonPropertyNode,
     JsonStructureNode,
     JsonTokenNode,
     JsonTokenType,
-    JsonValueNode,
-    PartialJsonCompositeDefinition,
     StructureDelimiter,
 } from '../../src';
 
