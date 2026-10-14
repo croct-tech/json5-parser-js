@@ -1,5 +1,5 @@
 import {SourceLocation} from '../location';
-import {Formatting} from '../formatting';
+import type {Formatting} from '../formatting';
 
 export interface JsonNodeDefinition {
     readonly location: SourceLocation;

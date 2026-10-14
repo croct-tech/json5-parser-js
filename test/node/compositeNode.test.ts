@@ -1,4 +1,5 @@
-import {Formatting, JsonArrayNode, JsonCompositeNode, PartialJsonCompositeDefinition} from '../../src';
+import type {Formatting, PartialJsonCompositeDefinition} from '../../src';
+import {JsonArrayNode, JsonCompositeNode} from '../../src';
 import spyOn = jest.spyOn;
 
 describe('CompositeNode', () => {

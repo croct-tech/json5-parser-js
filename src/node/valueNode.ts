@@ -1,9 +1,9 @@
-import {JsonValue} from '@croct/json';
+import type {JsonValue} from '@croct/json';
 import {JsonCompositeNode} from './compositeNode';
 import {JsonError} from '../error';
 
 export abstract class JsonValueNode extends JsonCompositeNode {
-    public abstract update(other: JsonValueNode|JsonValue): JsonValueNode;
+    public abstract update(other: JsonValueNode | JsonValue): JsonValueNode;
 
     public abstract clone(): JsonValueNode;
 
@@ -12,7 +12,7 @@ export abstract class JsonValueNode extends JsonCompositeNode {
             throw new JsonError(`Expected value of type ${type.name}, but got ${this.constructor.name}.`);
         }
 
-        return this as T;
+        return this;
     }
 
     public abstract toJSON(): JsonValue;

@@ -513,7 +513,7 @@ describe('JsonParser', () => {
 
     it('should report an error if a non-error is thrown parsing a string', () => {
         jest.spyOn(JSON, 'parse').mockImplementation(() => {
-            // eslint-disable-next-line no-throw-literal -- Testing a non-error throw.
+            // eslint-disable-next-line @typescript-eslint/only-throw-error -- Testing a non-error throw.
             throw 'Unexpected error.';
         });
 
