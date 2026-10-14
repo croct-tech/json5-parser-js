@@ -52,7 +52,7 @@ export class JsonPrimitiveNode<T extends JsonPrimitiveTokenType = JsonPrimitiveT
         return new JsonPrimitiveNode({
             token: new JsonTokenNode({
                 type: JsonTokenType.NUMBER,
-                value: `"0x${value.toString(16)}"`,
+                value: `0x${value.toString(16)}`,
             }),
             value: value,
         });

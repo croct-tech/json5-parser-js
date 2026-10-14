@@ -34,7 +34,7 @@ describe('PrimitiveNode', () => {
             new JsonPrimitiveNode({
                 token: new JsonTokenNode({
                     type: JsonTokenType.NUMBER,
-                    value: `"0x${number.toString(16)}"`,
+                    value: `0x${number.toString(16)}`,
                 }),
                 value: number,
             }),
