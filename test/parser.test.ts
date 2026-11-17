@@ -1151,32 +1151,39 @@ describe('JsonParser', () => {
         );
     });
 
-    it('should fail to parse an object with reserved identifier key', () => {
-        let caughtError: unknown;
+    it.each(['with', 'while', 'class', 'default', 'function'])(
+        'should parse an object with reserved identifier key "%s"',
+        key => {
+            expect(JsonParser.parse(`{${key}:"value"}`).toJSON()).toEqual({[key]: 'value'});
+        },
+    );
 
-        try {
-            JsonParser.parse('{with:"value"}');
-        } catch (error) {
-            caughtError = error;
-        }
+    it('should parse literal-like identifier keys', () => {
+        expect(JsonParser.parse('{true:1, false:2, null:3, Infinity:4, NaN:5}').toJSON()).toEqual({
+            true: 1,
+            false: 2,
+            null: 3,
+            Infinity: 4,
+            NaN: 5,
+        });
+    });
 
-        expect(caughtError).toEqual(
-            new JsonParseError(
-                'Reserved identifier \'with\' at 1:2.',
-                {
-                    start: {
-                        index: 1,
-                        line: 1,
-                        column: 2,
-                    },
-                    end: {
-                        index: 5,
-                        line: 1,
-                        column: 6,
-                    },
+    it('should parse reserved identifier keys in nested objects', () => {
+        expect(JsonParser.parse('{outer:{with:"value", class:{default:true}}}').toJSON()).toEqual({
+            outer: {
+                with: 'value',
+                class: {
+                    default: true,
                 },
-            ),
-        );
+            },
+        });
+    });
+
+    it('should round-trip a reserved identifier key without quotes', () => {
+        const serialized = JsonParser.parse('{while:true}').toString();
+
+        expect(serialized).toBe('{while:true}');
+        expect(JsonParser.parse(serialized).toJSON()).toEqual({while: true});
     });
 
     it('should parse a value of the specified type', () => {
