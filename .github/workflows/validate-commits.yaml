@@ -1,0 +1,23 @@
+name: Validate commits
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - reopened
+      - synchronize
+  push:
+    branches:
+      - master
+      - 'dev/*'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check
+        uses: mristin/opinionated-commit-message@v3.1.0
+        with:
+          allow-one-liners: 'true'
+          skip-body-check: 'true'
