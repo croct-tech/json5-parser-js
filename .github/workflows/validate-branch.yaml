@@ -11,6 +11,10 @@ on:
       - synchronize
       - opened
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   validate:
     uses: croct-tech/shared-public-configs/.github/workflows/javascript-validations.yml@master
