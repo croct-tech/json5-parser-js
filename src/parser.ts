@@ -173,6 +173,32 @@ export class JsonParser {
         const token = this.lexer.consume(JsonTokenType.STRING);
         const tokenNode = new JsonTokenNode(token);
 
+        return new JsonPrimitiveNode({
+            token: tokenNode,
+            value: JsonParser.parseJsonString(token.value) ?? JsonParser.decodeString(token),
+            children: [tokenNode],
+            location: token.location,
+        });
+    }
+
+    /**
+     * Parses a string that is also valid JSON natively, which is much faster and leaner.
+     *
+     * JSON strings mean the same in JSON5, so only JSON5-specific syntax needs the decoder.
+     */
+    private static parseJsonString(value: string): string | undefined {
+        if (!value.startsWith('"')) {
+            return undefined;
+        }
+
+        try {
+            return JSON.parse(value);
+        } catch {
+            return undefined;
+        }
+    }
+
+    private static decodeString(token: JsonToken): string {
         const content = token.value.slice(1, -1);
         // Collected and joined once: replace() with a callback buffers every match,
         // and += can keep the result as a rope of pieces until the engine flattens it
@@ -204,14 +230,7 @@ export class JsonParser {
 
         // The round-trip forces a fresh copy: a single-piece join returns a slice of the source,
         // which would keep the whole source text alive for as long as the value is referenced
-        const parsedValue: string = JSON.parse(JSON.stringify(parts.join('')));
-
-        return new JsonPrimitiveNode({
-            token: tokenNode,
-            value: parsedValue,
-            children: [tokenNode],
-            location: token.location,
-        });
+        return JSON.parse(JSON.stringify(parts.join('')));
     }
 
     private parseNull(): JsonNullNode {
