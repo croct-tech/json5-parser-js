@@ -558,10 +558,11 @@ describe('JsonParser', () => {
         }));
     });
 
-    it('should decode strings with more escape sequences than fit in one batch', () => {
-        const input = `'${'\\x41-'.repeat(1500)}'`;
+    // 1536 escapes end exactly on a batch boundary, 1500 leave a partial batch
+    it.each([1500, 1536])('should decode strings with %d escape sequences across batches', count => {
+        const input = `'${'\\x41-'.repeat(count)}'`;
 
-        expect(JsonParser.parse(input).toJSON()).toBe('A-'.repeat(1500));
+        expect(JsonParser.parse(input).toJSON()).toBe('A-'.repeat(count));
     });
 
     it('should report an error parsing an invalid string', () => {
