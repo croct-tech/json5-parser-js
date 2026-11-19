@@ -11,8 +11,9 @@ import {
     JsonNode,
     JsonObjectNode,
 } from './node';
-import {isReserved} from './identifier';
 import {JsonError, JsonParseError} from './error';
+
+const identifierNameLiterals = new Set(['true', 'false', 'null', 'Infinity', 'NaN']);
 
 export class JsonParser {
     // JSON spellings of the JSON5-only escapes. A Map, not an object literal, so inherited
@@ -338,10 +339,18 @@ export class JsonParser {
 
     private parseObjectProperty(): JsonPropertyNode {
         const children: Array<JsonNode | JsonToken> = [];
+        const token = this.lexer.peek();
+        const isLiteralIdentifier = (
+            token.type === JsonTokenType.BOOLEAN
+            || token.type === JsonTokenType.NULL
+            || token.type === JsonTokenType.NUMBER
+        ) && identifierNameLiterals.has(token.value);
 
-        this.lexer.expect(JsonTokenType.STRING, JsonTokenType.IDENTIFIER);
+        if (token.type !== JsonTokenType.STRING && token.type !== JsonTokenType.IDENTIFIER && !isLiteralIdentifier) {
+            this.lexer.expect(JsonTokenType.STRING, JsonTokenType.IDENTIFIER);
+        }
 
-        const key = this.lexer.matches(JsonTokenType.STRING)
+        const key = token.type === JsonTokenType.STRING
             ? this.parseString()
             : this.parseIdentifier();
 
@@ -368,18 +377,17 @@ export class JsonParser {
     }
 
     private parseIdentifier(): JsonIdentifierNode {
-        const token = this.lexer.consume(JsonTokenType.IDENTIFIER);
-
-        if (isReserved(token.value)) {
-            const location = token.location.start;
-
-            throw new JsonParseError(
-                `Reserved identifier '${token.value}' at ${location.line}:${location.column}.`,
-                token.location,
-            );
-        }
-
-        const tokenNode = new JsonTokenNode(token);
+        const token = this.lexer.consume(
+            JsonTokenType.IDENTIFIER,
+            JsonTokenType.BOOLEAN,
+            JsonTokenType.NULL,
+            JsonTokenType.NUMBER,
+        );
+        const tokenNode = new JsonTokenNode({
+            type: JsonTokenType.IDENTIFIER,
+            value: token.value,
+            location: token.location,
+        });
 
         return new JsonIdentifierNode({
             token: tokenNode,

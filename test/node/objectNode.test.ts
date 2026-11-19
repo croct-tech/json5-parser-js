@@ -218,6 +218,14 @@ describe('ObjectNode', () => {
         expect(node).toStrictEqual(JsonObjectNode.of({}));
     });
 
+    it('should serialize a reserved key set on the object in a form that can be parsed', () => {
+        const node = JsonObjectNode.of({});
+
+        node.set('while', true);
+
+        expect(JsonParser.parse(node.toString()).toJSON()).toEqual({while: true});
+    });
+
     it('should fail to get a non-existing property', () => {
         const node = JsonObjectNode.of({
             foo: 'bar',
