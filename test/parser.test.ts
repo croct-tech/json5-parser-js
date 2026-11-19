@@ -509,6 +509,10 @@ describe('JsonParser', () => {
             expected: '\\A',
         },
         {
+            input: "'a\\\\\u2028b'",
+            expected: 'a\\\u2028b',
+        },
+        {
             input: '"\\🎼"',
             expected: '🎼',
         },
