@@ -578,6 +578,17 @@ describe('JsonParser', () => {
         expect(() => JsonParser.parse(input)).toThrow(`Unexpected token '${input[0]}' at 1:1.`);
     });
 
+    it('should not decode escape sequences from inherited properties', () => {
+        // eslint-disable-next-line no-extend-native -- Simulates prototype pollution.
+        Object.defineProperty(Object.prototype, 'x', {value: 'inherited', configurable: true});
+
+        try {
+            expect(() => JsonParser.parse('"\\x"')).toThrow('Invalid string at 1:1: invalid escape sequence \\x.');
+        } finally {
+            Reflect.deleteProperty(Object.prototype, 'x');
+        }
+    });
+
     it('should report the location of a string with an invalid escape sequence', () => {
         let caughtError: unknown;
 

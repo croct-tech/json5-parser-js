@@ -15,21 +15,22 @@ import {isReserved} from './identifier';
 import {JsonError, JsonParseError} from './error';
 
 export class JsonParser {
-    // Escaped line terminators are line continuations and decode to nothing
-    private static readonly ESCAPES: Partial<Record<string, string>> = {
-        b: '\b',
-        f: '\f',
-        n: '\n',
-        r: '\r',
-        t: '\t',
-        v: '\v',
-        '0': '\0',
-        '\r\n': '',
-        '\r': '',
-        '\n': '',
-        '\u2028': '',
-        '\u2029': '',
-    };
+    // A Map, not an object literal, so inherited properties never count as escapes.
+    // Escaped line terminators are line continuations and decode to nothing.
+    private static readonly ESCAPES = new Map([
+        ['b', '\b'],
+        ['f', '\f'],
+        ['n', '\n'],
+        ['r', '\r'],
+        ['t', '\t'],
+        ['v', '\v'],
+        ['0', '\0'],
+        ['\r\n', ''],
+        ['\r', ''],
+        ['\n', ''],
+        ['\u2028', ''],
+        ['\u2029', ''],
+    ]);
 
     private readonly lexer: JsonLexer;
 
@@ -172,31 +173,33 @@ export class JsonParser {
         const token = this.lexer.consume(JsonTokenType.STRING);
         const tokenNode = new JsonTokenNode(token);
 
-        const parsedValue = token.value
-            .slice(1, -1)
-            .replace(
-                /\\(?:u([\da-fA-F]{4})|x([\da-fA-F]{2})|(0\d?|\r\n|[^]))/gu,
-                (_, unicode?: string, hex?: string, escape = '') => {
-                    const code = unicode ?? hex;
+        const content = token.value.slice(1, -1);
+        let parsedValue = '';
+        let offset = 0;
 
-                    if (code !== undefined) {
-                        return String.fromCharCode(Number.parseInt(code, 16));
-                    }
+        // A lazy loop rather than replace(), whose callback form buffers every match and multiplies memory use
+        for (const match of content.matchAll(/\\(?:u([\da-fA-F]{4})|x([\da-fA-F]{2})|(0\d?|\r\n|[^]))/gu)) {
+            const [sequence, unicode, hex, escape = ''] = match;
+            const code = unicode ?? hex;
 
-                    // Any other character escapes to itself, except digits, x and u (spec: NonEscapeCharacter)
-                    const replacement = JsonParser.ESCAPES[escape] ?? (/[\dux]/.test(escape) ? undefined : escape);
+            // Any other character escapes to itself, except digits, x and u (spec: NonEscapeCharacter)
+            const replacement = code !== undefined
+                ? String.fromCharCode(Number.parseInt(code, 16))
+                : JsonParser.ESCAPES.get(escape) ?? (/[\dux]/.test(escape) ? undefined : escape);
 
-                    if (replacement === undefined) {
-                        throw new JsonParseError(
-                            `Invalid string at ${token.location.start.line}:${token.location.start.column}: `
-                            + `invalid escape sequence \\${escape}.`,
-                            token.location,
-                        );
-                    }
+            if (replacement === undefined) {
+                throw new JsonParseError(
+                    `Invalid string at ${token.location.start.line}:${token.location.start.column}: `
+                    + `invalid escape sequence \\${escape}.`,
+                    token.location,
+                );
+            }
 
-                    return replacement;
-                },
-            );
+            parsedValue += content.slice(offset, match.index) + replacement;
+            offset = match.index + sequence.length;
+        }
+
+        parsedValue += content.slice(offset);
 
         return new JsonPrimitiveNode({
             token: tokenNode,
