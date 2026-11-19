@@ -424,6 +424,34 @@ describe('JsonParser', () => {
             input: "'😊'",
             expected: '😊',
         },
+        {
+            input: '\'say "hi"\'',
+            expected: 'say "hi"',
+        },
+        {
+            input: '"\\x41"',
+            expected: 'A',
+        },
+        {
+            input: '"\\v"',
+            expected: '\u000B',
+        },
+        {
+            input: '"\\0"',
+            expected: '\u0000',
+        },
+        {
+            input: '"\\a"',
+            expected: 'a',
+        },
+        {
+            input: '"it\\\'s"',
+            expected: "it's",
+        },
+        {
+            input: '"a\tb"',
+            expected: 'a\tb',
+        },
     ])('should parse string $input', ({input, expected}) => {
         const token = new JsonTokenNode({
             type: JsonTokenType.STRING,
@@ -479,45 +507,26 @@ describe('JsonParser', () => {
         });
     });
 
-    it('should report an error if unexpected error occurs parsing a string', () => {
-        jest.spyOn(JSON, 'parse').mockImplementation(() => {
-            throw new Error('Unexpected error.');
-        });
-
-        let caughtError: unknown;
-
-        try {
-            JsonParser.parse('""');
-        } catch (error) {
-            caughtError = error;
-        }
-
-        expect(caughtError).toEqual(
-            new JsonParseError(
-                'Invalid string at 1:1: Unexpected error.',
-                {
-                    start: {
-                        index: 1,
-                        line: 1,
-                        column: 2,
-                    },
-                    end: {
-                        index: 2,
-                        line: 1,
-                        column: 3,
-                    },
+    it.each([
+        ['"\\1"', '\\1'],
+        ['"\\01"', '\\01'],
+        ['"\\x4"', '\\x'],
+        ["'\\u12'", '\\u'],
+    ])('should reject the invalid escape sequence in %s', (input, sequence) => {
+        expect(() => JsonParser.parse(input)).toThrow(
+            new JsonParseError(`Invalid string at 1:1: invalid escape sequence ${sequence}.`, {
+                start: {
+                    index: 0,
+                    line: 1,
+                    column: 1,
                 },
-            ),
+                end: {
+                    index: input.length,
+                    line: 1,
+                    column: input.length + 1,
+                },
+            }),
         );
-    });
-
-    it('should report an error if a non-error is thrown parsing a string', () => {
-        jest.spyOn(JSON, 'parse').mockImplementation(() => {
-            // eslint-disable-next-line @typescript-eslint/only-throw-error -- Testing a non-error throw.
-            throw 'Unexpected error.';
-        });
-
-        expect(() => JsonParser.parse('""')).toThrow('Unexpected error.');
     });
 
     it('should parse an empty array', () => {
