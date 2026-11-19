@@ -456,6 +456,18 @@ describe('JsonParser', () => {
             input: '"a\u2028b\u2029c"',
             expected: 'a\u2028b\u2029c',
         },
+        {
+            input: '"\\b\\f\\n\\r\\t\\v\\0"',
+            expected: '\b\f\n\r\t\v\0',
+        },
+        {
+            input: '"\\x414\\x6a\\u00e9"',
+            expected: 'A4jé',
+        },
+        {
+            input: '"\\uD83D"',
+            expected: '\uD83D',
+        },
     ])('should parse string $input', ({input, expected}) => {
         const token = new JsonTokenNode({
             type: JsonTokenType.STRING,
@@ -513,24 +525,69 @@ describe('JsonParser', () => {
 
     it.each([
         ['"\\1"', '\\1'],
+        ['"\\8"', '\\8'],
         ['"\\01"', '\\01'],
+        ['"\\09"', '\\09'],
         ['"\\x4"', '\\x'],
+        ['"\\x4G"', '\\x'],
         ["'\\u12'", '\\u'],
+        ['"\\u12G4"', '\\u'],
     ])('should reject the invalid escape sequence in %s', (input, sequence) => {
-        expect(() => JsonParser.parse(input)).toThrow(
-            new JsonParseError(`Invalid string at 1:1: invalid escape sequence ${sequence}.`, {
-                start: {
-                    index: 0,
-                    line: 1,
-                    column: 1,
-                },
-                end: {
-                    index: input.length,
-                    line: 1,
-                    column: input.length + 1,
-                },
-            }),
-        );
+        let caughtError: unknown;
+
+        try {
+            JsonParser.parse(input);
+        } catch (error) {
+            caughtError = error;
+        }
+
+        expect(caughtError).toBeInstanceOf(JsonParseError);
+
+        const jsonParseError = caughtError as JsonParseError;
+
+        expect(jsonParseError.message).toBe(`Invalid string at 1:1: invalid escape sequence ${sequence}.`);
+
+        expect(jsonParseError.location).toStrictEqual({
+            start: {
+                index: 0,
+                line: 1,
+                column: 1,
+            },
+            end: {
+                index: input.length,
+                line: 1,
+                column: input.length + 1,
+            },
+        });
+    });
+
+    it('should report the location of a string with an invalid escape sequence', () => {
+        let caughtError: unknown;
+
+        try {
+            JsonParser.parse('[\n  "ok\\9"]');
+        } catch (error) {
+            caughtError = error;
+        }
+
+        expect(caughtError).toBeInstanceOf(JsonParseError);
+
+        const jsonParseError = caughtError as JsonParseError;
+
+        expect(jsonParseError.message).toBe('Invalid string at 2:3: invalid escape sequence \\9.');
+
+        expect(jsonParseError.location).toStrictEqual({
+            start: {
+                index: 4,
+                line: 2,
+                column: 3,
+            },
+            end: {
+                index: 10,
+                line: 2,
+                column: 9,
+            },
+        });
     });
 
     it('should parse an empty array', () => {
