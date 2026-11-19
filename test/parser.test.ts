@@ -473,6 +473,14 @@ describe('JsonParser', () => {
             expected: '\uD83D',
         },
         {
+            input: "'\\X41\\U0041'",
+            expected: 'X41U0041',
+        },
+        {
+            input: "'\\x00\\u0000'",
+            expected: '\u0000\u0000',
+        },
+        {
             input: "'a\u2028b\u2029c'",
             expected: 'a\u2028b\u2029c',
         },
