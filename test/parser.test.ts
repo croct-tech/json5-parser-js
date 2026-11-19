@@ -480,6 +480,14 @@ describe('JsonParser', () => {
             input: '"\\\\x41"',
             expected: '\\x41',
         },
+        {
+            input: '"C:\\\\tmp\\\\"',
+            expected: 'C:\\tmp\\',
+        },
+        {
+            input: '"🎼\\x41!"',
+            expected: '🎼A!',
+        },
     ])('should parse string $input', ({input, expected}) => {
         const token = new JsonTokenNode({
             type: JsonTokenType.STRING,
