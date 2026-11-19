@@ -225,6 +225,10 @@ describe('Functional test', () => {
             expected: ['ab', 'ab', 'ab', 'ab'],
         },
         {
+            input: '"\\0\\\n1"',
+            expected: '\u00001',
+        },
+        {
             input: '{"\\x41": 1, \'\\u0042\': 2}',
             expected: {A: 1, B: 2},
         },
