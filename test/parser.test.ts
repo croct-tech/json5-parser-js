@@ -413,16 +413,124 @@ describe('JsonParser', () => {
             expected: "'hello'",
         },
         {
-            input: "'\u0068ello'",
+            input: "'\\u0068ello'",
             expected: 'hello',
         },
         {
-            input: "'\uD83D\uDE0A'",
+            input: "'\\uD83D\\uDE0A'",
             expected: '😊',
         },
         {
             input: "'😊'",
             expected: '😊',
+        },
+        {
+            input: '\'say "hi"\'',
+            expected: 'say "hi"',
+        },
+        {
+            input: '"\\x41"',
+            expected: 'A',
+        },
+        {
+            input: '"\\v"',
+            expected: '\u000B',
+        },
+        {
+            input: '"\\0"',
+            expected: '\u0000',
+        },
+        {
+            input: '"\\0a"',
+            expected: '\u0000a',
+        },
+        {
+            input: '"\\a"',
+            expected: 'a',
+        },
+        {
+            input: '"it\\\'s"',
+            expected: "it's",
+        },
+        {
+            input: '"a\tb"',
+            expected: 'a\tb',
+        },
+        {
+            input: '"a\u2028b\u2029c"',
+            expected: 'a\u2028b\u2029c',
+        },
+        {
+            input: '"\\b\\f\\n\\r\\t\\v\\0"',
+            expected: '\b\f\n\r\t\v\0',
+        },
+        {
+            input: '"\\x414\\x6a\\u00e9"',
+            expected: 'A4jé',
+        },
+        {
+            input: '"\\uD83D"',
+            expected: '\uD83D',
+        },
+        {
+            input: "'\\X41\\U0041'",
+            expected: 'X41U0041',
+        },
+        {
+            input: "'\\x00\\u0000'",
+            expected: '\u0000\u0000',
+        },
+        {
+            input: "'\\\\x41'",
+            expected: '\\x41',
+        },
+        {
+            input: "'\\\\\"'",
+            expected: '\\"',
+        },
+        {
+            input: "'a\u0000b'",
+            expected: 'a\u0000b',
+        },
+        {
+            input: "'\\\t'",
+            expected: '\t',
+        },
+        {
+            input: '"\\x22"',
+            expected: '"',
+        },
+        {
+            input: "'\\xAF\\u00AF'",
+            expected: '¯¯',
+        },
+        {
+            input: "'\\\\\\x41'",
+            expected: '\\A',
+        },
+        {
+            input: "'a\\\\\u2028b'",
+            expected: 'a\\\u2028b',
+        },
+        {
+            input: '"\\🎼"',
+            expected: '🎼',
+        },
+        {
+            input: "'a\u2028b\u2029c'",
+            expected: 'a\u2028b\u2029c',
+        },
+        {
+            input: '"\\\\x41"',
+            expected: '\\x41',
+        },
+        {
+            input: '"C:\\\\tmp\\\\"',
+            expected: 'C:\\tmp\\',
+        },
+        {
+            input: '"🎼\\x41!"',
+            expected: '🎼A!',
         },
     ])('should parse string $input', ({input, expected}) => {
         const token = new JsonTokenNode({
@@ -448,6 +556,13 @@ describe('JsonParser', () => {
             location: token.location,
             children: [token],
         }));
+    });
+
+    // 1536 escapes end exactly on a batch boundary, 1500 leave a partial batch
+    it.each([1500, 1536])('should decode strings with %d escape sequences across batches', count => {
+        const input = `'${'\\x41-'.repeat(count)}'`;
+
+        expect(JsonParser.parse(input).toJSON()).toBe('A-'.repeat(count));
     });
 
     it('should report an error parsing an invalid string', () => {
@@ -479,45 +594,83 @@ describe('JsonParser', () => {
         });
     });
 
-    it('should report an error if unexpected error occurs parsing a string', () => {
-        jest.spyOn(JSON, 'parse').mockImplementation(() => {
-            throw new Error('Unexpected error.');
-        });
-
+    it.each([
+        ['"\\1"', '\\1'],
+        ['"\\8"', '\\8'],
+        ['"\\01"', '\\01'],
+        ['"\\09"', '\\09'],
+        ['"\\x4"', '\\x'],
+        ['"\\x4G"', '\\x'],
+        ["'\\u12'", '\\u'],
+        ['"\\u12G4"', '\\u'],
+    ])('should reject the invalid escape sequence in %s', (input, sequence) => {
         let caughtError: unknown;
 
         try {
-            JsonParser.parse('""');
+            JsonParser.parse(input);
         } catch (error) {
             caughtError = error;
         }
 
-        expect(caughtError).toEqual(
-            new JsonParseError(
-                'Invalid string at 1:1: Unexpected error.',
-                {
-                    start: {
-                        index: 1,
-                        line: 1,
-                        column: 2,
-                    },
-                    end: {
-                        index: 2,
-                        line: 1,
-                        column: 3,
-                    },
-                },
-            ),
-        );
+        expect(caughtError).toBeInstanceOf(JsonParseError);
+
+        const jsonParseError = caughtError as JsonParseError;
+
+        expect(jsonParseError.message).toBe(`Invalid string at 1:1: invalid escape sequence ${sequence}.`);
+
+        expect(jsonParseError.location).toStrictEqual({
+            start: {
+                index: 0,
+                line: 1,
+                column: 1,
+            },
+            end: {
+                index: input.length,
+                line: 1,
+                column: input.length + 1,
+            },
+        });
     });
 
-    it('should report an error if a non-error is thrown parsing a string', () => {
-        jest.spyOn(JSON, 'parse').mockImplementation(() => {
-            // eslint-disable-next-line @typescript-eslint/only-throw-error -- Testing a non-error throw.
-            throw 'Unexpected error.';
-        });
+    it.each([
+        '"a\nb"',
+        '"a\rb"',
+        '"a\r\nb"',
+        "'a\nb'",
+        "'a\rb'",
+        "'a\r\nb'",
+        '"a\\\\\nb"',
+    ])('should reject the unescaped line break in %j', input => {
+        expect(() => JsonParser.parse(input)).toThrow(`Unexpected token '${input[0]}' at 1:1.`);
+    });
 
-        expect(() => JsonParser.parse('""')).toThrow('Unexpected error.');
+    it('should report the location of a string with an invalid escape sequence', () => {
+        let caughtError: unknown;
+
+        try {
+            JsonParser.parse('[\n  "ok\\9"]');
+        } catch (error) {
+            caughtError = error;
+        }
+
+        expect(caughtError).toBeInstanceOf(JsonParseError);
+
+        const jsonParseError = caughtError as JsonParseError;
+
+        expect(jsonParseError.message).toBe('Invalid string at 2:3: invalid escape sequence \\9.');
+
+        expect(jsonParseError.location).toStrictEqual({
+            start: {
+                index: 4,
+                line: 2,
+                column: 3,
+            },
+            end: {
+                index: 10,
+                line: 2,
+                column: 9,
+            },
+        });
     });
 
     it('should parse an empty array', () => {

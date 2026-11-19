@@ -15,6 +15,18 @@ import {isReserved} from './identifier';
 import {JsonError, JsonParseError} from './error';
 
 export class JsonParser {
+    // JSON spellings of the JSON5-only escapes. A Map, not an object literal, so inherited
+    // properties never count as escapes. Escaped line terminators are line continuations.
+    private static readonly ESCAPES = new Map([
+        ['v', '\\u000b'],
+        ['0', '\\u0000'],
+        ['\r\n', ''],
+        ['\r', ''],
+        ['\n', ''],
+        ['\u2028', ''],
+        ['\u2029', ''],
+    ]);
+
     private readonly lexer: JsonLexer;
 
     public constructor(source: string) {
@@ -154,45 +166,86 @@ export class JsonParser {
 
     private parseString(): JsonStringNode {
         const token = this.lexer.consume(JsonTokenType.STRING);
-
-        let {value} = token;
-
-        if (value.startsWith("'")) {
-            value = value.slice(1, -1)
-                // Unescape single quotes and escape double quotes
-                .replace(
-                    /((?:^|[^\\])(?:\\\\)*)\\(["'])/g,
-                    (_, preceding, quote) => `${preceding}${quote === '"' ? '\\"' : "'"}`,
-                );
-
-            value = `"${value}"`;
-        }
-
-        value = value.replace(/\\(?:\r\n|\r|\n|\u2028|\u2029)/gu, '');
-
         const tokenNode = new JsonTokenNode(token);
 
-        let parsedValue: string;
+        return new JsonPrimitiveNode({
+            token: tokenNode,
+            value: JsonParser.parseJsonString(token.value) ?? JSON.parse(`"${JsonParser.toJsonString(token)}"`),
+            children: [tokenNode],
+            location: token.location,
+        });
+    }
+
+    /**
+     * Parses a double-quoted string that is already valid JSON, which means the same in JSON5.
+     */
+    private static parseJsonString(value: string): string | undefined {
+        if (!value.startsWith('"')) {
+            return undefined;
+        }
 
         try {
-            parsedValue = JSON.parse(value);
-        } catch (error) {
-            if (error instanceof Error) {
+            return JSON.parse(value);
+        } catch {
+            return undefined;
+        }
+    }
+
+    /**
+     * Rewrites the content of a JSON5-only string token as the content of an equivalent JSON string.
+     *
+     * Decoding is left to JSON.parse, which is much faster and leaner than decoding in JavaScript.
+     * Only JSON5-specific syntax is rewritten, in bounded batches, so memory stays proportional
+     * to the input even for strings with millions of escapes.
+     */
+    private static toJsonString(token: JsonToken): string {
+        const content = token.value.slice(1, -1);
+        const parts: string[] = [];
+        let json = '';
+        let offset = 0;
+
+        // Standard JSON escapes are matched only to skip them, keeping the scan aligned on backslashes
+        // eslint-disable-next-line no-control-regex -- Unescaped control characters are invalid in JSON.
+        const pattern = /\\(?:(["\\/bfnrt]|u[\da-fA-F]{4})|x([\da-fA-F]{2})|(0\d?|\r\n|[^]))|["\u0000-\u001F]/gu;
+
+        for (const match of content.matchAll(pattern)) {
+            const [sequence, standard, hex, escape] = match;
+
+            if (standard !== undefined) {
+                continue;
+            }
+
+            let replacement: string | undefined;
+
+            if (hex !== undefined) {
+                replacement = `\\u00${hex}`;
+            } else if (escape === undefined) {
+                // An unescaped double quote (in a single-quoted string) or control character
+                replacement = JSON.stringify(sequence).slice(1, -1);
+            } else {
+                // Any other character escapes to itself, except digits, x and u (spec: NonEscapeCharacter)
+                replacement = JsonParser.ESCAPES.get(escape)
+                    ?? (/[\dux]/.test(escape) ? undefined : JSON.stringify(escape).slice(1, -1));
+            }
+
+            if (replacement === undefined) {
                 throw new JsonParseError(
-                    `Invalid string at ${token.location.start.line}:${token.location.start.column}: ${error.message}`,
+                    `Invalid string at ${token.location.start.line}:${token.location.start.column}: `
+                    + `invalid escape sequence \\${escape}.`,
                     token.location,
                 );
             }
 
-            throw error;
+            parts.push(content.slice(offset, match.index), replacement);
+            offset = match.index + sequence.length;
+
+            if (parts.length >= 1024) {
+                json += parts.join('');
+                parts.length = 0;
+            }
         }
 
-        return new JsonPrimitiveNode({
-            token: tokenNode,
-            value: parsedValue,
-            children: [tokenNode],
-            location: token.location,
-        });
+        return json + parts.join('') + content.slice(offset);
     }
 
     private parseNull(): JsonNullNode {

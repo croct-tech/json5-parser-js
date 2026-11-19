@@ -216,6 +216,27 @@ describe('Functional test', () => {
             expected: '🎼',
         },
         {
+            // Expected values match JSON5.parse from the json5 reference implementation
+            input: '[\'say "hi"\', "it\\\'s", "\\x41", "\\0", "\\v", "\\a", "a\tb"]',
+            expected: ['say "hi"', "it's", 'A', '\0', '\v', 'a', 'a\tb'],
+        },
+        {
+            input: '["a\\\r\nb", "a\\\rb", "a\\\u2028b", \'a\\\u2029b\']',
+            expected: ['ab', 'ab', 'ab', 'ab'],
+        },
+        {
+            input: '"a\\\n  b"',
+            expected: 'a  b',
+        },
+        {
+            input: '"\\0\\\n1"',
+            expected: '\u00001',
+        },
+        {
+            input: '{"\\x41": 1, \'\\u0042\': 2}',
+            expected: {A: 1, B: 2},
+        },
+        {
             input: '{\r\n  "foo": "1",\r\n  "bar": "2"\r\n}',
             expected: {
                 foo: '1',
