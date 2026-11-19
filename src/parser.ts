@@ -174,10 +174,11 @@ export class JsonParser {
         const tokenNode = new JsonTokenNode(token);
 
         const content = token.value.slice(1, -1);
-        let parsedValue = '';
+        // Collected and joined once: replace() with a callback buffers every match, and += leaves
+        // the result as a rope of pieces that stays that size for as long as the value is kept
+        const parts: string[] = [];
         let offset = 0;
 
-        // A lazy loop rather than replace(), whose callback form buffers every match and multiplies memory use
         for (const match of content.matchAll(/\\(?:u([\da-fA-F]{4})|x([\da-fA-F]{2})|(0\d?|\r\n|[^]))/gu)) {
             const [sequence, unicode, hex, escape = ''] = match;
             const code = unicode ?? hex;
@@ -195,11 +196,13 @@ export class JsonParser {
                 );
             }
 
-            parsedValue += content.slice(offset, match.index) + replacement;
+            parts.push(content.slice(offset, match.index), replacement);
             offset = match.index + sequence.length;
         }
 
-        parsedValue += content.slice(offset);
+        parts.push(content.slice(offset));
+
+        const parsedValue = parts.join('');
 
         return new JsonPrimitiveNode({
             token: tokenNode,
