@@ -174,8 +174,8 @@ export class JsonParser {
         const tokenNode = new JsonTokenNode(token);
 
         const content = token.value.slice(1, -1);
-        // Collected and joined once: replace() with a callback buffers every match, and += leaves
-        // the result as a rope of pieces that stays that size for as long as the value is kept
+        // Collected and joined once: replace() with a callback buffers every match,
+        // and += can keep the result as a rope of pieces until the engine flattens it
         const parts: string[] = [];
         let offset = 0;
 
@@ -202,7 +202,9 @@ export class JsonParser {
 
         parts.push(content.slice(offset));
 
-        const parsedValue = parts.join('');
+        // The round-trip forces a fresh copy: a single-piece join returns a slice of the source,
+        // which would keep the whole source text alive for as long as the value is referenced
+        const parsedValue: string = JSON.parse(JSON.stringify(parts.join('')));
 
         return new JsonPrimitiveNode({
             token: tokenNode,
