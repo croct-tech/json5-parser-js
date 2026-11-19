@@ -468,6 +468,14 @@ describe('JsonParser', () => {
             input: '"\\uD83D"',
             expected: '\uD83D',
         },
+        {
+            input: "'a\u2028b\u2029c'",
+            expected: 'a\u2028b\u2029c',
+        },
+        {
+            input: '"\\\\x41"',
+            expected: '\\x41',
+        },
     ])('should parse string $input', ({input, expected}) => {
         const token = new JsonTokenNode({
             type: JsonTokenType.STRING,
@@ -559,6 +567,15 @@ describe('JsonParser', () => {
                 column: input.length + 1,
             },
         });
+    });
+
+    it.each([
+        '"a\nb"',
+        '"a\rb"',
+        "'a\r\nb'",
+        "'a\nb'",
+    ])('should reject the unescaped line break in %j', input => {
+        expect(() => JsonParser.parse(input)).toThrow(`Unexpected token '${input[0]}' at 1:1.`);
     });
 
     it('should report the location of a string with an invalid escape sequence', () => {
