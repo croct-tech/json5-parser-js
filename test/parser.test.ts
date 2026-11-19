@@ -441,6 +441,10 @@ describe('JsonParser', () => {
             expected: '\u0000',
         },
         {
+            input: '"\\0a"',
+            expected: '\u0000a',
+        },
+        {
             input: '"\\a"',
             expected: 'a',
         },
@@ -572,8 +576,10 @@ describe('JsonParser', () => {
     it.each([
         '"a\nb"',
         '"a\rb"',
-        "'a\r\nb'",
+        '"a\r\nb"',
         "'a\nb'",
+        "'a\rb'",
+        "'a\r\nb'",
     ])('should reject the unescaped line break in %j', input => {
         expect(() => JsonParser.parse(input)).toThrow(`Unexpected token '${input[0]}' at 1:1.`);
     });
