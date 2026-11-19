@@ -514,6 +514,12 @@ describe('JsonParser', () => {
         }));
     });
 
+    it('should decode strings with more escape sequences than fit in one batch', () => {
+        const input = `'${'\\x41-'.repeat(1500)}'`;
+
+        expect(JsonParser.parse(input).toJSON()).toBe('A-'.repeat(1500));
+    });
+
     it('should report an error parsing an invalid string', () => {
         let caughtError: unknown;
 

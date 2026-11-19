@@ -200,9 +200,10 @@ export class JsonParser {
 
     private static decodeString(token: JsonToken): string {
         const content = token.value.slice(1, -1);
-        // Collected and joined once: replace() with a callback buffers every match,
-        // and += can keep the result as a rope of pieces until the engine flattens it
+        // Decoded in bounded batches: replace() with a callback, or one part per escape,
+        // keeps every match alive at once and exhausts memory on large escape-heavy strings
         const parts: string[] = [];
+        let decoded = '';
         let offset = 0;
 
         for (const match of content.matchAll(/\\(?:u([\da-fA-F]{4})|x([\da-fA-F]{2})|(0\d?|\r\n|[^]))/gu)) {
@@ -224,13 +225,18 @@ export class JsonParser {
 
             parts.push(content.slice(offset, match.index), replacement);
             offset = match.index + sequence.length;
+
+            if (parts.length >= 1024) {
+                decoded += parts.join('');
+                parts.length = 0;
+            }
         }
 
         parts.push(content.slice(offset));
 
-        // The round-trip forces a fresh copy: a single-piece join returns a slice of the source,
-        // which would keep the whole source text alive for as long as the value is referenced
-        return JSON.parse(JSON.stringify(parts.join('')));
+        // The round-trip forces a fresh, flat copy: otherwise the value can be a slice that keeps
+        // the whole source text alive, or a rope of batches, for as long as it is referenced
+        return JSON.parse(JSON.stringify(decoded + parts.join('')));
     }
 
     private parseNull(): JsonNullNode {
