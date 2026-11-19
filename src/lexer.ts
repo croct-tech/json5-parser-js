@@ -238,9 +238,9 @@ export class JsonLexer implements Iterable<JsonToken> {
             column: start.column,
         } satisfies SourcePosition;
 
-        end.index += [...value].length;
-
         for (const char of value) {
+            end.index++;
+
             if (char === '\n') {
                 end.line++;
                 end.column = 1;
