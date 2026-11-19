@@ -413,11 +413,11 @@ describe('JsonParser', () => {
             expected: "'hello'",
         },
         {
-            input: "'\u0068ello'",
+            input: "'\\u0068ello'",
             expected: 'hello',
         },
         {
-            input: "'\uD83D\uDE0A'",
+            input: "'\\uD83D\\uDE0A'",
             expected: '😊',
         },
         {
