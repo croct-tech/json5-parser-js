@@ -47,11 +47,11 @@ export class JsonLexer implements Iterable<JsonToken> {
         },
         {
             type: JsonTokenType.STRING,
-            pattern: /^"(?:[^"\r\n\u2028\u2029\\]|\\(?:.|\r\n|\r|\n|\u2028|\u2029))*"/u,
+            pattern: /^"(?:[^"\r\n\\]|\\(?:.|\r\n|\r|\n|\u2028|\u2029))*"/u,
         },
         {
             type: JsonTokenType.STRING,
-            pattern: /^'(?:[^'\r\n\u2028\u2029\\]|\\(?:.|\r\n|\r|\n|\u2028|\u2029))*'/u,
+            pattern: /^'(?:[^'\r\n\\]|\\(?:.|\r\n|\r|\n|\u2028|\u2029))*'/u,
         },
         {
             type: JsonTokenType.NEWLINE,

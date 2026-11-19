@@ -452,6 +452,10 @@ describe('JsonParser', () => {
             input: '"a\tb"',
             expected: 'a\tb',
         },
+        {
+            input: '"a\u2028b\u2029c"',
+            expected: 'a\u2028b\u2029c',
+        },
     ])('should parse string $input', ({input, expected}) => {
         const token = new JsonTokenNode({
             type: JsonTokenType.STRING,
